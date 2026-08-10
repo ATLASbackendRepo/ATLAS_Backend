@@ -1,0 +1,10 @@
+﻿using ATLASDomain.Entities;
+using ATLASDomain.InterFaces.Repositories;
+
+namespace ATLASDomain.Interfaces.Repositories;
+
+public interface ICourseRepository : IGenericRepository<Course>
+{
+    // need CRUD operations for Course entity only now (generic)
+   
+}

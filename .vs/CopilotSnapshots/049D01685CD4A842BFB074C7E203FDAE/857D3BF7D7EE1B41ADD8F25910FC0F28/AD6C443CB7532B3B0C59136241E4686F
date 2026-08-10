@@ -1,0 +1,33 @@
+﻿using MediatR;
+using System.Threading;
+using System.Threading.Tasks;
+using ATLASDomain.Entities;
+using ATLAsDCL.UnitOfWork;
+
+namespace ATLAsBLL.Features.Users.Commands.CreateUser
+{
+    public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, int>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public CreateUserCommandHandler(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        public async Task<int> Handle(CreateUserCommand request, CancellationToken cancellationToken)
+        {
+            var user = new User
+            {
+                FullName = request.FullName,
+                Password = request.Password,
+                Role = request.Role
+            };
+
+            await _unitOfWork.Users.AddAsync(user);
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return user.UserId;
+        }
+    }
+}

@@ -1,0 +1,27 @@
+﻿using ATLAsDCL.UnitOfWork;
+using ATLASDomain.DTO.Student;
+using ATLASDomain.Entities;
+using MediatR;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace ATLAsBLL.Services.Student.Queries.GetSTudentGrade
+{
+    internal class GetStudentGradeHandler : IRequestHandler<GetStudentGradeQuery, StudentGradeDto>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+        public GetStudentGradeHandler(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+        public async Task<StudentGradeDto> Handle(GetStudentGradeQuery request, CancellationToken cancellationToken)
+        {
+            var student = await _unitOfWork.Students.GetStudentWithModeAsync(request.CourseOfferingID, request.ModuleId, request.StudentCode);
+            if (student == null) return null!;
+            return student;
+        }
+    
+    }
+}

@@ -1,0 +1,40 @@
+﻿using ATLASDomain.Entities;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
+
+namespace ATLAsDCL.Configuration
+{
+    public class CourseOfferingConfiguration : IEntityTypeConfiguration<CourseOffering>
+    {
+        public void Configure(EntityTypeBuilder<CourseOffering> builder)
+        {
+            builder.HasKey(co => co.CourseOfferingID);
+
+            builder.Property(co => co.SemesterID).IsRequired();
+            builder.Property(co => co.CourseID).IsRequired();
+
+            builder.HasIndex(x => new { x.CourseID, x.SemesterID })
+                .IsUnique();
+            builder.HasIndex(x => x.SemesterID)
+                .HasDatabaseName("IX_CourseOfferings_SemesterID");
+
+
+            builder.HasOne(co => co.Semester)
+                .WithMany(s => s.CourseOfferings)
+                .HasForeignKey(co => co.SemesterID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            builder.HasOne(co => co.Course)
+                .WithMany(c => c.CourseOfferings)
+                .HasForeignKey(co => co.CourseID)
+                .OnDelete(DeleteBehavior.Restrict);
+
+
+            builder.HasMany(co => co.AssessmentModules)
+                .WithOne(am => am.CourseOffering)
+                .HasForeignKey(am => am.CourseOfferingID)
+                .OnDelete(DeleteBehavior.Restrict);
+        }
+    }
+}

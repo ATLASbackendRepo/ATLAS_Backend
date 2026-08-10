@@ -1,0 +1,21 @@
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UserSecretsId>05f38b2c-20f1-4209-93dc-c52e694beace</UserSecretsId>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.0" />
+    <PackageReference Include="Swashbuckle.AspNetCore" Version="6.6.2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\ATLAsBLL\ATLAsBLL.csproj" />
+    <ProjectReference Include="..\ATLAsDCL\ATLAsDCL.csproj" />
+    <ProjectReference Include="..\ATLASDomain\ATLASDomain.csproj" />
+  </ItemGroup>
+
+</Project>

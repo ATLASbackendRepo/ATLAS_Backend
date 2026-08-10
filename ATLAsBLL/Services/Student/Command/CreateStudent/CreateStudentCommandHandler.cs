@@ -1,0 +1,49 @@
+﻿using MediatR;
+using System.Threading;
+using System.Threading.Tasks;
+using ATLASDomain.Entities;
+using ATLAsDCL.UnitOfWork;
+
+namespace ATLAsBLL.Features.Students.Commands.CreateStudent
+{
+    public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand, int>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public CreateStudentCommandHandler(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        public async Task<int> Handle(CreateStudentCommand request, CancellationToken cancellationToken)
+        {
+            if (await _unitOfWork.Students.StudentCodeExistsAsync(request.StudentCode))
+                throw new InvalidOperationException("Student code already exists.");
+
+            var user = new User
+            {
+                FullName = request.FullName
+            };
+
+            user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
+
+            // 2. إنشاء كائن الـ Studentوربطه بكائن الـ User مباشرة
+            var student = new Student
+            {
+                StudentCode = request.StudentCode,
+                AcademicId = request.AcademicId,
+                AcademicLevel = request.AcademicLevel,
+                DepartmentId = request.DepartmentId,
+                User = user // الربط المباشر هنا بيخلي الـ EF يتعامل مع الـ IDs تلقائياً
+            };
+
+            // 3. إضافة الطالب (الـ EF هيفهم تلقائياً إنه لازم يضيف الـ User المرتبط بيه كمان)
+            await _unitOfWork.Students.AddAsync(student);
+
+            // 4. حفظ الاتنين معاً كـ Transaction واحدة
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            return student.StudentId;
+        }
+    }
+}

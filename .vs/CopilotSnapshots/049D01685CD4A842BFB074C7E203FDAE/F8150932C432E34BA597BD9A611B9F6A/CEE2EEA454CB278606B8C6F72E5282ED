@@ -1,0 +1,42 @@
+﻿using ATLAsBLL.Behaviors;
+using ATLAsBLL.Behaviors.Caching;
+using FluentValidation;
+using MediatR;
+using ATLASDomain.Entities;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
+
+public static class DependencyInjection
+{
+    public static IServiceCollection AddBusinessLogicLayer(this IServiceCollection services)
+    {
+        var assembly = Assembly.GetExecutingAssembly();
+
+        // إضافة دعم الـ Memory Cache المطلوب للـ Caching Behavior
+        services.AddMemoryCache();
+
+        services.AddMediatR(cfg => {
+            cfg.RegisterServicesFromAssembly(assembly);
+
+            // الترتيب الأبدي والأكثر كفاءة للـ Pipeline لـ Enterprise Applications:
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(RateLimitingBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>)); // الكاش يفرمل قبل الـ Validation والـ DB
+            //cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(AuditBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(PerformanceBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
+            cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(TransactionBehavior<,>)); // الترانساكشن آخر خطوة تؤمن الحفظ الفعلي
+                                                                                           // أضف هذا السطر قبل builder.Build()
+
+        });
+
+        services.AddValidatorsFromAssembly(assembly);
+
+        // Register password hasher for User entities
+        services.AddScoped<IPasswordHasher<User>, PasswordHasher<User>>();
+
+        return services;
+    }
+}
