@@ -1,5 +1,7 @@
 ﻿using ATLASDomain.Entities;
 using System.ComponentModel.DataAnnotations;
+namespace ATLASDomain.DTO.Request;
+
 
 public class UpdateGradeAppealRequestDto
 {

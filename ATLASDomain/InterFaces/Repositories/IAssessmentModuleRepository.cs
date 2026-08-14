@@ -7,3 +7,4 @@ public interface IAssessmentModuleRepository : IGenericRepository<AssessmentModu
 {
     Task<IEnumerable<AssessmentModule>> GetModulesByCourseOfferingAsync(int courseOfferingId);
 }
+

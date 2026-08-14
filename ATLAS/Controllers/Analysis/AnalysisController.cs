@@ -34,7 +34,7 @@ namespace ATLASAPI.Controllers
          
             if (courseOfferingId <= 0)
             {
-                return BadRequest(new { Message = "Invalid course offering ID. ID must be greater than 0." });
+                return BadRequest(new { Message = "Invalid Request." });
             }
 
             if (!await _courseAuthorization.CanAccessOfferingAsync(User, courseOfferingId, HttpContext.RequestAborted))

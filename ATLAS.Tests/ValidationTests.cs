@@ -5,6 +5,7 @@ using ATLAsBLL.Services.Request.Command.UpdateGradeAppealRequest;
 using ATLASDomain.DTO.CourseGrade;
 using ATLASDomain.DTO.Request;
 using ATLASDomain.Entities;
+using Xunit;
 
 namespace ATLAS.Tests;
 

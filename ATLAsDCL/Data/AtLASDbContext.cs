@@ -1,4 +1,5 @@
-﻿using ATLASDomain.Entities;
+﻿using ATLAS.Domain.Entities;
+using ATLASDomain.Entities;
 using ATLASDomain.Views;
 using Microsoft.EntityFrameworkCore;
 
@@ -19,6 +20,7 @@ namespace ATLAsDCL.Data
         
 
         public DbSet<Department> Departments { get; set; }
+        public DbSet<Institution> Institutions { get; set; }
 
         public DbSet<Course> Courses { get; set; }
 
@@ -41,6 +43,14 @@ namespace ATLAsDCL.Data
         // feature
          public DbSet<GradeAppealRequest> GradeAppealRequests { get; set; } = null!;
 
+        // Groping
+        public DbSet<CourseGroupMessage> CourseGroupMessages { get; set; }
+        public DbSet<CourseGroupMessageRead> CourseGroupMessageReads { get; set; }
+        public DbSet<Notification> Notifications { get; set; }
+
+        // PROFILE 
+        public DbSet<StudentProfile> StudentProfiles => Set<StudentProfile>();
+        public DbSet<StaffProfile> StaffProfiles => Set<StaffProfile>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

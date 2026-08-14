@@ -26,12 +26,14 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
                .WithMany(d => d.Students)
                .HasForeignKey(x => x.DepartmentId)
                .OnDelete(DeleteBehavior.Restrict);
-        // Relationship: Student -> Department (many students per department)
-        builder.HasOne(s => s.Department)
-               .WithMany(d => d.Students)
-               .HasForeignKey(s => s.DepartmentId)
-               .OnDelete(DeleteBehavior.Restrict);
 
+        builder.Property(x => x.InstitutionID)
+    .IsRequired(true);
+
+        builder.HasOne(x => x.Institution)
+            .WithMany(i => i.Students)
+            .HasForeignKey(x => x.InstitutionID)
+            .OnDelete(DeleteBehavior.Restrict);
         // Relationship: Student -> User (one-to-one)
         builder.HasOne(x => x.User)
                .WithOne(u => u.Student)

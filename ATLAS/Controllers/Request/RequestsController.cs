@@ -1,6 +1,7 @@
 ﻿using ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest;
 using ATLAsBLL.Services.Request.Command.UpdateGradeAppealRequest;
 using ATLAsBLL.Services.Request.Qeuries;
+using ATLASDomain.DTO.Request;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;

@@ -1,4 +1,5 @@
-﻿using ATLASDomain.Entities;
+﻿using ATLASDomain.DTO.Request;
+using ATLASDomain.Entities;
 
 public interface IGradeAppealRequestRepository
 {

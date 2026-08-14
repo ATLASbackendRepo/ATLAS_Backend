@@ -30,6 +30,8 @@ public interface IUnitOfWork : IDisposable
  
 
     IUserRepository Users { get; }
+    ICourseGroupMessageRepository CourseGroupMessages { get; }
+    INotificationRepository Notifications { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);

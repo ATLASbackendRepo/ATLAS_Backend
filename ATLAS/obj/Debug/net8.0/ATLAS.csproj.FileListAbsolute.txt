@@ -166,3 +166,6 @@ C:\vs-communtiy2026\ATLAS\ATLAS\obj\Debug\net8.0\ref\ATLAS.dll
 C:\vs-communtiy2026\ATLAS\ATLAS\bin\Debug\net8.0\Dapper.dll
 C:\vs-communtiy2026\ATLAS\ATLAS\bin\Debug\net8.0\BCrypt.Net-Next.dll
 C:\vs-communtiy2026\ATLAS\ATLAS\bin\Debug\net8.0\Microsoft.AspNetCore.Authentication.JwtBearer.dll
+C:\vs-communtiy2026\ATLAS\ATLAS\obj\Debug\net8.0\ATLAS.sourcelink.json
+C:\vs-communtiy2026\ATLAS\ATLAS\obj\Debug\net8.0\swae.build.ex.cache
+C:\vs-communtiy2026\ATLAS\ATLAS\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

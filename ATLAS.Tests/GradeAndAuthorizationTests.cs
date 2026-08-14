@@ -1,15 +1,18 @@
-using System.Security.Claims;
 using ATLAS;
 using ATLAsBLL.Features.CourseGrades.Commands.CreateCourseGradesRange;
 using ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade;
 using ATLAsBLL.Features.Enrollments.Commands.CreateEnrollmentsRange;
 using ATLAsBLL.Services.Enrollment.Command.CreateEnrollmentRange;
 using ATLAsDCL.Data;
+using ATLAsDCL.Repositories;
 using ATLAsDCL.UnitOfWork;
 using ATLASDomain.DTO.CourseGrade;
 using ATLASDomain.Entities;
+using ATLASDomain.Interfaces.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
+using Xunit;
 
 namespace ATLAS.Tests;
 
@@ -101,5 +104,7 @@ public class GradeAndAuthorizationTests
         new EnrollmentRepository(context),
         new SemesterRepository(context),
         new StudentRepository(context),
-        new UserRepository(context));
+        new UserRepository(context),
+        new CourseGroupMessageRepository(context),
+        new NotificationRepository(context));
 }

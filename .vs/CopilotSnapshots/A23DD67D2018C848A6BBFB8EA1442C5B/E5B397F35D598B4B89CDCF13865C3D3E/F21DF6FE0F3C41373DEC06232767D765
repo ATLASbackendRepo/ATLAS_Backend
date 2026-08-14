@@ -1,0 +1,50 @@
+﻿using MediatR;
+using ATLAsBLL.Exceptions;
+using ATLAsDCL.UnitOfWork;
+using ATLAS.Domain.Entities;
+using System.Threading;
+using System.Threading.Tasks;
+
+namespace ATLAsBLL.Services.CourseGroupMessage.Command.MarkMessageAsRead;
+
+public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsReadCommand, int>
+{
+    private readonly IUnitOfWork _unitOfWork;
+
+    public MarkMessageAsReadCommandHandler(IUnitOfWork unitOfWork)
+    {
+        _unitOfWork = unitOfWork;
+    }
+
+    public async Task<int> Handle(MarkMessageAsReadCommand request, CancellationToken cancellationToken)
+    {
+        var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId);
+
+        if (message == null)
+        {
+            throw new KeyNotFoundException($"Message with ID {request.MessageId} not found.");
+        }
+
+        // Students only - verify this student is enrolled in the course
+        var isEnrolled = await _unitOfWork.Enrollments.FirstOrDefaultAsync(e =>
+            e.CourseOfferingID == message.CourseOfferingID && e.Student.UserId == request.StudentId);
+
+        if (isEnrolled == null)
+        {
+            throw new ForbiddenAccessException("You are not enrolled in this course.");
+        }
+
+        // Write read receipt
+        var readReceipt = new CourseGroupMessageRead
+        {
+            MessageID = request.MessageId,
+            StudentID = request.StudentId,
+            ReadAt = DateTime.UtcNow
+        };
+
+        await _unitOfWork.CourseGroupMessages.AddAsync(readReceipt as dynamic);
+        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        return request.MessageId;
+    }
+}

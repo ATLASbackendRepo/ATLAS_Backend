@@ -1,0 +1,51 @@
+﻿using MediatR;
+using ATLAsDCL.UnitOfWork;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using Newtonsoft.Json;
+
+namespace ATLAsBLL.Services.CourseGroupMessage.Queries.GetCourseGroupMessages;
+
+public class GetCourseGroupMessagesQueryHandler : IRequestHandler<GetCourseGroupMessagesQuery, string>
+{
+    private readonly IUnitOfWork _unitOfWork;
+    private readonly ATLASDomain.Services.ICourseAccessService _courseAccessService;
+
+    public GetCourseGroupMessagesQueryHandler(IUnitOfWork unitOfWork, ATLASDomain.Services.ICourseAccessService courseAccessService)
+    {
+        _unitOfWork = unitOfWork;
+        _courseAccessService = courseAccessService;
+    }
+
+    public async Task<string> Handle(GetCourseGroupMessagesQuery request, CancellationToken cancellationToken)
+    {
+        // Authorization: user must be able to read this course
+        if (!await _courseAccessService.CanReadAsync(request.RequestingUserId, request.CourseOfferingId))
+        {
+            throw new Exceptions.ForbiddenAccessException("You do not have permission to view messages in this course.");
+        }
+
+        var messages = await _unitOfWork.CourseGroupMessages.GetByCourseOfferingAsync(
+            request.CourseOfferingId,
+            request.Page,
+            request.PageSize);
+
+        // Map to anonymous objects for API response
+        var result = messages.Select(m => new
+        {
+            m.MessageID,
+            m.CourseOfferingID,
+            m.SenderUserID,
+            SenderName = m.SenderUser?.FullName,
+            m.Content,
+            m.SentAt,
+            m.IsPinned,
+            m.IsDeleted,
+            ReadCount = m.ReadReceipts?.Count ?? 0
+        }).ToList();
+
+        return JsonConvert.SerializeObject(result);
+    }
+}

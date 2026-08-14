@@ -17,11 +17,11 @@ public class User
 
     public string Password { get; set; } = null!;
 
-    public enUserRole Role { get; set; }
 
     public bool IsActive { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
+    public enUserRole Role { get; set; }
 
 
     public Student? Student { get; set; }

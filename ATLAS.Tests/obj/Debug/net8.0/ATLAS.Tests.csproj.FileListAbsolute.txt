@@ -1,0 +1,7 @@
+C:\vs-communtiy2026\ATLAS\ATLAS.Tests\bin\Debug\net8.0\.msCoverageSourceRootsMapping_ATLAS.Tests
+C:\vs-communtiy2026\ATLAS\ATLAS.Tests\obj\Debug\net8.0\ATLAS.Tests.csproj.AssemblyReference.cache
+C:\vs-communtiy2026\ATLAS\ATLAS.Tests\obj\Debug\net8.0\ATLAS.Tests.GeneratedMSBuildEditorConfig.editorconfig
+C:\vs-communtiy2026\ATLAS\ATLAS.Tests\obj\Debug\net8.0\ATLAS.Tests.AssemblyInfoInputs.cache
+C:\vs-communtiy2026\ATLAS\ATLAS.Tests\obj\Debug\net8.0\ATLAS.Tests.AssemblyInfo.cs
+C:\vs-communtiy2026\ATLAS\ATLAS.Tests\obj\Debug\net8.0\ATLAS.Tests.csproj.CoreCompileInputs.cache
+C:\vs-communtiy2026\ATLAS\ATLAS.Tests\obj\Debug\net8.0\ATLAS.Tests.sourcelink.json

@@ -1,0 +1,5 @@
+using ATLAsBLL.CQRS;
+
+namespace ATLAsBLL.Services.Notifications.Queries.GetMyNotifications;
+
+public record GetMyNotificationsQuery(int UserId, bool UnreadOnly = false) : IQuery<string>;

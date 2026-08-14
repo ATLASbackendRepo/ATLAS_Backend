@@ -22,7 +22,10 @@ public sealed class UnitOfWork : IUnitOfWork
 
     public IDepartmentRepository Departments { get; }
 
- 
+    public ICourseGroupMessageRepository CourseGroupMessages { get; }
+
+    public INotificationRepository Notifications { get; }
+
 
     public IEnrollmentRepository Enrollments { get; }
 
@@ -46,7 +49,9 @@ public sealed class UnitOfWork : IUnitOfWork
         IEnrollmentRepository enrollmentRepository,
         ISemesterRepository semesterRepository,
         IStudentRepository studentRepository,
-        IUserRepository userRepository)
+        IUserRepository userRepository,
+        ICourseGroupMessageRepository courseGroupMessageRepository,
+        INotificationRepository notificationRepository)
     {
         _context = context;
 
@@ -61,8 +66,10 @@ public sealed class UnitOfWork : IUnitOfWork
         Enrollments = enrollmentRepository;
         Semesters = semesterRepository;
         Students = studentRepository;
-      
+
         Users = userRepository;
+        CourseGroupMessages = courseGroupMessageRepository;
+        Notifications = notificationRepository;
     }
 
     public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)

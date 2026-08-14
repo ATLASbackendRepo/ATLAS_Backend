@@ -1,7 +1,192 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\vs-communtiy2026\\ATLAS\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|c:\\vs-communtiy2026\\atlas\\atlas\\controllers\\request\\requestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|solutionrelative:atlas\\controllers\\request\\requestscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\request\\qeuries\\getstudentgradeappealsqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\request\\qeuries\\getstudentgradeappealsqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\request\\qeuries\\getstudentgradeappealsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\request\\qeuries\\getstudentgradeappealsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\request\\qeuries\\getgradeappealbyidqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\request\\qeuries\\getgradeappealbyidqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\request\\qeuries\\getgradeappealbyidquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\request\\qeuries\\getgradeappealbyidquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\request\\qeuries\\getdoctorgradeappealsqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\request\\qeuries\\getdoctorgradeappealsqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\request\\qeuries\\getdoctorgradeappealsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\request\\qeuries\\getdoctorgradeappealsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\request\\command\\creategradeappealrequest\\creategradeappealrequestcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\request\\command\\creategradeappealrequest\\creategradeappealrequestcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BC073430-342B-1152-8903-33C579A86777}|ATLAsDCL\\ATLAsDCL.csproj|c:\\vs-communtiy2026\\atlas\\atlasdcl\\repositories\\gradeappealrequestrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BC073430-342B-1152-8903-33C579A86777}|ATLAsDCL\\ATLAsDCL.csproj|solutionrelative:atlasdcl\\repositories\\gradeappealrequestrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4954FE1-6D75-6009-B7DE-AEAED841B23E}|ATLASDomain\\ATLASDomain.csproj|c:\\vs-communtiy2026\\atlas\\atlasdomain\\interfaces\\repositories\\igradeappealrequestrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4954FE1-6D75-6009-B7DE-AEAED841B23E}|ATLASDomain\\ATLASDomain.csproj|solutionrelative:atlasdomain\\interfaces\\repositories\\igradeappealrequestrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|c:\\vs-communtiy2026\\atlas\\atlas\\controllers\\coursegroupmessages\\coursegroupmessagescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|solutionrelative:atlas\\controllers\\coursegroupmessages\\coursegroupmessagescontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B0B33070-810B-34EF-706B-12788FAD68BF}|ATLAS.Tests\\ATLAS.Tests.csproj|c:\\vs-communtiy2026\\atlas\\atlas.tests\\validationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B0B33070-810B-34EF-706B-12788FAD68BF}|ATLAS.Tests\\ATLAS.Tests.csproj|solutionrelative:atlas.tests\\validationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\request\\command\\updategradeappealrequest\\updategradeappealrequestcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\request\\command\\updategradeappealrequest\\updategradeappealrequestcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4954FE1-6D75-6009-B7DE-AEAED841B23E}|ATLASDomain\\ATLASDomain.csproj|c:\\vs-communtiy2026\\atlas\\atlasdomain\\dto\\request\\updategradeappealrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4954FE1-6D75-6009-B7DE-AEAED841B23E}|ATLASDomain\\ATLASDomain.csproj|solutionrelative:atlasdomain\\dto\\request\\updategradeappealrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4954FE1-6D75-6009-B7DE-AEAED841B23E}|ATLASDomain\\ATLASDomain.csproj|c:\\vs-communtiy2026\\atlas\\atlasdomain\\dto\\request\\gradeappealrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4954FE1-6D75-6009-B7DE-AEAED841B23E}|ATLASDomain\\ATLASDomain.csproj|solutionrelative:atlasdomain\\dto\\request\\gradeappealrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{F4954FE1-6D75-6009-B7DE-AEAED841B23E}|ATLASDomain\\ATLASDomain.csproj|c:\\vs-communtiy2026\\atlas\\atlasdomain\\dto\\request\\creategradeappealrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{F4954FE1-6D75-6009-B7DE-AEAED841B23E}|ATLASDomain\\ATLASDomain.csproj|solutionrelative:atlasdomain\\dto\\request\\creategradeappealrequestdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B0B33070-810B-34EF-706B-12788FAD68BF}|ATLAS.Tests\\ATLAS.Tests.csproj|c:\\vs-communtiy2026\\atlas\\atlas.tests\\gradeandauthorizationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B0B33070-810B-34EF-706B-12788FAD68BF}|ATLAS.Tests\\ATLAS.Tests.csproj|solutionrelative:atlas.tests\\gradeandauthorizationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B0B33070-810B-34EF-706B-12788FAD68BF}|ATLAS.Tests\\ATLAS.Tests.csproj|c:\\vs-communtiy2026\\atlas\\atlas.tests\\authenticationandauthorizationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B0B33070-810B-34EF-706B-12788FAD68BF}|ATLAS.Tests\\ATLAS.Tests.csproj|solutionrelative:atlas.tests\\authenticationandauthorizationtests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{BC073430-342B-1152-8903-33C579A86777}|ATLAsDCL\\ATLAsDCL.csproj|c:\\vs-communtiy2026\\atlas\\atlasdcl\\unitofwork\\unitofwork.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BC073430-342B-1152-8903-33C579A86777}|ATLAsDCL\\ATLAsDCL.csproj|solutionrelative:atlasdcl\\unitofwork\\unitofwork.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\notifications\\queries\\getmynotifications\\getmynotificationsqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\notifications\\queries\\getmynotifications\\getmynotificationsqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\queries\\getcoursegroupmessages\\getcoursegroupmessagesqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\queries\\getcoursegroupmessages\\getcoursegroupmessagesqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\command\\sendcoursegroupmessage\\sendcoursegroupmessagecommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\command\\sendcoursegroupmessage\\sendcoursegroupmessagecommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\command\\markmessageasread\\markmessageasreadcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\command\\markmessageasread\\markmessageasreadcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|c:\\vs-communtiy2026\\atlas\\atlas\\controllers\\notifications\\notificationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|solutionrelative:atlas\\controllers\\notifications\\notificationscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\notifications\\command\\markallnotificationsasread\\markallnotificationsasreadcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\notifications\\command\\markallnotificationsasread\\markallnotificationsasreadcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\notifications\\command\\marknotificationasread\\marknotificationasreadcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\notifications\\command\\marknotificationasread\\marknotificationasreadcommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\command\\togglepincoursegroupmessage\\togglepincoursegroupmessagecommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\command\\togglepincoursegroupmessage\\togglepincoursegroupmessagecommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\command\\deletecoursegroupmessage\\deletecoursegroupmessagecommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\command\\deletecoursegroupmessage\\deletecoursegroupmessagecommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\command\\editcoursegroupmessage\\editcoursegroupmessagecommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\command\\editcoursegroupmessage\\editcoursegroupmessagecommandhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\command\\editcoursegroupmessage\\editcoursegroupmessagecommandvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\command\\editcoursegroupmessage\\editcoursegroupmessagecommandvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\command\\sendcoursegroupmessage\\sendcoursegroupmessagecommandvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\command\\sendcoursegroupmessage\\sendcoursegroupmessagecommandvalidator.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\notifications\\command\\markallnotificationsasread\\markallnotificationsasreadcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\notifications\\command\\markallnotificationsasread\\markallnotificationsasreadcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\notifications\\command\\marknotificationasread\\marknotificationasreadcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\notifications\\command\\marknotificationasread\\marknotificationasreadcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\notifications\\queries\\getmynotifications\\getmynotificationsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\notifications\\queries\\getmynotifications\\getmynotificationsquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\queries\\getcoursegroupmessages\\getcoursegroupmessagesquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\queries\\getcoursegroupmessages\\getcoursegroupmessagesquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\command\\markmessageasread\\markmessageasreadcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\command\\markmessageasread\\markmessageasreadcommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\command\\togglepincoursegroupmessage\\togglepincoursegroupmessagecommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\command\\togglepincoursegroupmessage\\togglepincoursegroupmessagecommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\exceptions\\forbiddenaccessexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\exceptions\\forbiddenaccessexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{B0B33070-810B-34EF-706B-12788FAD68BF}|ATLAS.Tests\\ATLAS.Tests.csproj|c:\\vs-communtiy2026\\atlas\\atlas.tests\\courseaccessservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{B0B33070-810B-34EF-706B-12788FAD68BF}|ATLAS.Tests\\ATLAS.Tests.csproj|solutionrelative:atlas.tests\\courseaccessservicetests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|c:\\vs-communtiy2026\\atlas\\atlas\\controllers\\authtenication\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|solutionrelative:atlas\\controllers\\authtenication\\authcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|c:\\vs-communtiy2026\\atlas\\atlas\\controllers\\analysis\\analysiscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|solutionrelative:atlas\\controllers\\analysis\\analysiscontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\command\\deletecoursegroupmessage\\deletecoursegroupmessagecommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\command\\deletecoursegroupmessage\\deletecoursegroupmessagecommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|c:\\vs-communtiy2026\\atlas\\atlas\\courseofferingauthorizationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|solutionrelative:atlas\\courseofferingauthorizationservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|c:\\vs-communtiy2026\\atlas\\atlas\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}",
+      "RelativeMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|solutionrelative:atlas\\appsettings.json||{90A6B3A7-C1A3-4009-A288-E2FF89E96FA0}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|c:\\vs-communtiy2026\\atlas\\atlas\\atlas.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}",
+      "RelativeMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|solutionrelative:atlas\\atlas.http||{5703B403-55E7-4C63-8C88-A8F52C7A45C5}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\coursegroupmessage\\command\\editcoursegroupmessage\\editcoursegroupmessagecommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\coursegroupmessage\\command\\editcoursegroupmessage\\editcoursegroupmessagecommand.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +194,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Bookmark",
@@ -26,6 +211,559 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "RequestsController.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\Request\\RequestsController.cs",
+              "RelativeDocumentMoniker": "ATLAS\\Controllers\\Request\\RequestsController.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\Request\\RequestsController.cs",
+              "RelativeToolTip": "ATLAS\\Controllers\\Request\\RequestsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAwAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:11:01.779Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GetStudentGradeAppealsQueryHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Qeuries\\GetStudentGradeAppealsQueryHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Request\\Qeuries\\GetStudentGradeAppealsQueryHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Qeuries\\GetStudentGradeAppealsQueryHandler.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Request\\Qeuries\\GetStudentGradeAppealsQueryHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAABRAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:10:40.076Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "GetStudentGradeAppealsQuery.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Qeuries\\GetStudentGradeAppealsQuery.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Request\\Qeuries\\GetStudentGradeAppealsQuery.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Qeuries\\GetStudentGradeAppealsQuery.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Request\\Qeuries\\GetStudentGradeAppealsQuery.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:10:31.951Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "GetGradeAppealByIdQueryHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Qeuries\\GetGradeAppealByIdQueryHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Request\\Qeuries\\GetGradeAppealByIdQueryHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Qeuries\\GetGradeAppealByIdQueryHandler.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Request\\Qeuries\\GetGradeAppealByIdQueryHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAYAAABIAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:10:14.437Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "GetGradeAppealByIdQuery.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Qeuries\\GetGradeAppealByIdQuery.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Request\\Qeuries\\GetGradeAppealByIdQuery.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Qeuries\\GetGradeAppealByIdQuery.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Request\\Qeuries\\GetGradeAppealByIdQuery.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAmAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:09:58.415Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "GetDoctorGradeAppealsQueryHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Qeuries\\GetDoctorGradeAppealsQueryHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Request\\Qeuries\\GetDoctorGradeAppealsQueryHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Qeuries\\GetDoctorGradeAppealsQueryHandler.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Request\\Qeuries\\GetDoctorGradeAppealsQueryHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAcAAABQAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:09:42.107Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 6,
+              "Title": "GetDoctorGradeAppealsQuery.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Qeuries\\GetDoctorGradeAppealsQuery.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Request\\Qeuries\\GetDoctorGradeAppealsQuery.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Qeuries\\GetDoctorGradeAppealsQuery.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Request\\Qeuries\\GetDoctorGradeAppealsQuery.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:09:35.355Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 7,
+              "Title": "CreateGradeAppealRequestCommand.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Command\\CreateGradeAppealRequest\\CreateGradeAppealRequestCommand.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Request\\Command\\CreateGradeAppealRequest\\CreateGradeAppealRequestCommand.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Command\\CreateGradeAppealRequest\\CreateGradeAppealRequestCommand.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Request\\Command\\CreateGradeAppealRequest\\CreateGradeAppealRequestCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:09:21.426Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 8,
+              "Title": "GradeAppealRequestRepository.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsDCL\\Repositories\\GradeAppealRequestRepository.cs",
+              "RelativeDocumentMoniker": "ATLAsDCL\\Repositories\\GradeAppealRequestRepository.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsDCL\\Repositories\\GradeAppealRequestRepository.cs",
+              "RelativeToolTip": "ATLAsDCL\\Repositories\\GradeAppealRequestRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA4AAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:08:59.979Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 9,
+              "Title": "IGradeAppealRequestRepository.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLASDomain\\InterFaces\\Repositories\\IGradeAppealRequestRepository.cs",
+              "RelativeDocumentMoniker": "ATLASDomain\\InterFaces\\Repositories\\IGradeAppealRequestRepository.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLASDomain\\InterFaces\\Repositories\\IGradeAppealRequestRepository.cs",
+              "RelativeToolTip": "ATLASDomain\\InterFaces\\Repositories\\IGradeAppealRequestRepository.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAeAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:08:42.847Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "UpdateGradeAppealRequestCommand.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Command\\UpdateGradeAppealRequest\\UpdateGradeAppealRequestCommand.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Request\\Command\\UpdateGradeAppealRequest\\UpdateGradeAppealRequestCommand.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Request\\Command\\UpdateGradeAppealRequest\\UpdateGradeAppealRequestCommand.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Request\\Command\\UpdateGradeAppealRequest\\UpdateGradeAppealRequestCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAoAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:07:23.711Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 13,
+              "Title": "UpdateGradeAppealRequestDto.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLASDomain\\DTO\\Request\\UpdateGradeAppealRequestDto.cs",
+              "RelativeDocumentMoniker": "ATLASDomain\\DTO\\Request\\UpdateGradeAppealRequestDto.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLASDomain\\DTO\\Request\\UpdateGradeAppealRequestDto.cs",
+              "RelativeToolTip": "ATLASDomain\\DTO\\Request\\UpdateGradeAppealRequestDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAsAAAAhAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:03:55.464Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 14,
+              "Title": "GradeAppealRequestDto.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLASDomain\\DTO\\Request\\GradeAppealRequestDto.cs",
+              "RelativeDocumentMoniker": "ATLASDomain\\DTO\\Request\\GradeAppealRequestDto.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLASDomain\\DTO\\Request\\GradeAppealRequestDto.cs",
+              "RelativeToolTip": "ATLASDomain\\DTO\\Request\\GradeAppealRequestDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:03:52.098Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 15,
+              "Title": "CreateGradeAppealRequestDto.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLASDomain\\DTO\\Request\\CreateGradeAppealRequestDto.cs",
+              "RelativeDocumentMoniker": "ATLASDomain\\DTO\\Request\\CreateGradeAppealRequestDto.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLASDomain\\DTO\\Request\\CreateGradeAppealRequestDto.cs",
+              "RelativeToolTip": "ATLASDomain\\DTO\\Request\\CreateGradeAppealRequestDto.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:03:43.544Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "ValidationTests.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS.Tests\\ValidationTests.cs",
+              "RelativeDocumentMoniker": "ATLAS.Tests\\ValidationTests.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS.Tests\\ValidationTests.cs",
+              "RelativeToolTip": "ATLAS.Tests\\ValidationTests.cs",
+              "ViewState": "AgIAAB8AAAAAAAAAAAAuwCQAAAAFAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T20:03:04.355Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 16,
+              "Title": "GradeAndAuthorizationTests.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS.Tests\\GradeAndAuthorizationTests.cs",
+              "RelativeDocumentMoniker": "ATLAS.Tests\\GradeAndAuthorizationTests.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS.Tests\\GradeAndAuthorizationTests.cs",
+              "RelativeToolTip": "ATLAS.Tests\\GradeAndAuthorizationTests.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAA0AAAAdAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:58:38.375Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 17,
+              "Title": "AuthenticationAndAuthorizationTests.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS.Tests\\AuthenticationAndAuthorizationTests.cs",
+              "RelativeDocumentMoniker": "ATLAS.Tests\\AuthenticationAndAuthorizationTests.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS.Tests\\AuthenticationAndAuthorizationTests.cs",
+              "RelativeToolTip": "ATLAS.Tests\\AuthenticationAndAuthorizationTests.cs",
+              "ViewState": "AgIAACcAAAAAAAAAAAAmwBEAAAAJAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:58:22.543Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 18,
+              "Title": "UnitOfWork.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsDCL\\UnitOfWork\\UnitOfWork.cs",
+              "RelativeDocumentMoniker": "ATLAsDCL\\UnitOfWork\\UnitOfWork.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsDCL\\UnitOfWork\\UnitOfWork.cs",
+              "RelativeToolTip": "ATLAsDCL\\UnitOfWork\\UnitOfWork.cs",
+              "ViewState": "AgIAACAAAAAAAAAAAAAmwDQAAABCAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:54:24.796Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 37,
+              "Title": "ForbiddenAccessException.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Exceptions\\ForbiddenAccessException.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Exceptions\\ForbiddenAccessException.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Exceptions\\ForbiddenAccessException.cs",
+              "RelativeToolTip": "ATLAsBLL\\Exceptions\\ForbiddenAccessException.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:51:26.535Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 38,
+              "Title": "CourseAccessServiceTests.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS.Tests\\CourseAccessServiceTests.cs",
+              "RelativeDocumentMoniker": "ATLAS.Tests\\CourseAccessServiceTests.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS.Tests\\CourseAccessServiceTests.cs",
+              "RelativeToolTip": "ATLAS.Tests\\CourseAccessServiceTests.cs",
+              "ViewState": "AgIAALQAAAAAAAAAAADwv/EAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:42:39.143Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 23,
+              "Title": "NotificationsController.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\Notifications\\NotificationsController.cs",
+              "RelativeDocumentMoniker": "ATLAS\\Controllers\\Notifications\\NotificationsController.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\Notifications\\NotificationsController.cs",
+              "RelativeToolTip": "ATLAS\\Controllers\\Notifications\\NotificationsController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAGkAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:42:07.131Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "CourseGroupMessagesController.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\CourseGroupMessages\\CourseGroupMessagesController.cs",
+              "RelativeDocumentMoniker": "ATLAS\\Controllers\\CourseGroupMessages\\CourseGroupMessagesController.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\CourseGroupMessages\\CourseGroupMessagesController.cs",
+              "RelativeToolTip": "ATLAS\\Controllers\\CourseGroupMessages\\CourseGroupMessagesController.cs",
+              "ViewState": "AgIAAKYAAAAAAAAAAAAhwFYAAAA3AAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:41:55.143Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 24,
+              "Title": "MarkAllNotificationsAsReadCommandHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Notifications\\Command\\MarkAllNotificationsAsRead\\MarkAllNotificationsAsReadCommandHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Notifications\\Command\\MarkAllNotificationsAsRead\\MarkAllNotificationsAsReadCommandHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Notifications\\Command\\MarkAllNotificationsAsRead\\MarkAllNotificationsAsReadCommandHandler.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Notifications\\Command\\MarkAllNotificationsAsRead\\MarkAllNotificationsAsReadCommandHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:40:57.517Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 25,
+              "Title": "MarkNotificationAsReadCommandHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Notifications\\Command\\MarkNotificationAsRead\\MarkNotificationAsReadCommandHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Notifications\\Command\\MarkNotificationAsRead\\MarkNotificationAsReadCommandHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Notifications\\Command\\MarkNotificationAsRead\\MarkNotificationAsReadCommandHandler.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Notifications\\Command\\MarkNotificationAsRead\\MarkNotificationAsReadCommandHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:40:25.967Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 19,
+              "Title": "GetMyNotificationsQueryHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Notifications\\Queries\\GetMyNotifications\\GetMyNotificationsQueryHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Notifications\\Queries\\GetMyNotifications\\GetMyNotificationsQueryHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Notifications\\Queries\\GetMyNotifications\\GetMyNotificationsQueryHandler.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Notifications\\Queries\\GetMyNotifications\\GetMyNotificationsQueryHandler.cs",
+              "ViewState": "AgIAABMAAAAAAAAAAAA0wC0AAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:39:53.075Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 20,
+              "Title": "GetCourseGroupMessagesQueryHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Queries\\GetCourseGroupMessages\\GetCourseGroupMessagesQueryHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Queries\\GetCourseGroupMessages\\GetCourseGroupMessagesQueryHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Queries\\GetCourseGroupMessages\\GetCourseGroupMessagesQueryHandler.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Queries\\GetCourseGroupMessages\\GetCourseGroupMessagesQueryHandler.cs",
+              "ViewState": "AgIAAA0AAAAAAAAAAAAzwAcAAAAMAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:39:22.011Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 39,
+              "Title": "AuthController.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\Authtenication\\AuthController.cs",
+              "RelativeDocumentMoniker": "ATLAS\\Controllers\\Authtenication\\AuthController.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\Authtenication\\AuthController.cs",
+              "RelativeToolTip": "ATLAS\\Controllers\\Authtenication\\AuthController.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:39:09.667Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 22,
+              "Title": "MarkMessageAsReadCommandHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\MarkMessageAsRead\\MarkMessageAsReadCommandHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\MarkMessageAsRead\\MarkMessageAsReadCommandHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\MarkMessageAsRead\\MarkMessageAsReadCommandHandler.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\MarkMessageAsRead\\MarkMessageAsReadCommandHandler.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAADgvx0AAABOAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:39:07.293Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 26,
+              "Title": "TogglePinCourseGroupMessageCommandHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\TogglePinCourseGroupMessage\\TogglePinCourseGroupMessageCommandHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\TogglePinCourseGroupMessage\\TogglePinCourseGroupMessageCommandHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\TogglePinCourseGroupMessage\\TogglePinCourseGroupMessageCommandHandler.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\TogglePinCourseGroupMessage\\TogglePinCourseGroupMessageCommandHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAkAAAABAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:38:58.328Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 27,
+              "Title": "DeleteCourseGroupMessageCommandHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\DeleteCourseGroupMessage\\DeleteCourseGroupMessageCommandHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\DeleteCourseGroupMessage\\DeleteCourseGroupMessageCommandHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\DeleteCourseGroupMessage\\DeleteCourseGroupMessageCommandHandler.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\DeleteCourseGroupMessage\\DeleteCourseGroupMessageCommandHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACYAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:38:16.635Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 28,
+              "Title": "EditCourseGroupMessageCommandHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\EditCourseGroupMessage\\EditCourseGroupMessageCommandHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\EditCourseGroupMessage\\EditCourseGroupMessageCommandHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\EditCourseGroupMessage\\EditCourseGroupMessageCommandHandler.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\EditCourseGroupMessage\\EditCourseGroupMessageCommandHandler.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAACcAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:37:38.195Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 21,
+              "Title": "SendCourseGroupMessageCommandHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\SendCourseGroupMessage\\SendCourseGroupMessageCommandHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\SendCourseGroupMessage\\SendCourseGroupMessageCommandHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\SendCourseGroupMessage\\SendCourseGroupMessageCommandHandler.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\SendCourseGroupMessage\\SendCourseGroupMessageCommandHandler.cs",
+              "ViewState": "AgIAAB0AAAAAAAAAAAAiwCQAAAAiAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:37:00.68Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 29,
+              "Title": "EditCourseGroupMessageCommandValidator.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\EditCourseGroupMessage\\EditCourseGroupMessageCommandValidator.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\EditCourseGroupMessage\\EditCourseGroupMessageCommandValidator.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\EditCourseGroupMessage\\EditCourseGroupMessageCommandValidator.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\EditCourseGroupMessage\\EditCourseGroupMessageCommandValidator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:36:47.015Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 30,
+              "Title": "SendCourseGroupMessageCommandValidator.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\SendCourseGroupMessage\\SendCourseGroupMessageCommandValidator.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\SendCourseGroupMessage\\SendCourseGroupMessageCommandValidator.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\SendCourseGroupMessage\\SendCourseGroupMessageCommandValidator.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\SendCourseGroupMessage\\SendCourseGroupMessageCommandValidator.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAABoAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:36:14.989Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 31,
+              "Title": "MarkAllNotificationsAsReadCommand.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Notifications\\Command\\MarkAllNotificationsAsRead\\MarkAllNotificationsAsReadCommand.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Notifications\\Command\\MarkAllNotificationsAsRead\\MarkAllNotificationsAsReadCommand.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Notifications\\Command\\MarkAllNotificationsAsRead\\MarkAllNotificationsAsReadCommand.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Notifications\\Command\\MarkAllNotificationsAsRead\\MarkAllNotificationsAsReadCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:35:42.801Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 40,
+              "Title": "AnalysisController.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\Analysis\\AnalysisController.cs",
+              "RelativeDocumentMoniker": "ATLAS\\Controllers\\Analysis\\AnalysisController.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\Analysis\\AnalysisController.cs",
+              "RelativeToolTip": "ATLAS\\Controllers\\Analysis\\AnalysisController.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAC0AAAAWAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:35:39.505Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 43,
+              "Title": "appsettings.json",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\appsettings.json",
+              "RelativeDocumentMoniker": "ATLAS\\appsettings.json",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\appsettings.json",
+              "RelativeToolTip": "ATLAS\\appsettings.json",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001642|",
+              "WhenOpened": "2026-08-12T19:35:14.53Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 44,
+              "Title": "ATLAS.http",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\ATLAS.http",
+              "RelativeDocumentMoniker": "ATLAS\\ATLAS.http",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\ATLAS.http",
+              "RelativeToolTip": "ATLAS\\ATLAS.http",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.003502|",
+              "WhenOpened": "2026-08-12T19:35:13.069Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 32,
+              "Title": "MarkNotificationAsReadCommand.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Notifications\\Command\\MarkNotificationAsRead\\MarkNotificationAsReadCommand.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Notifications\\Command\\MarkNotificationAsRead\\MarkNotificationAsReadCommand.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Notifications\\Command\\MarkNotificationAsRead\\MarkNotificationAsReadCommand.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Notifications\\Command\\MarkNotificationAsRead\\MarkNotificationAsReadCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:35:12.013Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 33,
+              "Title": "GetMyNotificationsQuery.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Notifications\\Queries\\GetMyNotifications\\GetMyNotificationsQuery.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\Notifications\\Queries\\GetMyNotifications\\GetMyNotificationsQuery.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\Notifications\\Queries\\GetMyNotifications\\GetMyNotificationsQuery.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\Notifications\\Queries\\GetMyNotifications\\GetMyNotificationsQuery.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:34:44.198Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 34,
+              "Title": "GetCourseGroupMessagesQuery.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Queries\\GetCourseGroupMessages\\GetCourseGroupMessagesQuery.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Queries\\GetCourseGroupMessages\\GetCourseGroupMessagesQuery.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Queries\\GetCourseGroupMessages\\GetCourseGroupMessagesQuery.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Queries\\GetCourseGroupMessages\\GetCourseGroupMessagesQuery.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:34:39.422Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 35,
+              "Title": "MarkMessageAsReadCommand.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\MarkMessageAsRead\\MarkMessageAsReadCommand.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\MarkMessageAsRead\\MarkMessageAsReadCommand.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\MarkMessageAsRead\\MarkMessageAsReadCommand.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\MarkMessageAsRead\\MarkMessageAsReadCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:34:34.076Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 36,
+              "Title": "TogglePinCourseGroupMessageCommand.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\TogglePinCourseGroupMessage\\TogglePinCourseGroupMessageCommand.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\TogglePinCourseGroupMessage\\TogglePinCourseGroupMessageCommand.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\TogglePinCourseGroupMessage\\TogglePinCourseGroupMessageCommand.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\TogglePinCourseGroupMessage\\TogglePinCourseGroupMessageCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:34:04.801Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 42,
+              "Title": "CourseOfferingAuthorizationService.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\CourseOfferingAuthorizationService.cs",
+              "RelativeDocumentMoniker": "ATLAS\\CourseOfferingAuthorizationService.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\CourseOfferingAuthorizationService.cs",
+              "RelativeToolTip": "ATLAS\\CourseOfferingAuthorizationService.cs",
+              "ViewState": "AgIAAAYAAAAAAAAAAAAuwBEAAAAcAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:34:03.541Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 41,
+              "Title": "DeleteCourseGroupMessageCommand.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\DeleteCourseGroupMessage\\DeleteCourseGroupMessageCommand.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\DeleteCourseGroupMessage\\DeleteCourseGroupMessageCommand.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\DeleteCourseGroupMessage\\DeleteCourseGroupMessageCommand.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\DeleteCourseGroupMessage\\DeleteCourseGroupMessageCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:33:36.731Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 45,
+              "Title": "EditCourseGroupMessageCommand.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\EditCourseGroupMessage\\EditCourseGroupMessageCommand.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\EditCourseGroupMessage\\EditCourseGroupMessageCommand.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseGroupMessage\\Command\\EditCourseGroupMessage\\EditCourseGroupMessageCommand.cs",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseGroupMessage\\Command\\EditCourseGroupMessage\\EditCourseGroupMessageCommand.cs",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-12T19:33:06.659Z"
             }
           ]
         }

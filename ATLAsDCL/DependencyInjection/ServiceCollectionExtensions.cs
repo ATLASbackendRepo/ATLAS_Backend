@@ -4,6 +4,7 @@ using ATLAsDCL.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using ATLAsDCL.Repositories;
 
 namespace ATLAsDCL.DependencyInjection;
 
@@ -30,6 +31,10 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<IGradeAppealRequestRepository,
                                   GradeAppealRequestRepository>();
+        services.AddScoped<ICourseGroupMessageRepository, CourseGroupMessageRepository>();
+        services.AddScoped<INotificationRepository, NotificationRepository>();
+        // Course access service (authorization central point)
+        services.AddScoped<ATLASDomain.Services.ICourseAccessService, ATLAsDCL.Services.CourseAccessService>();
         services.AddScoped<IUnitOfWork, ATLAsDCL.UnitOfWork.UnitOfWork>();
       return services;
   }

@@ -1,4 +1,5 @@
 ﻿using ATLASDomain.Entities;
+namespace ATLASDomain.DTO.Request;
 
 public class GradeAppealRequestDto
 {

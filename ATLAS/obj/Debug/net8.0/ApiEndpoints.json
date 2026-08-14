@@ -124,6 +124,142 @@
     ]
   },
   {
+    "ContainingType": "ATLAS.Controllers.CourseGroupMessagesController",
+    "Method": "GetMessages",
+    "RelativePath": "api/course-offerings/{courseOfferingId}/messages",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "courseOfferingId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "page",
+        "Type": "System.Int32",
+        "IsRequired": false
+      },
+      {
+        "Name": "pageSize",
+        "Type": "System.Int32",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ATLAS.Controllers.CourseGroupMessagesController",
+    "Method": "SendMessage",
+    "RelativePath": "api/course-offerings/{courseOfferingId}/messages",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "courseOfferingId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "ATLAS.Controllers.SendMessageRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ATLAS.Controllers.CourseGroupMessagesController",
+    "Method": "EditMessage",
+    "RelativePath": "api/course-offerings/{courseOfferingId}/messages/{messageId}",
+    "HttpMethod": "PUT",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "courseOfferingId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "messageId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "request",
+        "Type": "ATLAS.Controllers.EditMessageRequest",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ATLAS.Controllers.CourseGroupMessagesController",
+    "Method": "DeleteMessage",
+    "RelativePath": "api/course-offerings/{courseOfferingId}/messages/{messageId}",
+    "HttpMethod": "DELETE",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "courseOfferingId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "messageId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ATLAS.Controllers.CourseGroupMessagesController",
+    "Method": "TogglePin",
+    "RelativePath": "api/course-offerings/{courseOfferingId}/messages/{messageId}/pin",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "courseOfferingId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "messageId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ATLAS.Controllers.CourseGroupMessagesController",
+    "Method": "MarkAsRead",
+    "RelativePath": "api/course-offerings/{courseOfferingId}/messages/{messageId}/read",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "courseOfferingId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "messageId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "ATLASAPI.Controllers.CourseGradeController",
     "Method": "AssignGrade",
     "RelativePath": "api/CourseGrade/assign",
@@ -394,6 +530,48 @@
     "EndpointName": "GetStudentMyCourses"
   },
   {
+    "ContainingType": "ATLAS.Controllers.NotificationsController",
+    "Method": "GetNotifications",
+    "RelativePath": "api/notifications",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "unreadOnly",
+        "Type": "System.Boolean",
+        "IsRequired": false
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ATLAS.Controllers.NotificationsController",
+    "Method": "MarkAsRead",
+    "RelativePath": "api/notifications/{notificationId}/read",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "notificationId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ATLAS.Controllers.NotificationsController",
+    "Method": "MarkAllAsRead",
+    "RelativePath": "api/notifications/read-all",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
     "ContainingType": "RequestController",
     "Method": "Create",
     "RelativePath": "api/Request",
@@ -403,7 +581,7 @@
     "Parameters": [
       {
         "Name": "dto",
-        "Type": "CreateGradeAppealRequestDto",
+        "Type": "ATLASDomain.DTO.Request.CreateGradeAppealRequestDto",
         "IsRequired": true
       }
     ],
@@ -439,7 +617,7 @@
       },
       {
         "Name": "dto",
-        "Type": "UpdateGradeAppealRequestDto",
+        "Type": "ATLASDomain.DTO.Request.UpdateGradeAppealRequestDto",
         "IsRequired": true
       }
     ],
@@ -485,7 +663,7 @@
     ],
     "ReturnTypes": [
       {
-        "Type": "GradeAppealRequestDto",
+        "Type": "ATLASDomain.DTO.Request.GradeAppealRequestDto",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -505,7 +683,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[GradeAppealRequestDto, ATLASDomain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[ATLASDomain.DTO.Request.GradeAppealRequestDto, ATLASDomain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",
@@ -534,7 +712,7 @@
     "Parameters": [],
     "ReturnTypes": [
       {
-        "Type": "System.Collections.Generic.List\u00601[[GradeAppealRequestDto, ATLASDomain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "Type": "System.Collections.Generic.List\u00601[[ATLASDomain.DTO.Request.GradeAppealRequestDto, ATLASDomain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
         "MediaTypes": [
           "text/plain",
           "application/json",

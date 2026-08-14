@@ -20,6 +20,16 @@ namespace ATLAsDCL.Configuration
                 .HasDefaultValue(true);
             builder.Property(u => u.CreatedAt)
                 .HasDefaultValueSql("GETDATE()");
+
+            builder.Property(u => u.Role)
+          .HasDefaultValue(enUserRole.Student.ToString());
+
+            builder.ToTable(t =>
+               t.HasCheckConstraint(
+                  "CK_Users_Role",
+                  "[Role] IN ('Student', 'Admin', 'SuperAdmin', 'Doctor', 'TeachingAssistant')"
+                 ) 
+                 );
         }
     }
 }

@@ -32,3 +32,4 @@ C:\vs-communtiy2026\ATLAS\ATLAsDCL\obj\Debug\net8.0\refint\ATLAsDCL.dll
 C:\vs-communtiy2026\ATLAS\ATLAsDCL\obj\Debug\net8.0\ATLAsDCL.pdb
 C:\vs-communtiy2026\ATLAS\ATLAsDCL\obj\Debug\net8.0\ATLAsDCL.genruntimeconfig.cache
 C:\vs-communtiy2026\ATLAS\ATLAsDCL\obj\Debug\net8.0\ref\ATLAsDCL.dll
+C:\vs-communtiy2026\ATLAS\ATLAsDCL\obj\Debug\net8.0\ATLAsDCL.sourcelink.json

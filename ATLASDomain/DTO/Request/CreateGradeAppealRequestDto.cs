@@ -1,5 +1,8 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
+
+namespace ATLASDomain.DTO.Request;
+
 public class CreateGradeAppealRequestDto
 {
     [Range(1, int.MaxValue)]
