@@ -1,0 +1,43 @@
+﻿using ATLAsDCL.UnitOfWork;
+using ATLASDomain.DTO.Profile;
+using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+
+namespace ATLAsBLL.Services.profile.Staff.Query
+{
+
+    public class GetStaffProfileByUserIdQueryHandler
+        : IRequestHandler<GetStaffProfileByUserIdQuery, StaffProfileResponseDto?>
+    {
+        private readonly IUnitOfWork _unitOfWork;
+
+        public GetStaffProfileByUserIdQueryHandler(IUnitOfWork unitOfWork)
+        {
+            _unitOfWork = unitOfWork;
+        }
+
+        public async Task<StaffProfileResponseDto?> Handle(
+            GetStaffProfileByUserIdQuery request,
+            CancellationToken cancellationToken)
+        {
+            var profile = await _unitOfWork.staffProfile.GetByUserIdAsync(request.UserId);
+
+            if (profile == null)
+                return null;
+
+            return new StaffProfileResponseDto
+            {
+                StaffProfileID = profile.StaffProfileID,
+                UserID = profile.UserID,
+                FullName = profile.User?.FullName ?? string.Empty, // ?? null-coalescing زي الـ convention بتاعك
+                Role = profile.Role.ToString(),
+                DepartmentID = profile.DepartmentID,
+                TeachingYears = profile.TeachingYears,
+            };
+        }
+    }
+}

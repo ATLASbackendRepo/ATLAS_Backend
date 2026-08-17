@@ -59,6 +59,22 @@
           }
         }
       },
+      "Castle.Core/5.1.1": {
+        "type": "package",
+        "dependencies": {
+          "System.Diagnostics.EventLog": "6.0.0"
+        },
+        "compile": {
+          "lib/net6.0/Castle.Core.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Castle.Core.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Dapper/2.1.79": {
         "type": "package",
         "compile": {
@@ -958,6 +974,22 @@
           }
         }
       },
+      "Moq/4.18.4": {
+        "type": "package",
+        "dependencies": {
+          "Castle.Core": "5.1.1"
+        },
+        "compile": {
+          "lib/net6.0/Moq.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/Moq.dll": {
+            "related": ".xml"
+          }
+        }
+      },
       "Newtonsoft.Json/13.0.1": {
         "type": "package",
         "compile": {
@@ -1070,6 +1102,32 @@
           "buildTransitive/net8.0/_._": {}
         }
       },
+      "System.Diagnostics.EventLog/6.0.0": {
+        "type": "package",
+        "compile": {
+          "lib/net6.0/System.Diagnostics.EventLog.dll": {
+            "related": ".xml"
+          }
+        },
+        "runtime": {
+          "lib/net6.0/System.Diagnostics.EventLog.dll": {
+            "related": ".xml"
+          }
+        },
+        "build": {
+          "buildTransitive/netcoreapp3.1/_._": {}
+        },
+        "runtimeTargets": {
+          "runtimes/win/lib/net6.0/System.Diagnostics.EventLog.Messages.dll": {
+            "assetType": "runtime",
+            "rid": "win"
+          },
+          "runtimes/win/lib/net6.0/System.Diagnostics.EventLog.dll": {
+            "assetType": "runtime",
+            "rid": "win"
+          }
+        }
+      },
       "System.Drawing.Common/6.0.0": {
         "type": "package",
         "dependencies": {
@@ -1112,11 +1170,11 @@
           }
         }
       },
-      "System.IdentityModel.Tokens.Jwt/7.0.3": {
+      "System.IdentityModel.Tokens.Jwt/8.14.0": {
         "type": "package",
         "dependencies": {
-          "Microsoft.IdentityModel.JsonWebTokens": "7.0.3",
-          "Microsoft.IdentityModel.Tokens": "7.0.3"
+          "Microsoft.IdentityModel.JsonWebTokens": "8.14.0",
+          "Microsoft.IdentityModel.Tokens": "8.14.0"
         },
         "compile": {
           "lib/net8.0/System.IdentityModel.Tokens.Jwt.dll": {
@@ -1654,6 +1712,30 @@
         "lib/netstandard2.0/BCrypt.Net-Next.xml",
         "lib/netstandard2.1/BCrypt.Net-Next.dll",
         "lib/netstandard2.1/BCrypt.Net-Next.xml"
+      ]
+    },
+    "Castle.Core/5.1.1": {
+      "sha512": "rpYtIczkzGpf+EkZgDr9CClTdemhsrwA/W5hMoPjLkRFnXzH44zDLoovXeKtmxb1ykXK9aJVODSpiJml8CTw2g==",
+      "type": "package",
+      "path": "castle.core/5.1.1",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "ASL - Apache Software Foundation License.txt",
+        "CHANGELOG.md",
+        "LICENSE",
+        "castle-logo.png",
+        "castle.core.5.1.1.nupkg.sha512",
+        "castle.core.nuspec",
+        "lib/net462/Castle.Core.dll",
+        "lib/net462/Castle.Core.xml",
+        "lib/net6.0/Castle.Core.dll",
+        "lib/net6.0/Castle.Core.xml",
+        "lib/netstandard2.0/Castle.Core.dll",
+        "lib/netstandard2.0/Castle.Core.xml",
+        "lib/netstandard2.1/Castle.Core.dll",
+        "lib/netstandard2.1/Castle.Core.xml",
+        "readme.txt"
       ]
     },
     "Dapper/2.1.79": {
@@ -3025,6 +3107,26 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "Moq/4.18.4": {
+      "sha512": "IOo+W51+7Afnb0noltJrKxPBSfsgMzTKCw+Re5AMx8l/vBbAbMDOynLik4+lBYIWDJSO0uV7Zdqt7cNb6RZZ+A==",
+      "type": "package",
+      "path": "moq/4.18.4",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "lib/net462/Moq.dll",
+        "lib/net462/Moq.xml",
+        "lib/net6.0/Moq.dll",
+        "lib/net6.0/Moq.xml",
+        "lib/netstandard2.0/Moq.dll",
+        "lib/netstandard2.0/Moq.xml",
+        "lib/netstandard2.1/Moq.dll",
+        "lib/netstandard2.1/Moq.xml",
+        "moq.4.18.4.nupkg.sha512",
+        "moq.nuspec",
+        "moq.png"
+      ]
+    },
     "Newtonsoft.Json/13.0.1": {
       "sha512": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A==",
       "type": "package",
@@ -3207,6 +3309,37 @@
         "useSharedDesignerContext.txt"
       ]
     },
+    "System.Diagnostics.EventLog/6.0.0": {
+      "sha512": "lcyUiXTsETK2ALsZrX+nWuHSIQeazhqPphLfaRxzdGaG93+0kELqpgEHtwWOlQe7+jSFnKwaCAgL4kjeZCQJnw==",
+      "type": "package",
+      "path": "system.diagnostics.eventlog/6.0.0",
+      "files": [
+        ".nupkg.metadata",
+        ".signature.p7s",
+        "Icon.png",
+        "LICENSE.TXT",
+        "THIRD-PARTY-NOTICES.TXT",
+        "buildTransitive/netcoreapp2.0/System.Diagnostics.EventLog.targets",
+        "buildTransitive/netcoreapp3.1/_._",
+        "lib/net461/System.Diagnostics.EventLog.dll",
+        "lib/net461/System.Diagnostics.EventLog.xml",
+        "lib/net6.0/System.Diagnostics.EventLog.dll",
+        "lib/net6.0/System.Diagnostics.EventLog.xml",
+        "lib/netcoreapp3.1/System.Diagnostics.EventLog.dll",
+        "lib/netcoreapp3.1/System.Diagnostics.EventLog.xml",
+        "lib/netstandard2.0/System.Diagnostics.EventLog.dll",
+        "lib/netstandard2.0/System.Diagnostics.EventLog.xml",
+        "runtimes/win/lib/net6.0/System.Diagnostics.EventLog.Messages.dll",
+        "runtimes/win/lib/net6.0/System.Diagnostics.EventLog.dll",
+        "runtimes/win/lib/net6.0/System.Diagnostics.EventLog.xml",
+        "runtimes/win/lib/netcoreapp3.1/System.Diagnostics.EventLog.Messages.dll",
+        "runtimes/win/lib/netcoreapp3.1/System.Diagnostics.EventLog.dll",
+        "runtimes/win/lib/netcoreapp3.1/System.Diagnostics.EventLog.xml",
+        "system.diagnostics.eventlog.6.0.0.nupkg.sha512",
+        "system.diagnostics.eventlog.nuspec",
+        "useSharedDesignerContext.txt"
+      ]
+    },
     "System.Drawing.Common/6.0.0": {
       "sha512": "NfuoKUiP2nUWwKZN6twGqXioIe1zVD0RIj2t976A+czLHr2nY454RwwXs6JU9Htc6mwqL6Dn/nEL3dpVf2jOhg==",
       "type": "package",
@@ -3266,15 +3399,14 @@
         "version.txt"
       ]
     },
-    "System.IdentityModel.Tokens.Jwt/7.0.3": {
-      "sha512": "caEe+OpQNYNiyZb+DJpUVROXoVySWBahko2ooNfUcllxa9ZQUM8CgM/mDjP6AoFn6cQU9xMmG+jivXWub8cbGg==",
+    "System.IdentityModel.Tokens.Jwt/8.14.0": {
+      "sha512": "EYGgN/S+HK7S6F3GaaPLFAfK0UzMrkXFyWCvXpQWFYmZln3dqtbyIO7VuTM/iIIPMzkelg8ZLlBPvMhxj6nOAA==",
       "type": "package",
-      "path": "system.identitymodel.tokens.jwt/7.0.3",
+      "path": "system.identitymodel.tokens.jwt/8.14.0",
       "files": [
         ".nupkg.metadata",
         ".signature.p7s",
-        "lib/net461/System.IdentityModel.Tokens.Jwt.dll",
-        "lib/net461/System.IdentityModel.Tokens.Jwt.xml",
+        "README.md",
         "lib/net462/System.IdentityModel.Tokens.Jwt.dll",
         "lib/net462/System.IdentityModel.Tokens.Jwt.xml",
         "lib/net472/System.IdentityModel.Tokens.Jwt.dll",
@@ -3283,9 +3415,11 @@
         "lib/net6.0/System.IdentityModel.Tokens.Jwt.xml",
         "lib/net8.0/System.IdentityModel.Tokens.Jwt.dll",
         "lib/net8.0/System.IdentityModel.Tokens.Jwt.xml",
+        "lib/net9.0/System.IdentityModel.Tokens.Jwt.dll",
+        "lib/net9.0/System.IdentityModel.Tokens.Jwt.xml",
         "lib/netstandard2.0/System.IdentityModel.Tokens.Jwt.dll",
         "lib/netstandard2.0/System.IdentityModel.Tokens.Jwt.xml",
-        "system.identitymodel.tokens.jwt.7.0.3.nupkg.sha512",
+        "system.identitymodel.tokens.jwt.8.14.0.nupkg.sha512",
         "system.identitymodel.tokens.jwt.nuspec"
       ]
     },
@@ -4010,6 +4144,8 @@
       "ATLAsDCL >= 1.0.0",
       "Microsoft.EntityFrameworkCore.InMemory >= 8.0.0",
       "Microsoft.NET.Test.Sdk >= 17.11.1",
+      "Moq >= 4.18.4",
+      "System.IdentityModel.Tokens.Jwt >= 8.14.0",
       "xunit >= 2.9.2",
       "xunit.runner.visualstudio >= 2.8.2"
     ]
@@ -4086,6 +4222,14 @@
           "Microsoft.NET.Test.Sdk": {
             "target": "Package",
             "version": "[17.11.1, )"
+          },
+          "Moq": {
+            "target": "Package",
+            "version": "[4.18.4, )"
+          },
+          "System.IdentityModel.Tokens.Jwt": {
+            "target": "Package",
+            "version": "[8.14.0, )"
           },
           "xunit": {
             "target": "Package",

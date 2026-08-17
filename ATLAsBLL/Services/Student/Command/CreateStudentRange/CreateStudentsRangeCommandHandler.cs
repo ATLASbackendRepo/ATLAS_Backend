@@ -1,20 +1,23 @@
-﻿using MediatR;
+﻿using ATLAsBLL.Events;
+using ATLAsDCL.UnitOfWork;
+using ATLASDomain.Entities;
+using MediatR;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using ATLASDomain.Entities;
-using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
 {
     public class CreateStudentsRangeCommandHandler : IRequestHandler<CreateStudentsRangeCommand, List<int>>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPublisher _publisher; 
 
-        public CreateStudentsRangeCommandHandler(IUnitOfWork unitOfWork)
+        public CreateStudentsRangeCommandHandler(IUnitOfWork unitOfWork, IPublisher publisher       )
         {
             _unitOfWork = unitOfWork;
+            _publisher = publisher;
         }
 
         public async Task<List<int>> Handle(CreateStudentsRangeCommand request, CancellationToken cancellationToken)
@@ -49,6 +52,15 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
 
             // 4. حفظ كل الطلاب مع كل المستخدمين المرتبطين بهم كـ Transaction واحدة آمنة
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            foreach (var Student in studentsList)
+            {
+                await _publisher.Publish(
+                    new StudentCreatedDomainEvent(Student.StudentId),
+                    cancellationToken
+                );
+            }
+
 
             // 5. إرجاع قائمة الـ StudentIds الجديدة التي تم توليدها
             return studentsList.Select(s => s.StudentId).ToList();

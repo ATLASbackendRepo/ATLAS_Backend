@@ -10,18 +10,18 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.Auth.Queries
 {
-    public sealed class GetStudentByAcademicIdQueryHandler
-     : IRequestHandler<GetStudentByAcademicIdQuery, ATLASDomain.Entities.Student?>
+    public sealed class GetUserByAcademicIdQueryHandler
+     : IRequestHandler<GetUserByAcademicIdQuery, ATLASDomain.Entities.User?>
     {
         private readonly IUnitOfWork _unitofwork;
 
-        public GetStudentByAcademicIdQueryHandler(IUnitOfWork unitofwork)
+        public GetUserByAcademicIdQueryHandler(IUnitOfWork unitofwork)
         {
             _unitofwork = unitofwork;
         }
 
-        public async Task<ATLASDomain.Entities.Student?> Handle(
-            GetStudentByAcademicIdQuery request,
+        public async Task<ATLASDomain.Entities.User?> Handle(
+            GetUserByAcademicIdQuery request,
             CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(request.AcademicId))
@@ -29,8 +29,8 @@ namespace ATLAsBLL.Services.Auth.Queries
 
             var academicId = request.AcademicId.Trim();
 
-            return await _unitofwork.Students
-                .GetStudentByAcademicIDAsync(academicId);
+            return await _unitofwork.Users
+                .GetUserByAcademicIDAsync(academicId);
         }
     }
 }

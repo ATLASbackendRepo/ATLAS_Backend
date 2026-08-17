@@ -85,7 +85,7 @@
         }
       }
     },
-    "/api/Auth/StudentLogin": {
+    "/api/Auth/Login": {
       "post": {
         "tags": [
           "Auth"
@@ -94,69 +94,29 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StudentLoginDTO"
+                "$ref": "#/components/schemas/LoginDTO"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/StudentLoginDTO"
+                "$ref": "#/components/schemas/LoginDTO"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/StudentLoginDTO"
+                "$ref": "#/components/schemas/LoginDTO"
               }
             }
           }
         },
         "responses": {
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
           }
         }
       }
     },
-    "/api/Auth/StaffLogin": {
+    "/api/Auth/refresh": {
       "post": {
         "tags": [
           "Auth"
@@ -165,64 +125,55 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/StaffLoginDTO"
+                "$ref": "#/components/schemas/RefreshRequest"
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/StaffLoginDTO"
+                "$ref": "#/components/schemas/RefreshRequest"
               }
             },
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/StaffLoginDTO"
+                "$ref": "#/components/schemas/RefreshRequest"
               }
             }
           }
         },
         "responses": {
-          "401": {
-            "description": "Unauthorized",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
           "200": {
             "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
+          }
+        }
+      }
+    },
+    "/api/Auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
+              }
+            },
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/LogoutRequest"
               }
             }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
           }
         }
       }
@@ -454,11 +405,12 @@
         }
       }
     },
-    "/api/course-offerings/{courseOfferingId}/messages": {
+    "/api/course/{courseOfferingId}/messages": {
       "get": {
         "tags": [
           "CourseGroupMessages"
         ],
+        "operationId": "GetMessages",
         "parameters": [
           {
             "name": "courseOfferingId",
@@ -490,7 +442,73 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CourseGroupMessageDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CourseGroupMessageDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CourseGroupMessageDto"
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       },
@@ -498,6 +516,7 @@
         "tags": [
           "CourseGroupMessages"
         ],
+        "operationId": "Send",
         "parameters": [
           {
             "name": "courseOfferingId",
@@ -529,17 +548,98 @@
           }
         },
         "responses": {
-          "200": {
-            "description": "OK"
+          "201": {
+            "description": "Created",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/course-offerings/{courseOfferingId}/messages/{messageId}": {
+    "/api/course/{courseOfferingId}/messages/{messageId}": {
       "put": {
         "tags": [
           "CourseGroupMessages"
         ],
+        "operationId": "Edit",
         "parameters": [
           {
             "name": "courseOfferingId",
@@ -581,7 +681,87 @@
         },
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "integer",
+                  "format": "int32"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       },
@@ -589,6 +769,7 @@
         "tags": [
           "CourseGroupMessages"
         ],
+        "operationId": "Delete",
         "parameters": [
           {
             "name": "courseOfferingId",
@@ -612,15 +793,76 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/course-offerings/{courseOfferingId}/messages/{messageId}/pin": {
+    "/api/course/{courseOfferingId}/messages/{messageId}/pin": {
       "post": {
         "tags": [
           "CourseGroupMessages"
         ],
+        "operationId": "TogglePin",
         "parameters": [
           {
             "name": "courseOfferingId",
@@ -644,15 +886,76 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
     },
-    "/api/course-offerings/{courseOfferingId}/messages/{messageId}/read": {
+    "/api/course/{courseOfferingId}/messages/{messageId}/read": {
       "post": {
         "tags": [
           "CourseGroupMessages"
         ],
+        "operationId": "MarkAsRead",
         "parameters": [
           {
             "name": "courseOfferingId",
@@ -676,6 +979,66 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -960,6 +1323,7 @@
         "tags": [
           "Notifications"
         ],
+        "operationId": "GetNotifications",
         "parameters": [
           {
             "name": "unreadOnly",
@@ -972,16 +1336,61 @@
         ],
         "responses": {
           "200": {
-            "description": "OK"
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationDto"
+                  }
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationDto"
+                  }
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/NotificationDto"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
-      }
-    },
-    "/api/notifications/{notificationId}/read": {
+      },
       "post": {
         "tags": [
           "Notifications"
         ],
+        "operationId": "{notificationId}/read",
         "parameters": [
           {
             "name": "notificationId",
@@ -996,6 +1405,46 @@
         "responses": {
           "200": {
             "description": "OK"
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -1008,6 +1457,66 @@
         "responses": {
           "200": {
             "description": "OK"
+          }
+        }
+      }
+    },
+    "/api/Profiles/STaffProfile/{userId}": {
+      "get": {
+        "tags": [
+          "Profiles"
+        ],
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffProfileResponseDto"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffProfileResponseDto"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/StaffProfileResponseDto"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationProblemDetails"
+                }
+              }
+            }
           }
         }
       }
@@ -1983,9 +2492,53 @@
         },
         "additionalProperties": false
       },
+      "CourseGroupMessageDto": {
+        "type": "object",
+        "properties": {
+          "messageID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "courseOfferingID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "senderUserID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "senderName": {
+            "type": "string",
+            "nullable": true
+          },
+          "content": {
+            "type": "string",
+            "nullable": true
+          },
+          "sentAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isPinned": {
+            "type": "boolean"
+          },
+          "isDeleted": {
+            "type": "boolean"
+          },
+          "readCount": {
+            "type": "integer",
+            "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
       "CourseOfferingDTO": {
         "type": "object",
         "properties": {
+          "courseOfferingId": {
+            "type": "integer",
+            "format": "int32"
+          },
           "courseOfferingHours": {
             "type": "integer",
             "format": "int32"
@@ -2212,6 +2765,34 @@
         },
         "additionalProperties": false
       },
+      "LoginDTO": {
+        "type": "object",
+        "properties": {
+          "academicId": {
+            "type": "string",
+            "nullable": true
+          },
+          "password": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
+      "LogoutRequest": {
+        "type": "object",
+        "properties": {
+          "acdimicID": {
+            "type": "string",
+            "nullable": true
+          },
+          "refreshToken": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "ModuleAverageDto": {
         "type": "object",
         "properties": {
@@ -2257,6 +2838,44 @@
           "rank": {
             "type": "integer",
             "format": "int32"
+          }
+        },
+        "additionalProperties": false
+      },
+      "NotificationDto": {
+        "type": "object",
+        "properties": {
+          "notificationID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "recipientUserID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "body": {
+            "type": "string",
+            "nullable": true
+          },
+          "relatedMessageID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "isRead": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
           }
         },
         "additionalProperties": false
@@ -2310,6 +2929,20 @@
         },
         "additionalProperties": false
       },
+      "RefreshRequest": {
+        "type": "object",
+        "properties": {
+          "refreshToken": {
+            "type": "string",
+            "nullable": true
+          },
+          "acdimicID": {
+            "type": "string",
+            "nullable": true
+          }
+        },
+        "additionalProperties": false
+      },
       "SendMessageRequest": {
         "type": "object",
         "properties": {
@@ -2320,14 +2953,31 @@
         },
         "additionalProperties": false
       },
-      "StaffLoginDTO": {
+      "StaffProfileResponseDto": {
         "type": "object",
         "properties": {
-          "staffID": {
+          "staffProfileID": {
             "type": "integer",
             "format": "int32"
           },
-          "password": {
+          "userID": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "fullName": {
+            "type": "string",
+            "nullable": true
+          },
+          "role": {
+            "type": "string",
+            "nullable": true
+          },
+          "departmentID": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "teachingYears": {
             "type": "string",
             "nullable": true
           }
@@ -2416,7 +3066,7 @@
             "type": "string",
             "nullable": true
           },
-          "studentname": {
+          "studentName": {
             "type": "string",
             "nullable": true
           },
@@ -2445,20 +3095,6 @@
           "studentdegree": {
             "type": "number",
             "format": "double"
-          }
-        },
-        "additionalProperties": false
-      },
-      "StudentLoginDTO": {
-        "type": "object",
-        "properties": {
-          "academicId": {
-            "type": "string",
-            "nullable": true
-          },
-          "password": {
-            "type": "string",
-            "nullable": true
           }
         },
         "additionalProperties": false
@@ -2529,6 +3165,43 @@
           }
         },
         "additionalProperties": false
+      },
+      "ValidationProblemDetails": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "nullable": true
+          },
+          "title": {
+            "type": "string",
+            "nullable": true
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true
+          },
+          "detail": {
+            "type": "string",
+            "nullable": true
+          },
+          "instance": {
+            "type": "string",
+            "nullable": true
+          },
+          "errors": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "nullable": true
+          }
+        },
+        "additionalProperties": { }
       },
       "enGradeAppealStatus": {
         "enum": [

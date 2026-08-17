@@ -7,7 +7,9 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
-[ApiController]
+namespace ATLAS.Controllers.Requests;
+
+    [ApiController]
 [Route("api/Request")]
 public class RequestController : ControllerBase
 {

@@ -1,14 +1,15 @@
-using MediatR;
+using ATLAsBLL.Services.Notifications.DTOs;
 using ATLAsDCL.UnitOfWork;
+using MediatR;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Text.Json;
 
 namespace ATLAsBLL.Services.Notifications.Queries.GetMyNotifications;
 
-public class GetMyNotificationsQueryHandler : IRequestHandler<GetMyNotificationsQuery, string>
+public class GetMyNotificationsQueryHandler : IRequestHandler<GetMyNotificationsQuery, List<NotificationDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
 
@@ -17,7 +18,7 @@ public class GetMyNotificationsQueryHandler : IRequestHandler<GetMyNotifications
         _unitOfWork = unitOfWork;
     }
 
-    public async Task<string> Handle(GetMyNotificationsQuery request, CancellationToken cancellationToken)
+    public async Task<List<NotificationDto>> Handle(GetMyNotificationsQuery request, CancellationToken cancellationToken)
     {
         IEnumerable<ATLAS.Domain.Entities.Notification> notifications;
 
@@ -31,18 +32,18 @@ public class GetMyNotificationsQueryHandler : IRequestHandler<GetMyNotifications
         }
 
         // Map to anonymous objects for API response
-        var result = notifications.Select(n => new
+        var result = notifications.Select(n => new NotificationDto
         {
-            n.NotificationID,
-            n.RecipientUserID,
-            n.Type,
-            n.Title,
-            n.Body,
-            n.RelatedMessageID,
-            n.IsRead,
-            n.CreatedAt
+            NotificationID = n.NotificationID,
+            RecipientUserID = n.RecipientUserID,
+            Type = n.Type,
+            Title = n.Title,
+            Body = n.Body,
+            RelatedMessageID = n.RelatedMessageID,
+            IsRead = n.IsRead,
+            CreatedAt = n.CreatedAt
         }).ToList();
 
-        return JsonSerializer.Serialize(result);
+        return result;
     }
 }

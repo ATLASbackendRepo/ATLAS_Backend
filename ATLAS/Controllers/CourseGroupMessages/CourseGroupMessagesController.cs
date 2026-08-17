@@ -1,15 +1,16 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using MediatR;
-using System.Security.Claims;
-using ATLAsBLL.Services.CourseGroupMessage.Command.SendCourseGroupMessage;
-using ATLAsBLL.Services.CourseGroupMessage.Command.EditCourseGroupMessage;
-using ATLAsBLL.Services.CourseGroupMessage.Command.DeleteCourseGroupMessage;
-using ATLAsBLL.Services.CourseGroupMessage.Command.TogglePinCourseGroupMessage;
-using ATLAsBLL.Services.CourseGroupMessage.Command.MarkMessageAsRead;
-using ATLAsBLL.Services.CourseGroupMessage.Queries.GetCourseGroupMessages;
 using ATLAsBLL.Exceptions;
+using ATLAsBLL.Services.CourseGroupMessage.Command.DeleteCourseGroupMessage;
+using ATLAsBLL.Services.CourseGroupMessage.Command.EditCourseGroupMessage;
+using ATLAsBLL.Services.CourseGroupMessage.Command.MarkMessageAsRead;
+using ATLAsBLL.Services.CourseGroupMessage.Command.SendCourseGroupMessage;
+using ATLAsBLL.Services.CourseGroupMessage.Command.TogglePinCourseGroupMessage;
+using ATLAsBLL.Services.CourseGroupMessage.DTOs;
+using ATLAsBLL.Services.CourseGroupMessage.Queries.GetCourseGroupMessages;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 using System.ComponentModel.DataAnnotations;
+using System.Security.Claims;
 
 namespace ATLAS.Controllers;
 
@@ -19,7 +20,7 @@ namespace ATLAS.Controllers;
 /// </summary>
 [Authorize]
 [ApiController]
-[Route("api/course-offerings/{courseOfferingId}/messages")]
+[Route("api/course/{courseOfferingId}/messages")]
 public class CourseGroupMessagesController : ControllerBase
 {
     private readonly IMediator _mediator;
@@ -33,8 +34,12 @@ public class CourseGroupMessagesController : ControllerBase
     /// Get paginated list of messages in a course offering.
     /// Authorization: User must be enrolled student or assigned staff (Doctor/TA).
     /// </summary>
-    [HttpGet]
-    public async Task<IActionResult> GetMessages(
+    [HttpGet(Name = "GetMessages")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
+    public async Task<ActionResult<List<CourseGroupMessageDto>>> GetMessages(
         [FromRoute] int courseOfferingId,
         [FromQuery] int page = 1,
         [FromQuery] int pageSize = 20,
@@ -61,8 +66,13 @@ public class CourseGroupMessagesController : ControllerBase
     /// Send a new message to a course group.
     /// Authorization: Only Doctors/TAs assigned to the course can send.
     /// </summary>
-    [HttpPost]
-    public async Task<IActionResult> SendMessage(
+    [HttpPost(Name = "Send")]
+    [ProducesResponseType(StatusCodes.Status201Created)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
+    public async Task<ActionResult<int>> SendMessage(
         [FromRoute] int courseOfferingId,
         [FromBody] SendMessageRequest request,
         CancellationToken cancellationToken = default)
@@ -72,7 +82,7 @@ public class CourseGroupMessagesController : ControllerBase
             var userId = GetCurrentUserId();
             var command = new SendCourseGroupMessageCommand(courseOfferingId, userId, request.Content);
             var messageId = await _mediator.Send(command, cancellationToken);
-            return Created($"/api/course-offerings/{courseOfferingId}/messages/{messageId}", new { messageId });
+            return Created();
         }
         catch (ForbiddenAccessException)
         {
@@ -95,8 +105,13 @@ public class CourseGroupMessagesController : ControllerBase
     /// <summary>
     /// Edit an existing message (sender only).
     /// </summary>
-    [HttpPut("{messageId}")]
-    public async Task<IActionResult> EditMessage(
+    [HttpPut("{messageId}", Name = "Edit")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
+    public async Task<ActionResult<int>> EditMessage(
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
         [FromBody] EditMessageRequest request,
@@ -107,7 +122,7 @@ public class CourseGroupMessagesController : ControllerBase
             var userId = GetCurrentUserId();
             var command = new EditCourseGroupMessageCommand(messageId, userId, request.NewContent);
             await _mediator.Send(command, cancellationToken);
-            return Ok(new { messageId, message = "Message updated successfully." });
+            return Ok();
         }
         catch (ForbiddenAccessException)
         {
@@ -126,7 +141,12 @@ public class CourseGroupMessagesController : ControllerBase
     /// <summary>
     /// Soft-delete a message (sender only).
     /// </summary>
-    [HttpDelete("{messageId}")]
+    [HttpDelete("{messageId}", Name = "Delete")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
     public async Task<IActionResult> DeleteMessage(
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
@@ -137,7 +157,7 @@ public class CourseGroupMessagesController : ControllerBase
             var userId = GetCurrentUserId();
             var command = new DeleteCourseGroupMessageCommand(messageId, userId);
             await _mediator.Send(command, cancellationToken);
-            return Ok(new { messageId, message = "Message deleted successfully." });
+            return Ok();
         }
         catch (ForbiddenAccessException)
         {
@@ -156,7 +176,12 @@ public class CourseGroupMessagesController : ControllerBase
     /// <summary>
     /// Toggle pin status of a message (sender only).
     /// </summary>
-    [HttpPost("{messageId}/pin")]
+    [HttpPost("{messageId}/pin", Name = "TogglePin")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
     public async Task<IActionResult> TogglePin(
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
@@ -167,7 +192,7 @@ public class CourseGroupMessagesController : ControllerBase
             var userId = GetCurrentUserId();
             var command = new TogglePinCourseGroupMessageCommand(messageId, userId);
             await _mediator.Send(command, cancellationToken);
-            return Ok(new { messageId, message = "Pin status toggled successfully." });
+            return Ok();
         }
         catch (ForbiddenAccessException)
         {
@@ -186,7 +211,12 @@ public class CourseGroupMessagesController : ControllerBase
     /// <summary>
     /// Mark a message as read by the current student.
     /// </summary>
-    [HttpPost("{messageId}/read")]
+    [HttpPost("{messageId}/read", Name = "MarkAsRead")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
     public async Task<IActionResult> MarkAsRead(
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
@@ -197,7 +227,7 @@ public class CourseGroupMessagesController : ControllerBase
             var userId = GetCurrentUserId();
             var command = new MarkMessageAsReadCommand(messageId, userId);
             await _mediator.Send(command, cancellationToken);
-            return Ok(new { messageId, message = "Message marked as read." });
+            return Ok();
         }
         catch (ForbiddenAccessException)
         {

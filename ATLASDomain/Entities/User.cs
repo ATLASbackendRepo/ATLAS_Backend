@@ -23,6 +23,16 @@ public class User
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public enUserRole Role { get; set; }
 
+    public string AcademicId { get; set; }
+    public int InstitutionID { get; set; }
+    public int DepartmentId { get; set; }
+
+   
+    public Institution Institution { get; set; }
+
+    public Department Department { get; set; }
+
+
 
     public Student? Student { get; set; }
 
@@ -34,4 +44,16 @@ public class User
 
     // if user is a super admin, then he can have many enrollments
     public ICollection<Enrollment>? Enrollments { get; set; } = new List<Enrollment>();
+
+
+
+
+
+    /// <summary>
+    ///  authentication
+    /// </summary>
+
+    public string? RefreshTokenHash { get; set; }
+    public DateTime? RefreshTokenExpiresAt { get; set; }
+    public DateTime? RefreshTokenRevokedAt { get; set; }
 }

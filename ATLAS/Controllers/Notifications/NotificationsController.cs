@@ -1,17 +1,16 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization;
-using MediatR;
-using System.Security.Claims;
-using ATLAsBLL.Services.Notifications.Queries.GetMyNotifications;
-using ATLAsBLL.Services.Notifications.Command.MarkNotificationAsRead;
-using ATLAsBLL.Services.Notifications.Command.MarkAllNotificationsAsRead;
 using ATLAsBLL.Exceptions;
+using ATLAsBLL.Services.Notifications.Command.MarkAllNotificationsAsRead;
+using ATLAsBLL.Services.Notifications.Command.MarkNotificationAsRead;
+using ATLAsBLL.Services.Notifications.DTOs;
+using ATLAsBLL.Services.Notifications.Queries.GetMyNotifications;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace ATLAS.Controllers;
 
-/// <summary>
-/// Manages user notifications.
-/// </summary>
+
 [Authorize]
 [ApiController]
 [Route("api/notifications")]
@@ -24,31 +23,33 @@ public class NotificationsController : ControllerBase
         _mediator = mediator;
     }
 
-    /// <summary>
-    /// Get current user's notifications.
-    /// </summary>
-    [HttpGet]
-    public async Task<IActionResult> GetNotifications(
+  
+    [HttpGet ( Name = "GetNotifications" )]
+    [ProducesResponseType(typeof(List<NotificationDto>), 200)]
+    [ProducesResponseType(statusCode: 404)]
+    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
+
+    public async Task<ActionResult<List<NotificationDto>>> GetNotifications(
         [FromQuery] bool unreadOnly = false,
         CancellationToken cancellationToken = default)
     {
-        try
+        var userId = GetCurrentUserId();
+        var result = await _mediator.Send(new GetMyNotificationsQuery(userId, unreadOnly), cancellationToken);
+        if (result == null)
         {
-            var userId = GetCurrentUserId();
-            var query = new GetMyNotificationsQuery(userId, unreadOnly);
-            var result = await _mediator.Send(query, cancellationToken);
-            return Ok(result);
+            return NotFound(new { message = "No notifications found." });
         }
-        catch (Exception ex)
-        {
-            return BadRequest(new { message = ex.Message });
-        }
+        return Ok(result);
     }
 
     /// <summary>
     /// Mark a single notification as read.
     /// </summary>
-    [HttpPost("{notificationId}/read")]
+    [HttpPost(Name = "{notificationId}/read")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
     public async Task<IActionResult> MarkAsRead(
         [FromRoute] int notificationId,
         CancellationToken cancellationToken = default)
@@ -78,6 +79,8 @@ public class NotificationsController : ControllerBase
     /// Mark all notifications as read for the current user.
     /// </summary>
     [HttpPost("read-all")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
     public async Task<IActionResult> MarkAllAsRead(CancellationToken cancellationToken = default)
     {
         try
@@ -93,7 +96,7 @@ public class NotificationsController : ControllerBase
         }
     }
 
-    private int GetCurrentUserId()
+    private int     GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))

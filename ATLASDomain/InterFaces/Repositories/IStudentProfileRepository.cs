@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace ATLASDomain.InterFaces.Repositories
 {
-    public interface IStudentProfileRepository
+    public interface IStudentProfileRepository :IGenericRepository<StudentProfile>
     {
         Task<StudentProfile?> GetByStudentIdAsync(int StudentId);
       

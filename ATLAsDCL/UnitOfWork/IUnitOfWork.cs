@@ -1,4 +1,5 @@
 ﻿using ATLASDomain.Interfaces.Repositories;
+using ATLASDomain.InterFaces.Repositories;
 
 
 namespace ATLAsDCL.UnitOfWork;
@@ -28,7 +29,9 @@ public interface IUnitOfWork : IDisposable
     IStudentRepository Students { get; }
 
  
+    IStaffProfileRepository staffProfile { get; }
 
+    IStudentProfileRepository StudentProfile { get; }
     IUserRepository Users { get; }
     ICourseGroupMessageRepository CourseGroupMessages { get; }
     INotificationRepository Notifications { get; }

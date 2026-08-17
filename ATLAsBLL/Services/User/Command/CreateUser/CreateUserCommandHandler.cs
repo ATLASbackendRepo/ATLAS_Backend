@@ -1,8 +1,9 @@
-﻿using MediatR;
+﻿using ATLAsBLL.Events;
+using ATLAsDCL.UnitOfWork;
+using ATLASDomain.Entities;
+using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
-using ATLASDomain.Entities;
-using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Features.Users.Commands.CreateUser
 {
@@ -10,6 +11,7 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUser
     {
         private readonly IUnitOfWork _unitOfWork;
 
+        private readonly IPublisher _publisher;
         public CreateUserCommandHandler(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
@@ -27,6 +29,13 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUser
 
             await _unitOfWork.Users.AddAsync(user);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+     
+                await _publisher.Publish(
+                    new UserCreatedEvent(user.UserId, user.Role, user.FullName),
+                    cancellationToken
+                );
+            
 
             return user.UserId;
         }

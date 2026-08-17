@@ -45,88 +45,56 @@
   },
   {
     "ContainingType": "ATLAS.Controllers.Authtenication.AuthController",
-    "Method": "StaffLogin",
-    "RelativePath": "api/Auth/StaffLogin",
+    "Method": "Login",
+    "RelativePath": "api/Auth/Login",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
         "Name": "request",
-        "Type": "ATLASDomain.DTO.Login.StaffLoginDTO",
+        "Type": "ATLASDomain.DTO.Login.LoginDTO",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": [
-      {
-        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 401
-      },
-      {
-        "Type": "System.Void",
-        "MediaTypes": [],
-        "StatusCode": 200
-      },
-      {
-        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 400
-      }
-    ]
+    "ReturnTypes": []
   },
   {
     "ContainingType": "ATLAS.Controllers.Authtenication.AuthController",
-    "Method": "StudentLogin",
-    "RelativePath": "api/Auth/StudentLogin",
+    "Method": "Logout",
+    "RelativePath": "api/Auth/logout",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
     "Parameters": [
       {
         "Name": "request",
-        "Type": "ATLASDomain.DTO.Login.StudentLoginDTO",
+        "Type": "ATLASDomain.DTO.Login.LogoutRequest",
         "IsRequired": true
       }
     ],
-    "ReturnTypes": [
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "ATLAS.Controllers.Authtenication.AuthController",
+    "Method": "Refresh",
+    "RelativePath": "api/Auth/refresh",
+    "HttpMethod": "POST",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
       {
-        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 401
-      },
-      {
-        "Type": "System.Void",
-        "MediaTypes": [],
-        "StatusCode": 200
-      },
-      {
-        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 400
+        "Name": "request",
+        "Type": "ATLASDomain.DTO.Login.RefreshRequest",
+        "IsRequired": true
       }
-    ]
+    ],
+    "ReturnTypes": []
   },
   {
     "ContainingType": "ATLAS.Controllers.CourseGroupMessagesController",
     "Method": "GetMessages",
-    "RelativePath": "api/course-offerings/{courseOfferingId}/messages",
+    "RelativePath": "api/course/{courseOfferingId}/messages",
     "HttpMethod": "GET",
     "IsController": true,
     "Order": 0,
@@ -147,12 +115,41 @@
         "IsRequired": false
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[ATLAsBLL.Services.CourseGroupMessage.DTOs.CourseGroupMessageDto, ATLASDomain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 403
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ],
+    "EndpointName": "GetMessages"
   },
   {
     "ContainingType": "ATLAS.Controllers.CourseGroupMessagesController",
     "Method": "SendMessage",
-    "RelativePath": "api/course-offerings/{courseOfferingId}/messages",
+    "RelativePath": "api/course/{courseOfferingId}/messages",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -168,12 +165,50 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "System.Int32",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 201
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 403
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ],
+    "EndpointName": "Send"
   },
   {
     "ContainingType": "ATLAS.Controllers.CourseGroupMessagesController",
     "Method": "EditMessage",
-    "RelativePath": "api/course-offerings/{courseOfferingId}/messages/{messageId}",
+    "RelativePath": "api/course/{courseOfferingId}/messages/{messageId}",
     "HttpMethod": "PUT",
     "IsController": true,
     "Order": 0,
@@ -194,12 +229,50 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "System.Int32",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 403
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ],
+    "EndpointName": "Edit"
   },
   {
     "ContainingType": "ATLAS.Controllers.CourseGroupMessagesController",
     "Method": "DeleteMessage",
-    "RelativePath": "api/course-offerings/{courseOfferingId}/messages/{messageId}",
+    "RelativePath": "api/course/{courseOfferingId}/messages/{messageId}",
     "HttpMethod": "DELETE",
     "IsController": true,
     "Order": 0,
@@ -215,12 +288,46 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 403
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ],
+    "EndpointName": "Delete"
   },
   {
     "ContainingType": "ATLAS.Controllers.CourseGroupMessagesController",
     "Method": "TogglePin",
-    "RelativePath": "api/course-offerings/{courseOfferingId}/messages/{messageId}/pin",
+    "RelativePath": "api/course/{courseOfferingId}/messages/{messageId}/pin",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -236,12 +343,46 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 403
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ],
+    "EndpointName": "TogglePin"
   },
   {
     "ContainingType": "ATLAS.Controllers.CourseGroupMessagesController",
     "Method": "MarkAsRead",
-    "RelativePath": "api/course-offerings/{courseOfferingId}/messages/{messageId}/read",
+    "RelativePath": "api/course/{courseOfferingId}/messages/{messageId}/read",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -257,7 +398,41 @@
         "IsRequired": true
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 403
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ],
+    "EndpointName": "MarkAsRead"
   },
   {
     "ContainingType": "ATLASAPI.Controllers.CourseGradeController",
@@ -543,12 +718,32 @@
         "IsRequired": false
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "System.Collections.Generic.List\u00601[[ATLAsBLL.Services.Notifications.DTOs.NotificationDto, ATLASDomain, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      }
+    ],
+    "EndpointName": "GetNotifications"
   },
   {
     "ContainingType": "ATLAS.Controllers.NotificationsController",
     "Method": "MarkAsRead",
-    "RelativePath": "api/notifications/{notificationId}/read",
+    "RelativePath": "api/notifications",
     "HttpMethod": "POST",
     "IsController": true,
     "Order": 0,
@@ -556,10 +751,35 @@
       {
         "Name": "notificationId",
         "Type": "System.Int32",
-        "IsRequired": true
+        "IsRequired": false
       }
     ],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 404
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 403
+      }
+    ],
+    "EndpointName": "{notificationId}/read"
   },
   {
     "ContainingType": "ATLAS.Controllers.NotificationsController",
@@ -569,10 +789,51 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
-    "ReturnTypes": []
+    "ReturnTypes": [
+      {
+        "Type": "System.Void",
+        "MediaTypes": [],
+        "StatusCode": 200
+      }
+    ]
   },
   {
-    "ContainingType": "RequestController",
+    "ContainingType": "ATLAS.API.Controllers.Profile.ProfilesController",
+    "Method": "GetByUserId",
+    "RelativePath": "api/Profiles/STaffProfile/{userId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "userId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": [
+      {
+        "Type": "ATLASDomain.DTO.Profile.StaffProfileResponseDto",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 200
+      },
+      {
+        "Type": "Microsoft.AspNetCore.Mvc.ValidationProblemDetails",
+        "MediaTypes": [
+          "text/plain",
+          "application/json",
+          "text/json"
+        ],
+        "StatusCode": 400
+      }
+    ]
+  },
+  {
+    "ContainingType": "ATLAS.Controllers.Requests.RequestController",
     "Method": "Create",
     "RelativePath": "api/Request",
     "HttpMethod": "POST",
@@ -603,7 +864,7 @@
     ]
   },
   {
-    "ContainingType": "RequestController",
+    "ContainingType": "ATLAS.Controllers.Requests.RequestController",
     "Method": "Update",
     "RelativePath": "api/Request/{requestId}",
     "HttpMethod": "PATCH",
@@ -648,7 +909,7 @@
     ]
   },
   {
-    "ContainingType": "RequestController",
+    "ContainingType": "ATLAS.Controllers.Requests.RequestController",
     "Method": "GetById",
     "RelativePath": "api/Request/{requestId}",
     "HttpMethod": "GET",
@@ -674,7 +935,7 @@
     ]
   },
   {
-    "ContainingType": "RequestController",
+    "ContainingType": "ATLAS.Controllers.Requests.RequestController",
     "Method": "GetDoctorRequests",
     "RelativePath": "api/Request/doctor",
     "HttpMethod": "GET",
@@ -703,7 +964,7 @@
     ]
   },
   {
-    "ContainingType": "RequestController",
+    "ContainingType": "ATLAS.Controllers.Requests.RequestController",
     "Method": "GetMyRequests",
     "RelativePath": "api/Request/student",
     "HttpMethod": "GET",

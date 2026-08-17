@@ -24,7 +24,7 @@ public class DepartmentRepository
     {
         return await _context.Departments
             .AsNoTracking()
-            .Include(d => d.Doctors)
+            .Include(d => d.Users)
             .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
     }
 }

@@ -7,8 +7,12 @@ public class Department
 
     public string D_Name { get; set; } = null!;
 
+     public int  InstitutionID { get; set; }
+
+    public Institution Institution { get; set; }
+
     public ICollection<Student> Students { get; set; } = new List<Student>();
 
     // Users with role Doctor that belong to this department
-    public ICollection<User> Doctors { get; set; } = new List<User>();
+    public ICollection<User> Users { get; set; } = new List<User>();
 }

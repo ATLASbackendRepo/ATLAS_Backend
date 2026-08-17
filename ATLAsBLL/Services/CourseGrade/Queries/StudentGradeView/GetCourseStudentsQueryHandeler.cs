@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace ATLAsBLL.Services.CourseGrade.Queries.StudentGradeView
+namespace ATLAsBLL.Services.CourseGrade.Queries
 {
     public class GetCourseStudentsQueryHandler : IRequestHandler<GetCourseStudentsQuery, PagedResultDto<StudentCardDto>>
     {

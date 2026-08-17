@@ -1,4 +1,5 @@
 using ATLAS;
+using ATLAS.Persistence.Repositories;
 using ATLAsBLL.Features.CourseGrades.Commands.CreateCourseGradesRange;
 using ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade;
 using ATLAsBLL.Features.Enrollments.Commands.CreateEnrollmentsRange;
@@ -9,6 +10,7 @@ using ATLAsDCL.UnitOfWork;
 using ATLASDomain.DTO.CourseGrade;
 using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
+using ATLASDomain.InterFaces.Repositories;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
@@ -106,5 +108,8 @@ public class GradeAndAuthorizationTests
         new StudentRepository(context),
         new UserRepository(context),
         new CourseGroupMessageRepository(context),
-        new NotificationRepository(context));
+        new NotificationRepository(context),
+        new StudentProfileRepository(context), 
+        new StaffProfileRepository(context)
+    );
 }

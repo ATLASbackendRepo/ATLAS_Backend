@@ -1,6 +1,6 @@
 ﻿using ATLAsBLL.Features.CourseGrades.Commands.CreateCourseGradesRange;
 using ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade;
-using ATLAsBLL.Services.CourseGrade.Queries.StudentGradeView;
+using ATLAsBLL.Services.CourseGrade.Queries;
 using ATLASDomain.DTO.CourseGrade;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;

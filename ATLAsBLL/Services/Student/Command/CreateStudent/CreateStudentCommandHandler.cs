@@ -3,16 +3,19 @@ using System.Threading;
 using System.Threading.Tasks;
 using ATLASDomain.Entities;
 using ATLAsDCL.UnitOfWork;
+using ATLAsBLL.Events;
 
 namespace ATLAsBLL.Features.Students.Commands.CreateStudent
 {
     public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand, int>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly IPublisher _publisher;
 
-        public CreateStudentCommandHandler(IUnitOfWork unitOfWork)
+        public CreateStudentCommandHandler(IUnitOfWork unitOfWork, IPublisher publisher)
         {
             _unitOfWork = unitOfWork;
+            _publisher = publisher;
         }
 
         public async Task<int> Handle(CreateStudentCommand request, CancellationToken cancellationToken)
@@ -42,6 +45,9 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
 
             // 4. حفظ الاتنين معاً كـ Transaction واحدة
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            // 5. إعلام بأن الطالب تم إنشاؤه
+            await _publisher.Publish(new StudentCreatedDomainEvent(student.StudentId), cancellationToken);
 
             return student.StudentId;
         }

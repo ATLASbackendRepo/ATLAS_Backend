@@ -4,7 +4,7 @@
 namespace ATLAsBLL.Services.Auth.Queries
 {
     public sealed class GetStudentByAcademicIdQueryValidator
-      : AbstractValidator<GetStudentByAcademicIdQuery>
+      : AbstractValidator<GetUserByAcademicIdQuery>
     {
         public GetStudentByAcademicIdQueryValidator()
         {

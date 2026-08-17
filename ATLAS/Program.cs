@@ -1,11 +1,12 @@
+using ATLAS;
 using ATLAsBLL;
 using ATLAsDCL.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using Microsoft.Extensions.Options;
 using System.Text;
-using ATLAS;
+using System.Threading.RateLimiting;
 using DALExt = ATLAsDCL.DependencyInjection.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -93,6 +94,25 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             ClockSkew = TimeSpan.Zero
         };
     });
+
+builder.Services.AddRateLimiter(options =>
+{
+    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests; 
+
+    options.AddPolicy("AuthLimiter", httpContext =>
+    {
+        var ip = httpContext.Connection.RemoteIpAddress?.ToString() ?? "unknown";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey: ip,
+            factory: _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 3,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0
+            });
+    });
+});
 
 
 

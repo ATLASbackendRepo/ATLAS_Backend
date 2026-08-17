@@ -8,5 +8,14 @@ namespace ATLASDomain.Entities
 
         public ICollection<Student> Students { get; set; } = new List<Student>();
 
+        public ICollection<User> Users { get; set; } = new List<User>();
+
+
+
+        public ICollection<Department> Departments { get; set; }
+
+
+
+
     }
 }

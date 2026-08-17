@@ -14,7 +14,7 @@ namespace ATLAS.Persistence.Configurations
             builder.HasKey(p => p.StudentProfileID);
 
             builder.Property(p => p.LinkedInUrl).HasMaxLength(300);
-            builder.Property(p => p.Faculty).HasMaxLength(150);
+           
             builder.Property(p => p.QRCodeUrl).HasMaxLength(300);
             builder.Property(p => p.SectionNumber).IsRequired();
             builder.Property(p => p.CreatedAt).IsRequired();

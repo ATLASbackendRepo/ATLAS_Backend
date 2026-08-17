@@ -13,8 +13,11 @@ namespace ATLAsDCL.Configuration
             builder.Property(d => d.D_Name)
                 .IsRequired()
                 .HasMaxLength(100);
-           
-         
+
+            builder.HasOne(d => d.Institution)
+              .WithMany(i => i.Departments)
+              .HasForeignKey(d => d.InstitutionID);
+
         }
     }
 }

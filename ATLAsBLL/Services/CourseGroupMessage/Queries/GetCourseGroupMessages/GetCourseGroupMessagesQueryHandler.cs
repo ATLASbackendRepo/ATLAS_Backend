@@ -1,52 +1,59 @@
-using MediatR;
+using ATLAsBLL.Services.CourseGroupMessage.DTOs;
 using ATLAsDCL.UnitOfWork;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text.Json;
-            using System.Text.Json.Serialization;
+using MediatR;
 
 namespace ATLAsBLL.Services.CourseGroupMessage.Queries.GetCourseGroupMessages;
 
-public class GetCourseGroupMessagesQueryHandler : IRequestHandler<GetCourseGroupMessagesQuery, string>
+public class GetCourseGroupMessagesQueryHandler
+    : IRequestHandler<
+        GetCourseGroupMessagesQuery,
+        List<CourseGroupMessageDto>>
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly ATLASDomain.Services.ICourseAccessService _courseAccessService;
 
-    public GetCourseGroupMessagesQueryHandler(IUnitOfWork unitOfWork, ATLASDomain.Services.ICourseAccessService courseAccessService)
+    public GetCourseGroupMessagesQueryHandler(
+        IUnitOfWork unitOfWork,
+        ATLASDomain.Services.ICourseAccessService courseAccessService)
     {
         _unitOfWork = unitOfWork;
         _courseAccessService = courseAccessService;
     }
 
-    public async Task<string> Handle(GetCourseGroupMessagesQuery request, CancellationToken cancellationToken)
+    public async Task<List<CourseGroupMessageDto>> Handle(
+        GetCourseGroupMessagesQuery request,
+        CancellationToken cancellationToken)
     {
-        // Authorization: user must be able to read this course
-        if (!await _courseAccessService.CanReadAsync(request.RequestingUserId, request.CourseOfferingId))
+        // Authorization
+        var canRead = await _courseAccessService.CanReadAsync(
+            request.RequestingUserId,
+            request.CourseOfferingId);
+
+        if (!canRead)
         {
-            throw new Exceptions.ForbiddenAccessException("You do not have permission to view messages in this course.");
+            throw new Exceptions.ForbiddenAccessException(
+                "You do not have permission to view messages in this course.");
         }
 
-        var messages = await _unitOfWork.CourseGroupMessages.GetByCourseOfferingAsync(
-            request.CourseOfferingId,
-            request.Page,
-            request.PageSize);
+        // Get messages
+        var messages = await _unitOfWork.CourseGroupMessages
+            .GetByCourseOfferingAsync(
+                request.CourseOfferingId,
+                request.Page,
+                request.PageSize);
 
-        // Map to anonymous objects for API response
-        var result = messages.Select(m => new
+        // Map to DTO
+        return messages.Select(m => new CourseGroupMessageDto
         {
-            m.MessageID,
-            m.CourseOfferingID,
-            m.SenderUserID,
+            MessageID = m.MessageID,
+            CourseOfferingID = m.CourseOfferingID,
+            SenderUserID = m.SenderUserID,
             SenderName = m.SenderUser?.FullName,
-            m.Content,
-            m.SentAt,
-            m.IsPinned,
-            m.IsDeleted,
+            Content = m.Content,
+            SentAt = m.SentAt,
+            IsPinned = m.IsPinned,
+            IsDeleted = m.IsDeleted,
             ReadCount = m.ReadReceipts?.Count ?? 0
         }).ToList();
-
-        return JsonSerializer.Serialize(result);
     }
 }

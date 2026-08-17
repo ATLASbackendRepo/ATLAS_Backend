@@ -5,6 +5,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ATLAsDCL.Repositories;
+using ATLAS.Persistence.Repositories;
+using ATLASDomain.InterFaces.Repositories;
 
 namespace ATLAsDCL.DependencyInjection;
 
@@ -28,6 +30,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISemesterRepository, SemesterRepository>();
         services.AddScoped<IStudentRepository, StudentRepository>();
         services.AddScoped<IUserRepository, UserRepository>();
+        services.AddScoped<IStaffProfileRepository, StaffProfileRepository>();
+        services.AddScoped<IStudentProfileRepository, StudentProfileRepository>();
 
         services.AddScoped<IGradeAppealRequestRepository,
                                   GradeAppealRequestRepository>();

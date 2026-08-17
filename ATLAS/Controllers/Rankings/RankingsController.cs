@@ -27,27 +27,33 @@ public class RankingsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     public async Task<ActionResult<MyRankDto>> GetMyRank(
-        int semesterId,
-        [FromQuery] int studentId,
-        CancellationToken cancellationToken)
+    int semesterId,
+    [FromQuery] int studentId,
+    CancellationToken cancellationToken)
     {
-        if (!int.TryParse(User.FindFirst("StudentId")?.Value, out var authenticatedStudentId))
-            return Unauthorized();
-
-        if (studentId != authenticatedStudentId)
-            return Forbid();
-
         if (studentId < 1)
             return BadRequest("StudentId must be greater than zero.");
 
         if (semesterId < 1)
             return BadRequest("SemesterId must be greater than zero.");
 
+        if (!int.TryParse(
+            User.FindFirst("StudentId")?.Value,
+            out var authenticatedStudentId))
+        {
+            return Unauthorized();
+        }
+
+        if (studentId != authenticatedStudentId)
+            return Forbid();
+
         var result = await _mediator.Send(
-            new GetMySemesterRankQuery(studentId, semesterId), cancellationToken);
+            new GetMySemesterRankQuery(studentId, semesterId),
+            cancellationToken);
 
         if (result is null)
-            return NotFound($"Student {studentId} has no enrollments in Semester {semesterId}.");
+            return NotFound(
+                $"Student {studentId} has no enrollments in Semester {semesterId}.");
 
         return Ok(result);
     }

@@ -22,7 +22,10 @@ namespace ATLAsDCL.Configuration
                 .HasDefaultValueSql("GETDATE()");
 
             builder.Property(u => u.Role)
-          .HasDefaultValue(enUserRole.Student.ToString());
+          .HasDefaultValue(enUserRole.Student)
+          .HasConversion<string>()
+          .HasMaxLength(50)
+          .IsRequired();
 
             builder.ToTable(t =>
                t.HasCheckConstraint(
@@ -30,6 +33,20 @@ namespace ATLAsDCL.Configuration
                   "[Role] IN ('Student', 'Admin', 'SuperAdmin', 'Doctor', 'TeachingAssistant')"
                  ) 
                  );
+
+            builder.HasOne(u => u.Institution)
+       .WithMany(i => i.Users)
+       .HasForeignKey(u => u.InstitutionID)
+       .HasConstraintName("FK_User_Insutition");
+
+            builder.HasOne(u => u.Department)
+                   .WithMany(d => d.Users)
+                   .HasForeignKey(u => u.DepartmentId)
+                   .HasConstraintName("FK_Users_Departments_DepartmentId");
+
+
+
+
         }
     }
 }

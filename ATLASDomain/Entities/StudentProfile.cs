@@ -12,7 +12,7 @@ namespace ATLAS.Domain.Entities
 
         public string? LinkedInUrl { get; set; }
         public int SectionNumber { get; set; }
-        public string? Faculty { get; set; }
+
         public string? QRCodeUrl { get; set; }
 
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

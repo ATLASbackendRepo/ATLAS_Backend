@@ -26,6 +26,18 @@ namespace ATLAsBLL.Services.Notifications
 
             var studentUserIds = enrollments.Select(e => e.Student.UserId).Distinct().Where(id => id != notification.SenderUserId).ToList();
 
+            // fetch the course offering and its course name
+            var offering = (await _unitOfWork.CourseOfferings
+                .FindAsync(co => co.CourseOfferingID == notification.CourseOfferingId))
+                .FirstOrDefault();
+
+            if(offering == null)
+            {
+                // Handle the case where the course offering is not found
+                return;
+            }
+            var title = offering.Course.C_Name;
+
             var notifications = new List<Notification>();
             foreach (var uid in studentUserIds)
             {
@@ -33,7 +45,7 @@ namespace ATLAsBLL.Services.Notifications
                 {
                     RecipientUserID = uid,
                     Type = "CourseGroupMessage",
-                    Title = "New message in your course group",
+                    Title = title,
                     Body = null,
                     RelatedMessageID = notification.MessageId,
                     IsRead = false

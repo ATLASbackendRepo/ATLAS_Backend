@@ -27,7 +27,7 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
 
         // Students only - verify this student is enrolled in the course
         var isEnrolled = await _unitOfWork.Enrollments.FirstOrDefaultAsync(e =>
-            e.CourseOfferingID == message.CourseOfferingID && e.Student.UserId == request.StudentId);
+            e.CourseOfferingID == message.CourseOfferingID && e.Student.UserId == request.UserId);
 
         if (isEnrolled == null)
         {
@@ -38,7 +38,7 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
         var readReceipt = new CourseGroupMessageRead
         {
             MessageID = request.MessageId,
-            StudentID = request.StudentId,
+            StudentID = request.UserId,
             ReadAt = DateTime.UtcNow
         };
 

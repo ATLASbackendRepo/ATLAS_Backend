@@ -5,11 +5,17 @@ namespace ATLAsBLL.Mappings;
 
 public static class StudentMappings
 {
-    public static StudentDTO ToDto(this Student student) => new()
+    public static StudentDTO ToDto(this Student student)
     {
-        StudentCode = student.StudentCode,
-        Studentname = student.User.FullName,
-        AcademicId = student.AcademicId,
-        AcademicLevel = student.AcademicLevel
-    };
+        ArgumentNullException.ThrowIfNull(student);
+        ArgumentNullException.ThrowIfNull(student.User);
+
+        return new()
+        {
+            StudentCode = student.StudentCode,
+            StudentName = student.User.FullName,
+            AcademicId = student.AcademicId,
+            AcademicLevel = student.AcademicLevel
+        };
+    }
 }

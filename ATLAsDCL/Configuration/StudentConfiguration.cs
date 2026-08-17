@@ -8,33 +8,60 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
     {
         builder.ToTable("Students");
 
+        // Primary Key
         builder.HasKey(x => x.StudentId);
 
-        builder.Property(x => x.StudentCode).IsRequired()
-               .HasMaxLength(20);
-        builder.HasIndex(x => x.StudentCode).IsUnique();
-        builder.Property(x => x.UserId).IsRequired();
-        builder.Property(x => x.AcademicId).IsRequired();
-        builder.Property(x => x.DepartmentId).IsRequired();
-        builder.Property(x => x.IsActive).HasDefaultValue(true);
+        // Properties
+        builder.Property(x => x.StudentId)
+               .HasColumnName("StudentId");
 
-        builder.Property(x => x.AcademicLevel)
-               .HasConversion<int>() 
+        builder.Property(x => x.StudentCode)
+               .HasColumnName("StudentCode")
+               .IsRequired()
+               .HasMaxLength(20);
+
+        builder.Property(x => x.UserId)
+               .HasColumnName("UserID")
                .IsRequired();
 
+        builder.Property(x => x.AcademicId)
+               .HasColumnName("AcademicId")
+               .IsRequired();
+
+        builder.Property(x => x.AcademicLevel)
+               .HasColumnName("AcademicLevel")
+               .HasConversion<int>()
+               .IsRequired();
+
+        builder.Property(x => x.IsActive)
+               .HasColumnName("IsActive")
+               .HasDefaultValue(true);
+
+        builder.Property(x => x.InstitutionID)
+               .HasColumnName("InstitutionID")
+               .IsRequired();
+
+        builder.Property(x => x.DepartmentId)
+               .HasColumnName("DepartmentID")
+               .IsRequired();
+
+        // Unique StudentCode
+        builder.HasIndex(x => x.StudentCode)
+               .IsUnique();
+
+        // Student -> Department
         builder.HasOne(x => x.Department)
                .WithMany(d => d.Students)
                .HasForeignKey(x => x.DepartmentId)
                .OnDelete(DeleteBehavior.Restrict);
 
-        builder.Property(x => x.InstitutionID)
-    .IsRequired(true);
-
+        // Student -> Institution
         builder.HasOne(x => x.Institution)
-            .WithMany(i => i.Students)
-            .HasForeignKey(x => x.InstitutionID)
-            .OnDelete(DeleteBehavior.Restrict);
-        // Relationship: Student -> User (one-to-one)
+               .WithMany(i => i.Students)
+               .HasForeignKey(x => x.InstitutionID)
+               .OnDelete(DeleteBehavior.Restrict);
+
+        // Student -> User (One-to-One)
         builder.HasOne(x => x.User)
                .WithOne(u => u.Student)
                .HasForeignKey<Student>(x => x.UserId)

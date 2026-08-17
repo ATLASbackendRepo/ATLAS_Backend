@@ -1,5 +1,6 @@
 ﻿using ATLAsDCL.Data;
 using ATLASDomain.Interfaces.Repositories;
+using ATLASDomain.InterFaces.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ATLAsDCL.UnitOfWork;
@@ -7,34 +8,22 @@ namespace ATLAsDCL.UnitOfWork;
 public sealed class UnitOfWork : IUnitOfWork
 {
     private readonly AtLASDbContext _context;
-    private IDbContextTransaction _currentTransaction;
+    private IDbContextTransaction? _currentTransaction;
+
     public IAssessmentModuleRepository AssessmentModules { get; }
-
     public ICourseGradeRepository CourseGrades { get; }
-
     public ICourseOfferingDoctorRepository CourseOfferingDoctors { get; }
-
     public ICourseOfferingRepository CourseOfferings { get; }
-
     public ICourseOfferingTARepository CourseOfferingTAs { get; }
-
     public ICourseRepository Courses { get; }
-
     public IDepartmentRepository Departments { get; }
-
     public ICourseGroupMessageRepository CourseGroupMessages { get; }
-
     public INotificationRepository Notifications { get; }
-
-
     public IEnrollmentRepository Enrollments { get; }
-
     public ISemesterRepository Semesters { get; }
-
     public IStudentRepository Students { get; }
-
-
-
+    public IStaffProfileRepository StaffProfile { get; }
+    public IStudentProfileRepository StudentProfile { get; }
     public IUserRepository Users { get; }
 
     public UnitOfWork(
@@ -51,7 +40,9 @@ public sealed class UnitOfWork : IUnitOfWork
         IStudentRepository studentRepository,
         IUserRepository userRepository,
         ICourseGroupMessageRepository courseGroupMessageRepository,
-        INotificationRepository notificationRepository)
+        INotificationRepository notificationRepository,
+        IStudentProfileRepository studentProfileRepository,
+        IStaffProfileRepository staffProfileRepository)
     {
         _context = context;
 
@@ -62,29 +53,34 @@ public sealed class UnitOfWork : IUnitOfWork
         CourseOfferingTAs = courseOfferingTARepository;
         Courses = courseRepository;
         Departments = departmentRepository;
-       
         Enrollments = enrollmentRepository;
         Semesters = semesterRepository;
         Students = studentRepository;
-
         Users = userRepository;
         CourseGroupMessages = courseGroupMessageRepository;
         Notifications = notificationRepository;
+        StudentProfile = studentProfileRepository;
+        StaffProfile = staffProfileRepository;
     }
 
-    public async Task<int> SaveChangesAsync(CancellationToken cancellationToken = default)
+    public async Task<int> SaveChangesAsync(
+        CancellationToken cancellationToken = default)
     {
         return await _context.SaveChangesAsync(cancellationToken);
     }
-    public async Task BeginTransactionAsync(CancellationToken cancellationToken = default)
-    {
-        // لو فيه Transaction مفتوحة أصلاً متفتحش واحدة جديدة
-        if (_currentTransaction != null) return;
 
-        _currentTransaction = await _context.Database.BeginTransactionAsync(cancellationToken);
+    public async Task BeginTransactionAsync(
+        CancellationToken cancellationToken = default)
+    {
+        if (_currentTransaction != null)
+            return;
+
+        _currentTransaction =
+            await _context.Database.BeginTransactionAsync(cancellationToken);
     }
 
-    public async Task CommitTransactionAsync(CancellationToken cancellationToken = default)
+    public async Task CommitTransactionAsync(
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -102,13 +98,14 @@ public sealed class UnitOfWork : IUnitOfWork
         {
             if (_currentTransaction != null)
             {
-                _currentTransaction.Dispose();
+                await _currentTransaction.DisposeAsync();
                 _currentTransaction = null;
             }
         }
     }
 
-    public async Task RollbackTransactionAsync(CancellationToken cancellationToken = default)
+    public async Task RollbackTransactionAsync(
+        CancellationToken cancellationToken = default)
     {
         try
         {
@@ -121,7 +118,7 @@ public sealed class UnitOfWork : IUnitOfWork
         {
             if (_currentTransaction != null)
             {
-                _currentTransaction.Dispose();
+                await _currentTransaction.DisposeAsync();
                 _currentTransaction = null;
             }
         }
@@ -129,8 +126,9 @@ public sealed class UnitOfWork : IUnitOfWork
 
     public void Dispose()
     {
-        _context.Dispose();
         _currentTransaction?.Dispose();
+        _context.Dispose();
     }
-  
+
+    public IStaffProfileRepository staffProfile => StaffProfile;
 }

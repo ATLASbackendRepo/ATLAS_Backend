@@ -7,7 +7,9 @@ using System.Threading.Tasks;
 namespace ATLASDomain.DTO.CourseOffring
 {
     public class CourseOfferingDTO
+
     {
+        public int CourseOfferingId { get; set; }
         public int CourseOfferingHours { get; set; }
         public string CourseName { get; set; } = null!;
         public string Semester { get; set; } = null!;

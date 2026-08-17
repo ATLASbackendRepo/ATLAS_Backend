@@ -20,6 +20,15 @@ public class UserRepository
         return await _dbSet.FirstOrDefaultAsync(u => u.UserId == userId);
     }
 
+
+    public async Task<User?> GetUserByAcademicIDAsync(string academicID)
+    {
+        return await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u=> u.AcademicId  == academicID);
+    }
+
+
     public async Task<bool> UserNameExistsAsync(string userName)
     {
         return await _dbSet.AnyAsync(u => u.FullName == userName);
