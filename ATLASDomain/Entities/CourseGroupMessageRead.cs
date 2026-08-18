@@ -1,5 +1,4 @@
 ﻿using ATLASDomain.Entities;
-using System;
 
 namespace ATLAS.Domain.Entities
 {
@@ -11,13 +10,13 @@ namespace ATLAS.Domain.Entities
     {
         public int MessageID { get; set; }
 
-        public int StudentID { get; set; }
+        public int UserID { get; set; }
 
         public DateTime ReadAt { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
         public CourseGroupMessage Message { get; set; } = null!;
 
-        public Student Student { get; set; } = null!;
+        public User user { get; set; } = null!;
     }
 }

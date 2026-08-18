@@ -6,7 +6,7 @@ public class Enrollment
 
     public int StudentID { get; set; }
 
-    public int CreatedBySuperAdminID { get; set; }
+    public int CreatedByUserID { get; set; }
     public DateTime EnrollmentDate { get; set; }
 
     public int CourseOfferingID { get; set; }

@@ -16,7 +16,7 @@ namespace ATLAsBLL.Features.CourseOfferingTAs.Commands.CreateCourseOfferingTA
             var cot = new CourseOfferingTA
             {
                 CourseOfferingID = request.CourseOfferingId,
-                TAID = request.TAID
+                TeacherAssistID = request.TAID
             };
             await _unitOfWork.CourseOfferingTAs.AddAsync(cot);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

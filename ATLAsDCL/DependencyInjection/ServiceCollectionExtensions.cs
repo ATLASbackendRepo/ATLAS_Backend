@@ -36,6 +36,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IGradeAppealRequestRepository,
                                   GradeAppealRequestRepository>();
         services.AddScoped<ICourseGroupMessageRepository, CourseGroupMessageRepository>();
+        services.AddScoped<ICourseGroupMessageReadRepository, CourseGroupMessageReadRepository>();
         services.AddScoped<INotificationRepository, NotificationRepository>();
         // Course access service (authorization central point)
         services.AddScoped<ATLASDomain.Services.ICourseAccessService, ATLAsDCL.Services.CourseAccessService>();

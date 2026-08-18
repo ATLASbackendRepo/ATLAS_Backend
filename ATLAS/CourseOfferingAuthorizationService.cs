@@ -25,7 +25,7 @@ public sealed class CourseOfferingAuthorizationService(AtLASDbContext context) :
             return await context.CourseOfferingDoctors.AnyAsync(x => x.CourseOfferingID == courseOfferingId && x.DoctorID == userId, cancellationToken);
 
         if (user.IsInRole("TeachingAssistant"))
-            return await context.CourseOfferingTAs.AnyAsync(x => x.CourseOfferingID == courseOfferingId && x.TAID == userId, cancellationToken);
+            return await context.CourseOfferingTAs.AnyAsync(x => x.CourseOfferingID == courseOfferingId && x.TeacherAssistID == userId, cancellationToken);
 
         return false;
     }

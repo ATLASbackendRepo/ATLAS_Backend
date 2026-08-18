@@ -15,7 +15,7 @@ namespace ATLAsBLL.Features.CourseOfferingTAs.Commands.UpdateCourseOfferingTA
             var record = await _unitOfWork.CourseOfferingTAs.GetByIdAsync(request.CourseOfferingTAId);
             if (record == null) throw new System.Collections.Generic.KeyNotFoundException("TA Assignment record not found.");
 
-            record.TAID = request.NewTAID;
+            record.TeacherAssistID = request.NewTAID;
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return true;
         }

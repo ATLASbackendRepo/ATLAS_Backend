@@ -28,10 +28,9 @@ namespace ATLAsBLL.Services.Notifications
 
             // fetch the course offering and its course name
             var offering = (await _unitOfWork.CourseOfferings
-                .FindAsync(co => co.CourseOfferingID == notification.CourseOfferingId))
-                .FirstOrDefault();
+                          .GetCourseOFferingByID( notification.CourseOfferingId));
 
-            if(offering == null)
+            if (offering == null)
             {
                 // Handle the case where the course offering is not found
                 return;

@@ -11,18 +11,20 @@ namespace ATLAsDCL.Repositories
 {
     public class CourseGroupMessageRepository : GenericRepository<CourseGroupMessage>, ICourseGroupMessageRepository
     {
+        private readonly AtLASDbContext _Context;
         public CourseGroupMessageRepository(AtLASDbContext context) : base(context)
         {
+            _Context = context;
         }
 
         public async Task AddAsync(CourseGroupMessage message)
         {
-            await _dbSet.AddAsync(message);
+            await _Context.CourseGroupMessages.AddAsync(message);
         }
 
         public async Task<CourseGroupMessage?> GetByIdAsync(int messageId)
         {
-            return await _dbSet
+            return await _Context.CourseGroupMessages
                 .Include(m => m.SenderUser)
                 .Include(m => m.ReadReceipts)
                 .Include(m => m.Notifications)
@@ -31,7 +33,7 @@ namespace ATLAsDCL.Repositories
 
         public async Task<IEnumerable<CourseGroupMessage>> GetByCourseOfferingAsync(int courseOfferingId, int page, int pageSize)
         {
-            return await _dbSet
+            return await _Context.CourseGroupMessages
                 .Where(m => m.CourseOfferingID == courseOfferingId && !m.IsDeleted)
                 .OrderByDescending(m => m.IsPinned)
                 .ThenByDescending(m => m.SentAt)
@@ -44,14 +46,14 @@ namespace ATLAsDCL.Repositories
         public Task SoftDeleteAsync(CourseGroupMessage message)
         {
             message.IsDeleted = true;
-            _dbSet.Update(message);
+            _Context.CourseGroupMessages.Update(message);
             return Task.CompletedTask;
         }
 
         public Task TogglePinAsync(CourseGroupMessage message)
         {
             message.IsPinned = !message.IsPinned;
-            _dbSet.Update(message);
+            _Context.CourseGroupMessages.Update(message);
             return Task.CompletedTask;
         }
     }

@@ -11,7 +11,7 @@ namespace ATLAS.Infrastructure.Persistence.Configurations
             builder.ToTable("CourseGroupMessageReads");
 
             // Composite primary key: one read-record per (message, student)
-            builder.HasKey(r => new { r.MessageID, r.StudentID });
+            builder.HasKey(r => new { r.MessageID, r.UserID });
 
             builder.Property(r => r.ReadAt)
                 .IsRequired()
@@ -22,9 +22,9 @@ namespace ATLAS.Infrastructure.Persistence.Configurations
                 .HasForeignKey(r => r.MessageID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            builder.HasOne(r => r.Student)
+            builder.HasOne(r => r.user)
                 .WithMany()
-                .HasForeignKey(r => r.StudentID)
+                .HasForeignKey(r => r.UserID)
                 .OnDelete(DeleteBehavior.Cascade);
         }
     }

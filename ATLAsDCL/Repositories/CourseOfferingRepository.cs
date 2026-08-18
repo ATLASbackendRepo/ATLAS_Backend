@@ -30,6 +30,16 @@ public class CourseOfferingRepository
     }
 
 
+
+
+    public async Task<CourseOffering?> GetCourseOFferingByID(int id)
+    {
+        return await _context.CourseOfferings
+            .AsNoTracking()
+            .Include(c => c.Course)
+            .FirstOrDefaultAsync(c => c.CourseOfferingID == id);
+    }
+
     public async Task<CourseOffering?> GetOfferingDetailsAsync(int offeringId)
     {
 

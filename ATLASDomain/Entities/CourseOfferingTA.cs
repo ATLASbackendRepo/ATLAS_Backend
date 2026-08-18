@@ -6,7 +6,7 @@ public class CourseOfferingTA
 
     public int CourseOfferingID { get; set; }
 
-    public int TAID { get; set; }
+    public int TeacherAssistID { get; set; }
 
     public CourseOffering CourseOffering { get; set; } = null!;
 

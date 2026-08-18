@@ -1,4 +1,5 @@
 ﻿using ATLAsDCL.Data;
+using ATLAsDCL.Repositories;
 using ATLASDomain.Interfaces.Repositories;
 using ATLASDomain.InterFaces.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -18,6 +19,8 @@ public sealed class UnitOfWork : IUnitOfWork
     public ICourseRepository Courses { get; }
     public IDepartmentRepository Departments { get; }
     public ICourseGroupMessageRepository CourseGroupMessages { get; }
+
+    public ICourseGroupMessageReadRepository CourseGroupMessageRead { get; }
     public INotificationRepository Notifications { get; }
     public IEnrollmentRepository Enrollments { get; }
     public ISemesterRepository Semesters { get; }
@@ -42,7 +45,8 @@ public sealed class UnitOfWork : IUnitOfWork
         ICourseGroupMessageRepository courseGroupMessageRepository,
         INotificationRepository notificationRepository,
         IStudentProfileRepository studentProfileRepository,
-        IStaffProfileRepository staffProfileRepository)
+        IStaffProfileRepository staffProfileRepository,
+        ICourseGroupMessageReadRepository courseGroupMessageRead)
     {
         _context = context;
 
@@ -61,6 +65,7 @@ public sealed class UnitOfWork : IUnitOfWork
         Notifications = notificationRepository;
         StudentProfile = studentProfileRepository;
         StaffProfile = staffProfileRepository;
+        CourseGroupMessageRead = courseGroupMessageRead;
     }
 
     public async Task<int> SaveChangesAsync(
@@ -131,4 +136,20 @@ public sealed class UnitOfWork : IUnitOfWork
     }
 
     public IStaffProfileRepository staffProfile => StaffProfile;
+
+    private ICourseGroupMessageReadRepository? _courseGroupMessagesRead;
+
+    public ICourseGroupMessageReadRepository CourseGroupMessagesRead
+    {
+        get
+        {
+            if (_courseGroupMessagesRead == null)
+            {
+                _courseGroupMessagesRead =
+                    new CourseGroupMessageReadRepository(_context);
+            }
+
+            return _courseGroupMessagesRead;
+        }
+    }
 }

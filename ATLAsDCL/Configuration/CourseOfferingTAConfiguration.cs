@@ -10,7 +10,7 @@ namespace ATLAsDCL.Configuration
         {
             builder.HasKey(cot => cot.CourseOfferingTAID);
             
-            builder.HasIndex(cot => new { cot.CourseOfferingID, cot.TAID })
+            builder.HasIndex(cot => new { cot.CourseOfferingID, cot.TeacherAssistID })
                    .IsUnique();
     
 
@@ -21,7 +21,7 @@ namespace ATLAsDCL.Configuration
 
             builder.HasOne(cot => cot.TeachingAssistant)
                    .WithMany(ta => ta.CourseOfferingTAs)
-                   .HasForeignKey(cot => cot.TAID)
+                   .HasForeignKey(cot => cot.TeacherAssistID)
                    .OnDelete(DeleteBehavior.    Restrict);
         }
     }

@@ -1,4 +1,5 @@
 using ATLAsDCL.Data;
+using ATLASDomain.Entities;
 using ATLASDomain.Services;
 using Microsoft.EntityFrameworkCore;
 using System.Linq;
@@ -18,7 +19,7 @@ namespace ATLAsDCL.Services
             if (isDoctor) return true;
 
             // TA?
-            var isTa = await _context.CourseOfferingTAs.AnyAsync(x => x.CourseOfferingID == courseOfferingId && x.TAID == userId);
+            var isTa = await _context.CourseOfferingTAs.AnyAsync(x => x.CourseOfferingID == courseOfferingId && x.TeacherAssistID == userId);
             if (isTa) return true;
 
             return false;
@@ -30,7 +31,7 @@ namespace ATLAsDCL.Services
             if (await _context.CourseOfferingDoctors.AnyAsync(x => x.CourseOfferingID == courseOfferingId && x.DoctorID == userId))
                 return true;
 
-            if (await _context.CourseOfferingTAs.AnyAsync(x => x.CourseOfferingID == courseOfferingId && x.TAID == userId))
+            if (await _context.CourseOfferingTAs.AnyAsync(x => x.CourseOfferingID == courseOfferingId && x.TeacherAssistID == userId))
                 return true;
 
             // Student with enrollment

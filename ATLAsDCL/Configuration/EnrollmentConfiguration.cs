@@ -12,7 +12,7 @@ namespace ATLAsDCL.Configuration
         {
             builder.HasKey(e => e.EnrollmentID);
             builder.Property(e => e.StudentID).IsRequired();
-            builder.Property(e => e.CreatedBySuperAdminID).IsRequired();
+            builder.Property(e => e.CreatedByUserID).IsRequired();
             builder.Property(e => e.CourseOfferingID).IsRequired();
             builder.HasIndex(e => new { e.StudentID, e.CourseOfferingID })
                    .IsUnique()
@@ -27,7 +27,7 @@ namespace ATLAsDCL.Configuration
             
             builder.HasOne(e => e.CreatedBySuperAdmin)
                    .WithMany(sa => sa.Enrollments)
-                   .HasForeignKey(e => e.CreatedBySuperAdminID)
+                   .HasForeignKey(e => e.CreatedByUserID)
                    .OnDelete(DeleteBehavior.Restrict);
             
             builder.HasOne(e => e.CourseOffering)

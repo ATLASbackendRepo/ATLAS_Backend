@@ -25,24 +25,48 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
             throw new KeyNotFoundException($"Message with ID {request.MessageId} not found.");
         }
 
-        // Students only - verify this student is enrolled in the course
-        var isEnrolled = await _unitOfWork.Enrollments.FirstOrDefaultAsync(e =>
-            e.CourseOfferingID == message.CourseOfferingID && e.Student.UserId == request.UserId);
-
-        if (isEnrolled == null)
+        if (request.Role == "Student")
         {
-            throw new ForbiddenAccessException("You are not enrolled in this course.");
-        }
 
+            var isEnrolled = await _unitOfWork.Enrollments.FirstOrDefaultAsync(e =>
+                e.CourseOfferingID == message.CourseOfferingID && e.Student.UserId == request.UserId);
+
+            if (isEnrolled == null)
+            {
+                throw new ForbiddenAccessException("You are not enrolled in this course.");
+            }
+        }
+        else if (request.Role == "Doctor")
+        {
+            var isInstructor = await _unitOfWork.CourseOfferingDoctors.FirstOrDefaultAsync(co =>
+                co.CourseOfferingID == message.CourseOfferingID && co.Doctor.UserId == request.UserId);
+            if (isInstructor == null)
+            {
+                throw new ForbiddenAccessException("You are not the instructor for this course.");
+            }
+        }
+        else if (request.Role == "TeachingAssistant")
+        {
+            var isteacherassist = await _unitOfWork.CourseOfferingTAs.FirstOrDefaultAsync(co =>
+                co.CourseOfferingID == message.CourseOfferingID && co.TeachingAssistant.UserId == request.UserId);
+            if (isteacherassist == null)
+            {
+                throw new ForbiddenAccessException("You are not the instructor for this course.");
+            }
+        }
+        else
+        {
+            throw new ForbiddenAccessException("Invalid user role.");
+        }
         // Write read receipt
         var readReceipt = new CourseGroupMessageRead
         {
             MessageID = request.MessageId,
-            StudentID = request.UserId,
+            UserID = request.UserId,
             ReadAt = DateTime.UtcNow
         };
 
-        await _unitOfWork.CourseGroupMessages.AddAsync(readReceipt as dynamic);
+        await _unitOfWork.CourseGroupMessagesRead.AddAsync(readReceipt );
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return request.MessageId;

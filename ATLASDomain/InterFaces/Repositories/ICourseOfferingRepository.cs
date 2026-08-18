@@ -14,7 +14,7 @@ public interface ICourseOfferingRepository : IGenericRepository<CourseOffering>
     Task<IEnumerable<CourseOffering>> GetByCourseAsync(int courseId);
     Task<IEnumerable<DoctorCourseOfferingDTO>> GetStaffMyCourseAsync(int staffId);
     Task<IEnumerable<CourseOfferingDTO>> GetMyCourseAsync(int id);
-
+    Task<CourseOffering?> GetCourseOFferingByID(int id);
     Task<IEnumerable<CourseofferingDetailsDTO>> GetMyCourseDetailsAsync(int courseofferingId , int studentID   );
 
 

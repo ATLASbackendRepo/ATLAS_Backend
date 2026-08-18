@@ -6,6 +6,7 @@ using ATLAsBLL.Services.CourseGroupMessage.Command.SendCourseGroupMessage;
 using ATLAsBLL.Services.CourseGroupMessage.Command.TogglePinCourseGroupMessage;
 using ATLAsBLL.Services.CourseGroupMessage.DTOs;
 using ATLAsBLL.Services.CourseGroupMessage.Queries.GetCourseGroupMessages;
+using ATLASDomain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -48,7 +49,7 @@ public class CourseGroupMessagesController : ControllerBase
         try
         {
             var userId = GetCurrentUserId();
-            var query = new GetCourseGroupMessagesQuery(courseOfferingId, userId, page, pageSize);
+            var query = new GetCourseGroupMessagesQuery(userId, courseOfferingId, page, pageSize);
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }
@@ -71,11 +72,11 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
+    [Authorize(Roles = "Doctor,TeachingAssistant")]
     public async Task<ActionResult<int>> SendMessage(
         [FromRoute] int courseOfferingId,
         [FromBody] SendMessageRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default)   // Done Integration Test  
     {
         try
         {
@@ -110,12 +111,12 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
+    [Authorize(Roles = "Doctor,TeachingAssistant")]
     public async Task<ActionResult<int>> EditMessage(
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
         [FromBody] EditMessageRequest request,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default)  // Done Integration Test
     {
         try
         {
@@ -146,7 +147,7 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
+    [Authorize(Roles = "Doctor,TeachingAssistant")]
     public async Task<IActionResult> DeleteMessage(
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
@@ -181,11 +182,11 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
-    [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
-    public async Task<IActionResult> TogglePin(
+    [Authorize(Roles = "Doctor,TeachingAssistant")]
+    public async Task<IActionResult> TogglePin(  
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
-        CancellationToken cancellationToken = default)
+        CancellationToken cancellationToken = default)   // Done Integration Test
     {
         try
         {
@@ -225,7 +226,7 @@ public class CourseGroupMessagesController : ControllerBase
         try
         {
             var userId = GetCurrentUserId();
-            var command = new MarkMessageAsReadCommand(messageId, userId);
+            var command = new MarkMessageAsReadCommand(messageId, userId, GetUserRole());
             await _mediator.Send(command, cancellationToken);
             return Ok();
         }
@@ -241,7 +242,7 @@ public class CourseGroupMessagesController : ControllerBase
         {
             return BadRequest(new { message = ex.Message });
         }
-    }
+    }  // Done Integration test
 
     private int GetCurrentUserId()
     {
@@ -251,6 +252,17 @@ public class CourseGroupMessagesController : ControllerBase
             throw new UnauthorizedAccessException("User ID not found in token.");
         }
         return userId;
+    }
+    private string GetUserRole()
+    {
+        var roleClaim = User.FindFirst(ClaimTypes.Role);
+
+        if (roleClaim == null || string.IsNullOrWhiteSpace(roleClaim.Value))
+        {
+            throw new UnauthorizedAccessException("User role not found in token.");
+        }
+
+        return roleClaim.Value;
     }
 }
 

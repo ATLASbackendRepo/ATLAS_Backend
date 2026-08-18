@@ -15,7 +15,7 @@ public class CourseOfferingTARepository
         return await _context.CourseOfferingTAs
             .AsNoTracking()
             .Include(c => c.CourseOffering)
-            .Where(c => c.TAID == taId)
+            .Where(c => c.TeacherAssistID == taId)
             .ToListAsync();
     }
 

@@ -34,6 +34,7 @@ public interface IUnitOfWork : IDisposable
     IStudentProfileRepository StudentProfile { get; }
     IUserRepository Users { get; }
     ICourseGroupMessageRepository CourseGroupMessages { get; }
+    ICourseGroupMessageReadRepository CourseGroupMessagesRead { get; }
     INotificationRepository Notifications { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

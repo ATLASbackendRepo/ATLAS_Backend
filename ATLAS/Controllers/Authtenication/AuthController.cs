@@ -143,7 +143,7 @@ namespace ATLAS.Controllers.Authtenication
             if (!refreshValid)
                 return Unauthorized("Invalid refresh token");
 
-            // Issue NEW access token (same claims & signing settings as login)
+            
 
             var claims = new[]
                      {
@@ -171,7 +171,7 @@ namespace ATLAS.Controllers.Authtenication
             );
             var newAccessToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-            // Rotation: replace refresh token
+            
             var newRefreshToken = GenerateRefreshToken();
             User.RefreshTokenHash = BCrypt.Net.BCrypt.HashPassword(newRefreshToken);
             User.RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);
@@ -191,7 +191,7 @@ namespace ATLAS.Controllers.Authtenication
                
 
             if (user == null)
-                return Ok(); // Do not reveal if user exists
+                return Ok(); 
 
             bool refreshValid = BCrypt.Net.BCrypt.Verify(request.RefreshToken, user.RefreshTokenHash);
             if (!refreshValid)

@@ -82,7 +82,7 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
 
             ValidateIssuerSigningKey = true,
             IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes(jwtOptions.Key)),
+            Encoding.UTF8.GetBytes("ATLAS-Super-Secret-Key-2026-For-JWT-Signing!")),
 
             ValidateIssuer = true,
             ValidIssuer = jwtOptions.Issuer,
