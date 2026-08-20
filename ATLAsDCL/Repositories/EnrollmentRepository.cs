@@ -69,7 +69,14 @@ public class EnrollmentRepository
             .ToListAsync(cancellationToken);
     }
 
-
+    public async Task<List<int>> GetStudentUserIdsByCourseOfferingAsync(int courseOfferingId)
+    {
+        return await _context.Enrollments
+            .Where(e => e.CourseOfferingID == courseOfferingId)
+            .Select(e => e.Student.UserId)
+            .Distinct()
+            .ToListAsync();
+    }
 
 
 

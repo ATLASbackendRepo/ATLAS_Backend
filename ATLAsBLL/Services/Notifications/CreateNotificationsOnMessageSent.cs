@@ -21,12 +21,8 @@ namespace ATLAsBLL.Services.Notifications
 
         public async Task Handle(CourseGroupMessageSentEvent notification, CancellationToken cancellationToken)
         {
-            // get enrolled students for the course offering
-            var enrollments = await _unitOfWork.Enrollments.FindAsync(e => e.CourseOfferingID == notification.CourseOfferingId);
-
-            var studentUserIds = enrollments.Select(e => e.Student.UserId).Distinct().Where(id => id != notification.SenderUserId).ToList();
-
-            // fetch the course offering and its course name
+      var studentUserIds = await _unitOfWork.Enrollments
+                             .GetStudentUserIdsByCourseOfferingAsync(notification.CourseOfferingId);
             var offering = (await _unitOfWork.CourseOfferings
                           .GetCourseOFferingByID( notification.CourseOfferingId));
 
@@ -45,7 +41,7 @@ namespace ATLAsBLL.Services.Notifications
                     RecipientUserID = uid,
                     Type = "CourseGroupMessage",
                     Title = title,
-                    Body = null,
+                    Body = notification.Content,
                     RelatedMessageID = notification.MessageId,
                     IsRead = false
                 });

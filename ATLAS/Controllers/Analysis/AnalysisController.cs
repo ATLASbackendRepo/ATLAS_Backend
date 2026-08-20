@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using ATLAsBLL.Services.CourseOffering.Queries.Analysis;
 using ATLASDomain.DTO.Analysis;
 using ATLAS;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ATLASAPI.Controllers
 {
@@ -29,6 +30,7 @@ namespace ATLASAPI.Controllers
         [ProducesResponseType(typeof(CourseAnalysisResponseDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [EnableRateLimiting("AnalysisPolicy")]
         public async Task<ActionResult<CourseAnalysisResponseDto>> GetCourseAnalysis(int courseOfferingId)
         {
          

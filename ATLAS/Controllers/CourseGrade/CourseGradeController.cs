@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Features.CourseGrades.Commands.CreateCourseGradesRange;
+﻿//using ATLAsBLL.Features.CourseGrades.Commands.CreateCourseGradesRange;
 using ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade;
 using ATLAsBLL.Services.CourseGrade.Queries;
 using ATLASDomain.DTO.CourseGrade;
@@ -98,39 +98,39 @@ namespace ATLASAPI.Controllers
 
 
 
-        [HttpPost("assign-range")]
-        [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> AssignGrades(
-           [FromBody] InsertGradeDTO gradeDTO)
-        {
-            if (gradeDTO == null || gradeDTO.EnrollmentId <= 0 || gradeDTO.ModuleId <= 0)
-            {
-                return BadRequest("Invalid grade data.");
-            }
+        //[HttpPost("assign-range")]
+        //[Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
+        //[ProducesResponseType(StatusCodes.Status200OK)]
+        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
+        //[ProducesResponseType(StatusCodes.Status404NotFound)]
+        //public async Task<IActionResult> AssignGrades(
+        //   [FromBody] InsertGradeDTO gradeDTO)
+        //{
+        //    if (gradeDTO == null || gradeDTO.EnrollmentId <= 0 || gradeDTO.ModuleId <= 0)
+        //    {
+        //        return BadRequest("Invalid grade data.");
+        //    }
 
-            if (!int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var userId))
-                return Unauthorized();
+        //    if (!int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var userId))
+        //        return Unauthorized();
 
-            if (!await _courseAuthorization.CanManageGradeAsync(User, gradeDTO.EnrollmentId, gradeDTO.ModuleId, HttpContext.RequestAborted))
-                return Forbid();
+        //    if (!await _courseAuthorization.CanManageGradeAsync(User, gradeDTO.EnrollmentId, gradeDTO.ModuleId, HttpContext.RequestAborted))
+        //        return Forbid();
 
-            gradeDTO.UserId = userId;
+        //    gradeDTO.UserId = userId;
 
 
-            var result = await _mediator.Send(new AssignCourseGradesRangeCommand(new List<InsertGradeDTO> { gradeDTO }));
+        //    var result = await _mediator.Send(new AssignCourseGradesRangeCommand(new List<InsertGradeDTO> { gradeDTO }));
 
-            if (result == false)
-                return NotFound("Failed to assign grades.");
+        //    if (result == false)
+        //        return NotFound("Failed to assign grades.");
 
-            return Ok(new
-            {
-                Success = true,
-                Message = "Grades assigned successfully."
-            });
-        }
+        //    return Ok(new
+        //    {
+        //        Success = true,
+        //        Message = "Grades assigned successfully."
+        //    });
+        //}
 
 
 

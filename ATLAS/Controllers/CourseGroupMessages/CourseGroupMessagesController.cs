@@ -10,6 +10,7 @@ using ATLASDomain.Entities;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.ComponentModel.DataAnnotations;
 using System.Security.Claims;
 
@@ -73,6 +74,7 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Doctor,TeachingAssistant")]
+    [EnableRateLimiting("MessagesPolicy")]
     public async Task<ActionResult<int>> SendMessage(
         [FromRoute] int courseOfferingId,
         [FromBody] SendMessageRequest request,
@@ -112,6 +114,7 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Doctor,TeachingAssistant")]
+    [EnableRateLimiting("MessagesPolicy")]
     public async Task<ActionResult<int>> EditMessage(
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
@@ -148,6 +151,7 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Doctor,TeachingAssistant")]
+    [EnableRateLimiting("MessagesPolicy")]
     public async Task<IActionResult> DeleteMessage(
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
@@ -183,6 +187,7 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Doctor,TeachingAssistant")]
+    [EnableRateLimiting("MessagesPolicy")]
     public async Task<IActionResult> TogglePin(  
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,

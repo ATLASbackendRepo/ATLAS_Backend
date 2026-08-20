@@ -44,7 +44,7 @@ public class SendCourseGroupMessageCommandHandler : IRequestHandler<SendCourseGr
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Publish domain event to create notifications
-        await _publisher.Publish(new CourseGroupMessageSentEvent(message.MessageID, request.CourseOfferingId, request.SenderUserId), cancellationToken);
+        await _publisher.Publish(new CourseGroupMessageSentEvent(message.MessageID, request.CourseOfferingId, request.SenderUserId,request.Content), cancellationToken);
 
         return message.MessageID;
     }

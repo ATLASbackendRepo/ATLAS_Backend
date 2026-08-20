@@ -6,6 +6,7 @@ using ATLAsBLL.Services.Notifications.Queries.GetMyNotifications;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace ATLAS.Controllers;
@@ -28,6 +29,7 @@ public class NotificationsController : ControllerBase
     [ProducesResponseType(typeof(List<NotificationDto>), 200)]
     [ProducesResponseType(statusCode: 404)]
     [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
+    [EnableRateLimiting("NotificationsPolicy")]
 
     public async Task<ActionResult<List<NotificationDto>>> GetNotifications(
         [FromQuery] bool unreadOnly = false,
@@ -45,14 +47,15 @@ public class NotificationsController : ControllerBase
     /// <summary>
     /// Mark a single notification as read.
     /// </summary>
-    [HttpPost(Name = "{notificationId}/read")]
+    [HttpPost("{notificationId}/read")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
+    [EnableRateLimiting("NotificationsPolicy")]
     public async Task<IActionResult> MarkAsRead(
-        [FromRoute] int notificationId,
-        CancellationToken cancellationToken = default)
+    [FromRoute] int notificationId,
+    CancellationToken cancellationToken = default)
     {
         try
         {
@@ -81,6 +84,7 @@ public class NotificationsController : ControllerBase
     [HttpPost("read-all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
+    [EnableRateLimiting("NotificationsReadAllPolicy")]
     public async Task<IActionResult> MarkAllAsRead(CancellationToken cancellationToken = default)
     {
         try

@@ -19,7 +19,7 @@ namespace ATLAsBLL.Services.CourseOffering.Queries.GetCourseDetails
 
         public async Task<IEnumerable<CourseofferingDetailsDTO>> Handle(GetCourseDetailsQuery request, CancellationToken cancellationToken)
         {
-            var courseDetails = await _unitOfWork.CourseOfferings.GetMyCourseDetailsAsync(request.CourseOfferingId, request.studentId);
+            var courseDetails = await _unitOfWork.CourseOfferings.GetMyCourseDetailsAsync(request.CourseOfferingId, request.userId);
 
             if (courseDetails == null)
             {

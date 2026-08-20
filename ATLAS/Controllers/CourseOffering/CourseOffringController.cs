@@ -1,9 +1,11 @@
 ﻿using ATLAsBLL.Services.CourseOffering.Queries;
-using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using ATLASDomain.DTO.CourseOffring;
+using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Claims;
+using System.Threading.Tasks;
 
 namespace ATLAS.Controllers.CourseOffering
 
@@ -21,25 +23,24 @@ namespace ATLAS.Controllers.CourseOffering
 
 
         [HttpGet("Student/MyCourses", Name = "GetStudentMyCourses")]
-        [Authorize(Roles = "Student")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<CourseOfferingDTO>>> GetStudentMyCourses(int studentId)
+        [Authorize(Roles = "Student")]
+        [EnableRateLimiting("CourseQueryPolicy")]
+        public async Task<ActionResult<IEnumerable<CourseOfferingDTO>>> GetStudentMyCourses()
         {
-            if (!int.TryParse(User.FindFirst("StudentId")?.Value, out var authenticatedStudentId))
-                return Unauthorized();
+            var userId = GetCurrentUserId();
 
-            if (studentId != authenticatedStudentId)
-                return Forbid();
-            if (studentId < 1)
+           
+            if (userId < 1)
             {
-                return BadRequest("Invalid student ID.");
+                return BadRequest("Invalid Request.");
             }
-            var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Student.GetMyCourseQuery(studentId));
+            var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Student.GetMyCourseQuery(userId));
             if (courses == null || !courses.Any())
             {
-                return NotFound($"No courses found for student ID {studentId}.");
+                return NotFound($"No courses found for student ID {userId}.");
             }
             return Ok(courses);
         }
@@ -47,17 +48,14 @@ namespace ATLAS.Controllers.CourseOffering
 
 
         [HttpGet("Staff/MyCourses", Name = "GetStaffMyCourses")]
-        [Authorize(Roles = "Doctor")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<DoctorCourseOfferingDTO>>> GetStaffMyCourses(int StaffId)
+        [Authorize(Roles = "Doctor,TeachingAssistant")]
+        [EnableRateLimiting("CourseQueryPolicy")]
+        public async Task<ActionResult<IEnumerable<DoctorCourseOfferingDTO>>> GetStaffMyCourses()
         {
-            if (!int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var authenticatedUserId))
-                return Unauthorized();
-
-            if (StaffId != authenticatedUserId)
-                return Forbid();
+            var StaffId = GetCurrentUserId();
             if (StaffId < 1)
             {
                 return BadRequest("Invalid Staff ID.");
@@ -72,29 +70,36 @@ namespace ATLAS.Controllers.CourseOffering
 
 
         [HttpGet("CourseDetails", Name = "GetCourseDetails")]
-        [Authorize(Roles = "Student")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async Task<ActionResult<IEnumerable<CourseofferingDetailsDTO>>> GetCourseDetails(int courseOfferingId, int studentId)
+        [Authorize(Roles = "Student")]
+        [EnableRateLimiting("CourseDetailsPolicy")]
+        public async Task<ActionResult<IEnumerable<CourseofferingDetailsDTO>>> GetCourseDetails(int courseOfferingId)
         {
-            if (!int.TryParse(User.FindFirst("StudentId")?.Value, out var authenticatedStudentId))
-                return Unauthorized();
-
-            if (studentId != authenticatedStudentId)
-                return Forbid();
-            if (studentId < 1 || courseOfferingId < 1)
+            var userId = GetCurrentUserId();
+            if (userId < 1 || courseOfferingId < 1)
             {
                 return BadRequest("Invalid student ID or course offering ID.");
             }
-            var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetCourseDetails.GetCourseDetailsQuery(courseOfferingId, studentId));
+            var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetCourseDetails.GetCourseDetailsQuery(courseOfferingId, userId));
             if (courses == null || !courses.Any())
             {
-                return NotFound($"No course details found for CourseOfferingId {courseOfferingId} and StudentId {studentId}.");
+                return NotFound($"No course details found for CourseOfferingId {courseOfferingId} and StudentId {userId}.");
             }
             return Ok(courses);
         }
 
+
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                throw new UnauthorizedAccessException("User ID not found in token.");
+            }
+            return userId;
+        }
 
 
     }

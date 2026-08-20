@@ -63,30 +63,28 @@ public class CourseOfferingRepository
     }
 
 
-    public async Task<IEnumerable<CourseOfferingDTO>> GetMyCourseAsync(int Studentid)
+    public async Task<IEnumerable<CourseOfferingDTO>> GetMyCourseAsync(int userId)
     {
         return await _context.CourseOfferings
             .AsNoTracking()
+           
+            .Where(co => co.Enrollments.Any(e => e.Student.UserId == userId))
             .Select(co => new CourseOfferingDTO
             {
-               
+                CourseOfferingId = co.CourseOfferingID,
                 CourseOfferingHours = co.Course.Credit_Hours,
                 CourseName = co.Course.C_Name,
+                Semester = co.Semester.SemesterName,
 
-                Semester = co.Semester.SemesterName
-               
-                , Doctorname = co.CourseOfferingDoctors
-                    .Select(cd => cd.Doctor.FullName ?? "No Doctor Assigned")
-                    .FirstOrDefault()
-                    ,
+              
+                Doctorname = co.CourseOfferingDoctors
+                    .Select(cd => cd.Doctor.FullName)
+                    .FirstOrDefault() ?? "No Doctor Assigned",
 
-               
                 CourseOfferingGrade = co.Enrollments
-                    .Where(e => e.StudentID == Studentid)
+                    .Where(e => e.Student.UserId == userId)
                     .SelectMany(e => e.CourseGrades)
-                    .Sum(cg => (decimal?)cg.StudentDegree) ?? 0
-
-             
+                    .Sum(cg => (decimal?)cg.StudentDegree) ?? 0m
             })
             .ToListAsync();
     }
@@ -109,11 +107,18 @@ public class CourseOfferingRepository
 
 
 
-    public  async Task<IEnumerable<CourseofferingDetailsDTO>> GetMyCourseDetailsAsync(int courseofferingId, int studentID)
+    public  async Task<IEnumerable<CourseofferingDetailsDTO>> GetMyCourseDetailsAsync(int courseofferingId, int userId)
     {
-    return await    _context.CourseDetails
+        var StudentID = await _context.Students
+            .Where(s => s.UserId == userId)
+            .Select(s => s.StudentId)
+            .FirstOrDefaultAsync();
+
+
+
+        return await    _context.CourseDetails
             .AsNoTracking()
-            .Where(cd => cd.CourseOfferingID == courseofferingId && cd.studentId == studentID)
+            .Where(cd => cd.CourseOfferingID == courseofferingId && cd.studentId == StudentID)
             .Select(cd => new CourseofferingDetailsDTO
             {
                 C_Name = cd.C_Name,

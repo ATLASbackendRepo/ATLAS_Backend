@@ -4,5 +4,5 @@ using ATLASDomain.DTO.CourseOffring;
 
 namespace ATLAsBLL.Services.CourseOffering.Queries.GetCourseDetails
 {
-    public record GetCourseDetailsQuery(int CourseOfferingId, int studentId) : IQuery<IEnumerable<CourseofferingDetailsDTO>>;
+    public record GetCourseDetailsQuery(int CourseOfferingId, int userId) : IQuery<IEnumerable<CourseofferingDetailsDTO>>;
 }

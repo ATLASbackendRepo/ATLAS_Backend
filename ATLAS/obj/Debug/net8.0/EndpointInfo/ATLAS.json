@@ -334,77 +334,6 @@
         }
       }
     },
-    "/api/CourseGrade/assign-range": {
-      "post": {
-        "tags": [
-          "CourseGrade"
-        ],
-        "requestBody": {
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InsertGradeDTO"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InsertGradeDTO"
-              }
-            },
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/InsertGradeDTO"
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "400": {
-            "description": "Bad Request",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "Not Found",
-            "content": {
-              "text/plain": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              },
-              "text/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProblemDetails"
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     "/api/course/{courseOfferingId}/messages": {
       "get": {
         "tags": [
@@ -1049,16 +978,6 @@
           "CourseOffring"
         ],
         "operationId": "GetStudentMyCourses",
-        "parameters": [
-          {
-            "name": "studentId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1138,16 +1057,6 @@
           "CourseOffring"
         ],
         "operationId": "GetStaffMyCourses",
-        "parameters": [
-          {
-            "name": "StaffId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK",
@@ -1230,14 +1139,6 @@
         "parameters": [
           {
             "name": "courseOfferingId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
-          },
-          {
-            "name": "studentId",
             "in": "query",
             "schema": {
               "type": "integer",
@@ -1385,12 +1286,13 @@
             }
           }
         }
-      },
+      }
+    },
+    "/api/notifications/{notificationId}/read": {
       "post": {
         "tags": [
           "Notifications"
         ],
-        "operationId": "{notificationId}/read",
         "parameters": [
           {
             "name": "notificationId",
@@ -2739,28 +2641,6 @@
             "type": "string",
             "format": "date-time",
             "nullable": true
-          }
-        },
-        "additionalProperties": false
-      },
-      "InsertGradeDTO": {
-        "type": "object",
-        "properties": {
-          "moduleId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "enrollmentId": {
-            "type": "integer",
-            "format": "int32"
-          },
-          "studentDegree": {
-            "type": "number",
-            "format": "double"
-          },
-          "userId": {
-            "type": "integer",
-            "format": "int32"
           }
         },
         "additionalProperties": false
