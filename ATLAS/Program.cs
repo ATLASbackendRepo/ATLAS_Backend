@@ -151,11 +151,11 @@ builder.Services.AddRateLimiter(options =>
     // ==========================================
     // Messages Rate Limiter
     // ==========================================
-    options.AddPolicy("MessagesPolicy", httpContext => 
+    options.AddPolicy("MessagesPolicy", httpContext =>
     {
-    var userId =
-            httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-            ?? httpContext.User.FindFirst("sub")?.Value;
+        var userId =
+                httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                ?? httpContext.User.FindFirst("sub")?.Value;
 
         var partitionKey = !string.IsNullOrEmpty(userId)
             ? $"messages:user:{userId}"
@@ -172,48 +172,48 @@ builder.Services.AddRateLimiter(options =>
             });
     });
 
-     // ==========================================
-     // Messages Rate Limiter
-     // ==========================================
-     options.AddPolicy("NotificationsPolicy", httpContext => 
-     {
-         var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                     ?? httpContext.User.FindFirst("sub")?.Value;
-     
-         var partitionKey = !string.IsNullOrEmpty(userId)
-             ? $"notif:user:{userId}"
-             : $"notif:ip:{httpContext.Connection.RemoteIpAddress}";
-     
-         return RateLimitPartition.GetFixedWindowLimiter(
-             partitionKey,
-             _ => new FixedWindowRateLimiterOptions
-             {
-                 PermitLimit = 30,
-                 Window = TimeSpan.FromMinutes(1),
-                 QueueLimit = 0,
-                 AutoReplenishment = true
-             });
-     });
-     
-     options.AddPolicy("NotificationsReadAllPolicy", httpContext =>
-     {
-         var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                     ?? httpContext.User.FindFirst("sub")?.Value;
+    // ==========================================
+    // Messages Rate Limiter
+    // ==========================================
+    options.AddPolicy("NotificationsPolicy", httpContext =>
+    {
+        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? httpContext.User.FindFirst("sub")?.Value;
 
-         var partitionKey = !string.IsNullOrEmpty(userId)
-             ? $"notif-read-all:user:{userId}"
-             : $"notif-read-all:ip:{httpContext.Connection.RemoteIpAddress}";
+        var partitionKey = !string.IsNullOrEmpty(userId)
+            ? $"notif:user:{userId}"
+            : $"notif:ip:{httpContext.Connection.RemoteIpAddress}";
 
-         return RateLimitPartition.GetFixedWindowLimiter(
-             partitionKey,
-             _ => new FixedWindowRateLimiterOptions
-             {
-                 PermitLimit = 5, 
-                 Window = TimeSpan.FromMinutes(1),
-                 QueueLimit = 0,
-                 AutoReplenishment = true
-             });
-     });
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 30,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+
+    options.AddPolicy("NotificationsReadAllPolicy", httpContext =>
+    {
+        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? httpContext.User.FindFirst("sub")?.Value;
+
+        var partitionKey = !string.IsNullOrEmpty(userId)
+            ? $"notif-read-all:user:{userId}"
+            : $"notif-read-all:ip:{httpContext.Connection.RemoteIpAddress}";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
     // ==========================================
     // Standard Query Policy (MyCourses)
     // ==========================================
@@ -230,7 +230,7 @@ builder.Services.AddRateLimiter(options =>
             partitionKey,
             _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 30, 
+                PermitLimit = 30,
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0,
                 AutoReplenishment = true
@@ -253,7 +253,7 @@ builder.Services.AddRateLimiter(options =>
             partitionKey,
             _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 15, 
+                PermitLimit = 15,
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0,
                 AutoReplenishment = true
@@ -282,27 +282,117 @@ builder.Services.AddRateLimiter(options =>
                 AutoReplenishment = true
             });
     });
+
     // ==========================================
-    // Rejection Response
+    // Request Write Policy (POST / PATCH /api/Request)
     // ==========================================
-    options.OnRejected = async (context, cancellationToken) =>
+    options.AddPolicy("RequestWritePolicy", httpContext =>
     {
-        context.HttpContext.Response.StatusCode =
-            StatusCodes.Status429TooManyRequests;
+        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? httpContext.User.FindFirst("sub")?.Value;
 
-        context.HttpContext.Response.ContentType =
-            "application/json";
+        var partitionKey = !string.IsNullOrEmpty(userId)
+            ? $"req-write:user:{userId}"
+            : $"req-write:ip:{httpContext.Connection.RemoteIpAddress}";
 
-        await context.HttpContext.Response.WriteAsJsonAsync(
-            new
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
             {
-                statusCode = 429,
-                message = "Too many requests. Please try again later."
-            },
-            cancellationToken);
-    };
-});
+                PermitLimit = 10, // 10 طلبات إنشاء/تعديل في الدقيقة
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
 
+    // ==========================================
+    // Request Read Policy (GET /api/Request/*)
+    // ==========================================
+    options.AddPolicy("RequestReadPolicy", httpContext =>
+    {
+        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? httpContext.User.FindFirst("sub")?.Value;
+
+        var partitionKey = !string.IsNullOrEmpty(userId)
+            ? $"req-read:user:{userId}"
+            : $"req-read:ip:{httpContext.Connection.RemoteIpAddress}";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 30, // 30 طلب استرجاع في الدقيقة
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+        // ==========================================
+        // CourseGrade Read Policy (GET /api/CourseGrade/course-offering/{id}/students)
+        // ==========================================
+        options.AddPolicy("CourseGradeReadPolicy", httpContext =>
+        {
+            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                        ?? httpContext.User.FindFirst("sub")?.Value;
+
+            var partitionKey = !string.IsNullOrEmpty(userId)
+                ? $"grades-read:user:{userId}"
+                : $"grades-read:ip:{httpContext.Connection.RemoteIpAddress}";
+
+            return RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey,
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 20, // 20 طلب استرجاع للدرجات في الدقيقة
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                });
+        });
+
+        // ==========================================
+        // CourseGrade Assign Policy (POST /api/CourseGrade/assign)
+        // ==========================================
+        options.AddPolicy("CourseGradeAssignPolicy", httpContext =>
+        {
+            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                        ?? httpContext.User.FindFirst("sub")?.Value;
+
+            var partitionKey = !string.IsNullOrEmpty(userId)
+                ? $"grades-assign:user:{userId}"
+                : $"grades-assign:ip:{httpContext.Connection.RemoteIpAddress}";
+
+            return RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey,
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 10, // 10 عمليات إسناد درجات في الدقيقة
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                });
+        });
+        // ==========================================
+        // Rejection Response
+        // ==========================================
+        options.OnRejected = async (context, cancellationToken) =>
+        {
+            context.HttpContext.Response.StatusCode =
+                StatusCodes.Status429TooManyRequests;
+
+            context.HttpContext.Response.ContentType =
+                "application/json";
+
+            await context.HttpContext.Response.WriteAsJsonAsync(
+                new
+                {
+                    statusCode = 429,
+                    message = "Too many requests. Please try again later."
+                },
+                cancellationToken);
+        };
+    });
+});
 
 
 var app = builder.Build();

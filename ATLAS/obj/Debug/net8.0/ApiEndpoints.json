@@ -852,32 +852,6 @@
   },
   {
     "ContainingType": "ATLAS.Controllers.Requests.RequestController",
-    "Method": "GetById",
-    "RelativePath": "api/Request/{requestId}",
-    "HttpMethod": "GET",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "requestId",
-        "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": [
-      {
-        "Type": "ATLASDomain.DTO.Request.GradeAppealRequestDto",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
-  },
-  {
-    "ContainingType": "ATLAS.Controllers.Requests.RequestController",
     "Method": "GetDoctorRequests",
     "RelativePath": "api/Request/doctor",
     "HttpMethod": "GET",

@@ -98,8 +98,7 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
             x.StudentID == studentId &&
             x.AssessmentModuleID == assessmentModuleId &&
             (x.Status == enGradeAppealStatus.Pending
-             || x.Status == enGradeAppealStatus.UnderReview
-             || x.Status == enGradeAppealStatus.NeedMoreInfo));
+             || x.Status == enGradeAppealStatus.UnderReview));
     }
     public async Task<int> AddAsync(
         CreateGradeAppealRequestDto dto,

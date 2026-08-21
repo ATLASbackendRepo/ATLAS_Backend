@@ -37,6 +37,8 @@ public interface IUnitOfWork : IDisposable
     ICourseGroupMessageReadRepository CourseGroupMessagesRead { get; }
     INotificationRepository Notifications { get; }
 
+    IGradeAppealRequestRepository GradeAppealRequests { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);
     Task CommitTransactionAsync(CancellationToken cancellationToken = default);

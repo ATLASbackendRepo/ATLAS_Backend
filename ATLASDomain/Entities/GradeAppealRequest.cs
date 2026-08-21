@@ -5,11 +5,11 @@ namespace ATLASDomain.Entities
     public enum enGradeAppealStatus
     {
         Pending,
-        UnderReview,
-        NeedMoreInfo,
-        Approved,
         Rejected,
+        Approved,
+        UnderReview,
         Closed
+    
     }
     public class GradeAppealRequest
     {
@@ -28,7 +28,7 @@ namespace ATLASDomain.Entities
 
         public DateTime SubmittedAt { get; set; }
         public DateTime? ReviewedAt { get; set; }
-        public byte[] RowVersion { get; set; } = Array.Empty<byte>();
+   
 
         public Student Student { get; set; } = null!;
         public CourseOffering CourseOffering { get; set; } = null!;

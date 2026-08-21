@@ -8,7 +8,7 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
     {
         public CreateGradeAppealRequestCommandValidator()
         {
-            RuleFor(x => x.StudentId)
+            RuleFor(x => x.UserId)
                 .GreaterThan(0);
 
             RuleFor(x => x.Request)
@@ -25,7 +25,7 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
                 .When(x => x.Request.AssessmentModuleID.HasValue);
 
             RuleFor(x => x.Request.CurrentGrade)
-                .InclusiveBetween(0, 100)
+                .InclusiveBetween(0, 40)
                 .When(x => x.Request.CurrentGrade.HasValue);
 
             RuleFor(x => x.Request.ProblemDescription)

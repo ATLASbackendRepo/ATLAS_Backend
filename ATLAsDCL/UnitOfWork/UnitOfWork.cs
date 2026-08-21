@@ -29,6 +29,8 @@ public sealed class UnitOfWork : IUnitOfWork
     public IStudentProfileRepository StudentProfile { get; }
     public IUserRepository Users { get; }
 
+ 
+
     public UnitOfWork(
         AtLASDbContext context,
         IAssessmentModuleRepository assessmentModuleRepository,
@@ -46,7 +48,8 @@ public sealed class UnitOfWork : IUnitOfWork
         INotificationRepository notificationRepository,
         IStudentProfileRepository studentProfileRepository,
         IStaffProfileRepository staffProfileRepository,
-        ICourseGroupMessageReadRepository courseGroupMessageRead)
+        ICourseGroupMessageReadRepository courseGroupMessageRead
+        , IGradeAppealRequestRepository gradeAppealRequestRepository)
     {
         _context = context;
 
@@ -66,6 +69,7 @@ public sealed class UnitOfWork : IUnitOfWork
         StudentProfile = studentProfileRepository;
         StaffProfile = staffProfileRepository;
         CourseGroupMessageRead = courseGroupMessageRead;
+        GradeAppealRequest = gradeAppealRequestRepository;
     }
 
     public async Task<int> SaveChangesAsync(
@@ -134,7 +138,6 @@ public sealed class UnitOfWork : IUnitOfWork
         _currentTransaction?.Dispose();
         _context.Dispose();
     }
-
     public IStaffProfileRepository staffProfile => StaffProfile;
 
     private ICourseGroupMessageReadRepository? _courseGroupMessagesRead;
@@ -152,4 +155,9 @@ public sealed class UnitOfWork : IUnitOfWork
             return _courseGroupMessagesRead;
         }
     }
+
+    public IGradeAppealRequestRepository GradeAppealRequest { get; }
+
+    public IGradeAppealRequestRepository GradeAppealRequests
+        => GradeAppealRequest;
 }

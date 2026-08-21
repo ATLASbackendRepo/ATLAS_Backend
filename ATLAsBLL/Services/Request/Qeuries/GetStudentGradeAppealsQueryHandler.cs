@@ -1,4 +1,5 @@
 ﻿
+using ATLAsDCL.UnitOfWork;
 using ATLASDomain.DTO.Request;
 using MediatR;
 namespace ATLAsBLL.Services.Request.Qeuries
@@ -7,19 +8,22 @@ namespace ATLAsBLL.Services.Request.Qeuries
     public class GetStudentGradeAppealsQueryHandler
         : IRequestHandler<GetStudentGradeAppealsQuery, List<GradeAppealRequestDto>>
     {
-        private readonly IGradeAppealRequestRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public GetStudentGradeAppealsQueryHandler(
-            IGradeAppealRequestRepository repository)
+            IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<List<GradeAppealRequestDto>> Handle(
             GetStudentGradeAppealsQuery query,
             CancellationToken cancellationToken)
         {
-            return await _repository.GetByStudentIdAsync(query.StudentId);
+
+           ATLASDomain.Entities.Student student = await  _unitOfWork.Students.GetStudentByUserIDAsync(query.UserId);
+
+            return await _unitOfWork.GradeAppealRequests.GetByStudentIdAsync(student.StudentId);
         }
     }
 }

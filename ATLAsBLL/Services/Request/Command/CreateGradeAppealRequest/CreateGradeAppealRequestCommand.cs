@@ -7,7 +7,7 @@ using ATLASDomain.DTO.Request;
 namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
 {
     public record CreateGradeAppealRequestCommand(
-      int StudentId,
+      int UserId,
       CreateGradeAppealRequestDto Request)
       : ICommand<int>;
 }

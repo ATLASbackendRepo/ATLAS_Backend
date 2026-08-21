@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading.Tasks;
 using ATLAS;
+using Microsoft.AspNetCore.RateLimiting;
 namespace ATLASAPI.Controllers
 {
     [ApiController]
@@ -30,9 +31,10 @@ namespace ATLASAPI.Controllers
         /// <param name="pageSize">Number of items per page (default is 9).</param>
         /// <param name="searchTerm">Optional search term to filter students by name, academic ID, or code.</param>
         [HttpGet("course-offering/{courseOfferingId:int}/students")]
-        [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
         [ProducesResponseType(typeof(PagedResultDto<StudentCardDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
+        [EnableRateLimiting("CourseGradeReadPolicy")]
         public async Task<ActionResult<PagedResultDto<StudentCardDto>>> GetCourseStudentsPaged(
             int courseOfferingId,
             [FromQuery] int pageNumber = 1,
@@ -64,10 +66,11 @@ namespace ATLASAPI.Controllers
 
 
         [HttpPost("assign")]
-        [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
+        [EnableRateLimiting("CourseGradeAssignPolicy")]
         public async Task<IActionResult> AssignGrade(
              [FromBody] AssignCourseGradeCommand command)
         {

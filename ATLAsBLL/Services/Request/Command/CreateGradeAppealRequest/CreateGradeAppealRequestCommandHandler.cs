@@ -1,4 +1,7 @@
-﻿using MediatR;
+﻿using ATLAsBLL.Exceptions;
+using ATLAsDCL.UnitOfWork;
+using ATLASDomain.Entities;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,12 +13,12 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
     public class CreateGradeAppealRequestCommandHandler
         : IRequestHandler<CreateGradeAppealRequestCommand, int>
     {
-        private readonly IGradeAppealRequestRepository _repository;
+        private readonly IUnitOfWork _UnitOfWork;
 
         public CreateGradeAppealRequestCommandHandler(
-            IGradeAppealRequestRepository repository)
+            IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _UnitOfWork = unitOfWork;
         }
 
         public async Task<int> Handle(
@@ -26,10 +29,26 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
             // - Student is enrolled in CourseOfferingID
             // - Selected doctor teaches CourseOfferingID
             // - No open appeal exists for this assessment
+            
+            var DoctorIds = await _UnitOfWork.CourseOfferingDoctors
+                .GetDoctorIdsByCourseOfferingIdAsync(command.Request.CourseOfferingID);
 
-            return await _repository.AddAsync(
+
+            if (!DoctorIds.Contains(command.Request.DoctorUserID))
+            {
+                throw new ForbiddenAccessException("Selected doctor does not teach the specified course offering.");
+            }
+
+            if (command.Request.CourseOfferingID <= 0)
+            {
+                throw new ArgumentException("Invalid Request ");
+            }
+
+            ATLASDomain.Entities.Student student = await _UnitOfWork.Students.FirstOrDefaultAsync(s => s.UserId == command.UserId);
+
+            return await _UnitOfWork.GradeAppealRequests.AddAsync(
                 command.Request,
-                command.StudentId);
+                student.StudentId);
         }
     }
 }

@@ -1,10 +1,12 @@
-﻿using ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest;
+﻿using ATLAsBLL.Exceptions;
+using ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest;
 using ATLAsBLL.Services.Request.Command.UpdateGradeAppealRequest;
 using ATLAsBLL.Services.Request.Qeuries;
 using ATLASDomain.DTO.Request;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 using System.Security.Claims;
 
 namespace ATLAS.Controllers.Requests;
@@ -21,44 +23,52 @@ public class RequestController : ControllerBase
     }
 
     [HttpPost]
-    [Authorize(Roles = "Student")]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [Authorize(Roles = "Student")]
+    [EnableRateLimiting("RequestWritePolicy")]
     public async Task<IActionResult> Create(
         [FromBody] CreateGradeAppealRequestDto dto,
         CancellationToken cancellationToken)
     {
-        // Your JWT must contain the StudentId claim.
-        var studentIdValue = User.FindFirstValue("StudentId");
+        try
+        { 
+        var UserId = GetCurrentUserId();
 
-        if (!int.TryParse(studentIdValue, out int studentId))
-            return Unauthorized("Student identity was not found.");
 
         var requestId = await _mediator.Send(
-            new CreateGradeAppealRequestCommand(studentId, dto),
+            new CreateGradeAppealRequestCommand(UserId, dto),
             cancellationToken);
 
         return CreatedAtAction(
             nameof(GetById),
             new { requestId },
             new { requestId });
+         }
+        catch (ForbiddenAccessException ex)
+        {
+            return Forbid();
+}
+        catch (Exception ex)
+        {
+            return BadRequest(new { message = ex.Message });
+        }
     }
 
+
     [HttpPatch("{requestId:int}")]
-    [Authorize(Roles = "Doctor")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [Authorize(Roles = "Doctor")]
+    [EnableRateLimiting("RequestWritePolicy")]
     public async Task<IActionResult> Update(
         int requestId,
         [FromBody] UpdateGradeAppealRequestDto dto,
         CancellationToken cancellationToken)
     {
         // Standard JWT user identifier claim.
-        var doctorUserIdValue = User.FindFirstValue(ClaimTypes.NameIdentifier);
-
-        if (!int.TryParse(doctorUserIdValue, out int doctorUserId))
-            return Unauthorized("Doctor identity was not found.");
+        var doctorUserId = GetCurrentUserId();
 
         var updated = await _mediator.Send(
             new UpdateGradeAppealRequestCommand(requestId, doctorUserId, dto),
@@ -67,29 +77,33 @@ public class RequestController : ControllerBase
         return updated ? NoContent() : NotFound();
     }
 
+
     [HttpGet("student")]
-    [Authorize(Roles = "Student")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [Authorize(Roles = "Student")]
+    [EnableRateLimiting("RequestReadPolicy")]
     public async Task<ActionResult<List<GradeAppealRequestDto>>> GetMyRequests(
         CancellationToken cancellationToken)
     {
-        var studentIdValue = User.FindFirstValue("StudentId");
+        var UserId = GetCurrentUserId();
 
-        if (!int.TryParse(studentIdValue, out int studentId))
-            return Unauthorized();
+
 
         var requests = await _mediator.Send(
-            new GetStudentGradeAppealsQuery(studentId),
+            new GetStudentGradeAppealsQuery(UserId),
             cancellationToken);
 
         return Ok(requests);
     }
 
+
     [HttpGet("doctor")]
-    [Authorize(Roles = "Doctor")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [Authorize(Roles = "Doctor")]
+    [EnableRateLimiting("RequestReadPolicy")]
+
     public async Task<ActionResult<List<GradeAppealRequestDto>>> GetDoctorRequests(
         CancellationToken cancellationToken)
     {
@@ -105,9 +119,9 @@ public class RequestController : ControllerBase
         return Ok(requests);
     }
 
-    [HttpGet("{requestId:int}")]
-    [Authorize(Roles = "Student,Doctor,SAdmin")]
-    public async Task<ActionResult<GradeAppealRequestDto>> GetById(
+
+
+    private async Task<ActionResult<GradeAppealRequestDto>> GetById(
     int requestId,
     CancellationToken cancellationToken)
     {
@@ -130,5 +144,18 @@ public class RequestController : ControllerBase
             cancellationToken);
 
         return request is null ? NotFound() : Ok(request);
+    }
+
+
+
+
+    private int GetCurrentUserId()
+    {
+        var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+        if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+        {
+            throw new UnauthorizedAccessException("User ID not found in token.");
+        }
+        return userId;
     }
 }

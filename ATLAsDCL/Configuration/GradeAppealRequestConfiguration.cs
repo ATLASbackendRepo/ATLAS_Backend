@@ -44,8 +44,6 @@ public class GradeAppealRequestConfiguration
             .HasColumnType("nvarchar(max)")
             .IsRequired();
 
-        builder.Property(x => x.RowVersion)
-            .IsRowVersion();
 
         builder.Property(x => x.DoctorResponse)
             .HasColumnName("DoctorResponse")

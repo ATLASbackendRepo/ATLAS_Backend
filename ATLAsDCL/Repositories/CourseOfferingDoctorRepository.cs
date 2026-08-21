@@ -28,4 +28,13 @@ public class CourseOfferingDoctorRepository
             .Where(c => c.CourseOfferingID == offeringId)
             .ToListAsync();
     }
+    public async Task<IEnumerable<int>> GetDoctorIdsByCourseOfferingIdAsync(int offeringId)
+    {
+        return await _context.CourseOfferingDoctors
+            .AsNoTracking()
+            .Include(c => c.CourseOffering)
+            .Where(c => c.CourseOfferingID == offeringId)
+            .Select(c => c.DoctorID)
+            .ToListAsync();
+    }
 }

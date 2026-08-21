@@ -16,6 +16,8 @@ public interface IStudentRepository : IGenericRepository<Student>
     Task<bool> StudentCodeExistsAsync(string studentCode);
 
     Task<Student?> GetStudentByAcademicIDAsync(string academicID);
+    Task<Student?> GetStudentByUserIDAsync(int UserID);
+
    Task<Student?> GetStudentByCodeAsync(string studentCode);
    Task<IEnumerable<Student>> GetAllStudentWithLevelAsync(int level);
    Task <IEnumerable<Student>> GetAllStudentWithCoursefferingAsync( int courseOfferingID);

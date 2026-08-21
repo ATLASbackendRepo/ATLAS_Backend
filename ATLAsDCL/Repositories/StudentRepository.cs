@@ -46,6 +46,12 @@ public class StudentRepository
             .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.StudentId == studentId);
     }
+    public async Task<Student?> GetStudentByUserIDAsync(int UserID)
+    {
+        return await _context.Students
+            .AsNoTracking()
+            .FirstOrDefaultAsync(s => s.UserId  == UserID);
+    }
 
     public async Task<bool> StudentCodeExistsAsync(string studentCode)
     {

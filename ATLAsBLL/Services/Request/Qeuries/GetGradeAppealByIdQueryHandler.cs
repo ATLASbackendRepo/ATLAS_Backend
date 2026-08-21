@@ -1,4 +1,5 @@
-﻿using ATLASDomain.DTO.Request;
+﻿using ATLAsDCL.UnitOfWork;
+using ATLASDomain.DTO.Request;
 using MediatR;
 namespace ATLAsBLL.Services.Request.Qeuries
 {
@@ -6,27 +7,25 @@ namespace ATLAsBLL.Services.Request.Qeuries
     public class GetGradeAppealByIdQueryHandler
         : IRequestHandler<GetGradeAppealByIdQuery, GradeAppealRequestDto?>
     {
-        private readonly IGradeAppealRequestRepository _repository;
+        private readonly IUnitOfWork _UnitOfWork;
 
         public GetGradeAppealByIdQueryHandler(
-            IGradeAppealRequestRepository repository)
+            IUnitOfWork unitOfWork)
         {
-            _repository = repository;
+            _UnitOfWork = unitOfWork;
         }
 
         public async Task<GradeAppealRequestDto?> Handle(
             GetGradeAppealByIdQuery query,
             CancellationToken cancellationToken)
         {
-            var request = await _repository.GetByIdAsync(query.RequestId);
+            var request = await _UnitOfWork.GradeAppealRequests.GetByIdAsync(query.RequestId);
 
             if (request is null)
                 return null;
 
-            // Student or assigned doctor can view the request.
-            bool canView = query.IsSuperAdmin ||
-                           request.StudentID == query.CurrentStudentId ||
-                           request.DoctorUserID == query.CurrentUserId;
+            
+            bool canView = request.DoctorUserID == query.CurrentUserId;
 
             return canView ? request : null;
         }
