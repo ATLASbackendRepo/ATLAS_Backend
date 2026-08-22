@@ -2,41 +2,56 @@ using ATLAS;
 using ATLAsBLL;
 using ATLAsDCL.DependencyInjection;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
+
 using DALExt = ATLAsDCL.DependencyInjection.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// ======================================================
+// Services
+// ======================================================
 
 builder.Services.AddControllers();
-builder.Services.AddScoped<ICourseOfferingAuthorizationService, CourseOfferingAuthorizationService>();
+
+builder.Services.AddScoped<
+    ICourseOfferingAuthorizationService,
+    CourseOfferingAuthorizationService>();
+
+// ======================================================
+// JWT Options
+// ======================================================
 
 builder.Services.AddOptions<JwtOptions>()
     .Bind(builder.Configuration.GetSection(JwtOptions.SectionName))
-    .Validate(o => !string.IsNullOrWhiteSpace(o.Key), "Jwt:Key must be supplied through a secure configuration provider.")
-    .Validate(o => !string.IsNullOrWhiteSpace(o.Issuer), "Jwt:Issuer is required.")
-    .Validate(o => !string.IsNullOrWhiteSpace(o.Audience), "Jwt:Audience is required.")
-    .Validate(o => o.ExpiryMinutes > 0, "Jwt:ExpiryMinutes must be greater than zero.")
+    .Validate(
+        o => !string.IsNullOrWhiteSpace(o.Key),
+        "Jwt:Key must be supplied through a secure configuration provider.")
+    .Validate(
+        o => !string.IsNullOrWhiteSpace(o.Issuer),
+        "Jwt:Issuer is required.")
+    .Validate(
+        o => !string.IsNullOrWhiteSpace(o.Audience),
+        "Jwt:Audience is required.")
+    .Validate(
+        o => o.ExpiryMinutes > 0,
+        "Jwt:ExpiryMinutes must be greater than zero.")
     .ValidateOnStart();
 
+// ======================================================
+// Swagger
+// ======================================================
+
 builder.Services.AddEndpointsApiExplorer();
+
 builder.Services.AddSwaggerGen(options =>
 {
-    // ===============================
-    // 1) Define the JWT Bearer security scheme
-    // ===============================
-    //
-    // This tells Swagger that our API uses JWT Bearer authentication
-    // through the HTTP Authorization header.
     options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
-
         Name = "Authorization",
         Type = SecuritySchemeType.Http,
         Scheme = "Bearer",
@@ -44,98 +59,144 @@ builder.Services.AddSwaggerGen(options =>
         In = ParameterLocation.Header,
         Description = "Enter: Bearer {your JWT token}"
     });
+
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
     {
         {
             new OpenApiSecurityScheme
             {
-                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "Bearer" }
+                Reference = new OpenApiReference
+                {
+                    Type = ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
             },
             Array.Empty<string>()
         }
     });
 });
-builder.Services.AddBusinessLogicLayer();
-DALExt.AddDAL(builder.Services, builder.Configuration);
-var jwtOptions = builder.Configuration.GetSection(JwtOptions.SectionName).Get<JwtOptions>()
-    ?? throw new InvalidOperationException("JWT configuration is missing.");
 
-builder.Services.AddCors(options =>   // cors
+// ======================================================
+// Business Logic & DAL
+// ======================================================
+
+builder.Services.AddBusinessLogicLayer();
+
+DALExt.AddDAL(
+    builder.Services,
+    builder.Configuration);
+
+// ======================================================
+// JWT Configuration
+// ======================================================
+
+var jwtOptions =
+    builder.Configuration
+        .GetSection(JwtOptions.SectionName)
+        .Get<JwtOptions>()
+    ?? throw new InvalidOperationException(
+        "JWT configuration is missing.");
+
+// ======================================================
+// CORS
+// ======================================================
+
+builder.Services.AddCors(options =>
 {
-    options.AddPolicy("StudentApiCorsPolicy", policy =>  
+    options.AddPolicy("StudentApiCorsPolicy", policy =>
     {
         policy
             .WithOrigins(
                 "https://localhost:7133",
-                "http://localhost:5056"
-            )
+                "http://localhost:5056")
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
 });
 
-builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+// ======================================================
+// Authentication
+// ======================================================
+
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     .AddJwtBearer(options =>
     {
+        options.TokenValidationParameters =
+            new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
 
-        options.TokenValidationParameters = new TokenValidationParameters
-        {
+                IssuerSigningKey =
+                    new SymmetricSecurityKey(
+                        Encoding.UTF8.GetBytes(
+                            "ATLAS-Super-Secret-Key-2026-For-JWT-Signing!")),
 
-            ValidateIssuerSigningKey = true,
-            IssuerSigningKey = new SymmetricSecurityKey(
-            Encoding.UTF8.GetBytes("ATLAS-Super-Secret-Key-2026-For-JWT-Signing!")),
+                ValidateIssuer = true,
+                ValidIssuer = jwtOptions.Issuer,
 
-            ValidateIssuer = true,
-            ValidIssuer = jwtOptions.Issuer,
+                ValidateAudience = true,
+                ValidAudience = jwtOptions.Audience,
 
-            ValidateAudience = true,
-            ValidAudience = jwtOptions.Audience,
+                ValidateLifetime = true,
 
-            ValidateLifetime = true,
-            ClockSkew = TimeSpan.Zero
-        };
+                ClockSkew = TimeSpan.Zero
+            };
     });
+
+// ======================================================
+// Rate Limiting
+// ======================================================
 
 builder.Services.AddRateLimiter(options =>
 {
-    options.RejectionStatusCode = StatusCodes.Status429TooManyRequests;
+    options.RejectionStatusCode =
+        StatusCodes.Status429TooManyRequests;
 
-    // ==========================================
-    // Global Rate Limiter
-    // ==========================================
+    // ==================================================
+    // GLOBAL RATE LIMITER
+    // ==================================================
+
     options.GlobalLimiter =
-        PartitionedRateLimiter.Create<HttpContext, string>(httpContext =>
-        {
-            var userId =
-                httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                ?? httpContext.User.FindFirst("sub")?.Value;
+        PartitionedRateLimiter.Create<HttpContext, string>(
+            httpContext =>
+            {
+                var userId =
+                    httpContext.User
+                        .FindFirst(ClaimTypes.NameIdentifier)?.Value
+                    ?? httpContext.User
+                        .FindFirst("sub")?.Value;
 
-            var partitionKey = !string.IsNullOrEmpty(userId)
-                ? $"user:{userId}"
-                : $"ip:{httpContext.Connection.RemoteIpAddress}";
+                var partitionKey =
+                    !string.IsNullOrEmpty(userId)
+                        ? $"user:{userId}"
+                        : $"ip:{httpContext.Connection.RemoteIpAddress}";
 
-            var permitLimit = !string.IsNullOrEmpty(userId)
-                ? 100
-                : 20;
+                var permitLimit =
+                    !string.IsNullOrEmpty(userId)
+                        ? 100
+                        : 20;
 
-            return RateLimitPartition.GetFixedWindowLimiter(
-                partitionKey,
-                _ => new FixedWindowRateLimiterOptions
-                {
-                    PermitLimit = permitLimit,
-                    Window = TimeSpan.FromMinutes(1),
-                    QueueLimit = 0,
-                    AutoReplenishment = true
-                });
-        });
+                return RateLimitPartition.GetFixedWindowLimiter(
+                    partitionKey,
+                    _ => new FixedWindowRateLimiterOptions
+                    {
+                        PermitLimit = permitLimit,
+                        Window = TimeSpan.FromMinutes(1),
+                        QueueLimit = 0,
+                        AutoReplenishment = true
+                    });
+            });
 
-    // ==========================================
-    // Auth Rate Limiter
-    // ==========================================
+    // ==================================================
+    // AUTH
+    // ==================================================
+
     options.AddPolicy("AuthLimiter", httpContext =>
     {
-        var ip = httpContext.Connection.RemoteIpAddress?.ToString()
-                 ?? "unknown";
+        var ip =
+            httpContext.Connection.RemoteIpAddress?.ToString()
+            ?? "unknown";
 
         return RateLimitPartition.GetFixedWindowLimiter(
             $"auth:ip:{ip}",
@@ -148,18 +209,22 @@ builder.Services.AddRateLimiter(options =>
             });
     });
 
-    // ==========================================
-    // Messages Rate Limiter
-    // ==========================================
+    // ==================================================
+    // MESSAGES
+    // ==================================================
+
     options.AddPolicy("MessagesPolicy", httpContext =>
     {
         var userId =
-                httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                ?? httpContext.User.FindFirst("sub")?.Value;
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
 
-        var partitionKey = !string.IsNullOrEmpty(userId)
-            ? $"messages:user:{userId}"
-            : $"messages:ip:{httpContext.Connection.RemoteIpAddress}";
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"messages:user:{userId}"
+                : $"messages:ip:{httpContext.Connection.RemoteIpAddress}";
 
         return RateLimitPartition.GetFixedWindowLimiter(
             partitionKey,
@@ -172,17 +237,22 @@ builder.Services.AddRateLimiter(options =>
             });
     });
 
-    // ==========================================
-    // Messages Rate Limiter
-    // ==========================================
+    // ==================================================
+    // NOTIFICATIONS
+    // ==================================================
+
     options.AddPolicy("NotificationsPolicy", httpContext =>
     {
-        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? httpContext.User.FindFirst("sub")?.Value;
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
 
-        var partitionKey = !string.IsNullOrEmpty(userId)
-            ? $"notif:user:{userId}"
-            : $"notif:ip:{httpContext.Connection.RemoteIpAddress}";
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"notif:user:{userId}"
+                : $"notif:ip:{httpContext.Connection.RemoteIpAddress}";
 
         return RateLimitPartition.GetFixedWindowLimiter(
             partitionKey,
@@ -195,14 +265,22 @@ builder.Services.AddRateLimiter(options =>
             });
     });
 
+    // ==================================================
+    // NOTIFICATIONS - READ ALL
+    // ==================================================
+
     options.AddPolicy("NotificationsReadAllPolicy", httpContext =>
     {
-        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? httpContext.User.FindFirst("sub")?.Value;
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
 
-        var partitionKey = !string.IsNullOrEmpty(userId)
-            ? $"notif-read-all:user:{userId}"
-            : $"notif-read-all:ip:{httpContext.Connection.RemoteIpAddress}";
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"notif-read-all:user:{userId}"
+                : $"notif-read-all:ip:{httpContext.Connection.RemoteIpAddress}";
 
         return RateLimitPartition.GetFixedWindowLimiter(
             partitionKey,
@@ -214,17 +292,23 @@ builder.Services.AddRateLimiter(options =>
                 AutoReplenishment = true
             });
     });
-    // ==========================================
-    // Standard Query Policy (MyCourses)
-    // ==========================================
+
+    // ==================================================
+    // COURSE QUERY
+    // ==================================================
+
     options.AddPolicy("CourseQueryPolicy", httpContext =>
     {
-        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? httpContext.User.FindFirst("sub")?.Value;
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
 
-        var partitionKey = !string.IsNullOrEmpty(userId)
-            ? $"courses:user:{userId}"
-            : $"courses:ip:{httpContext.Connection.RemoteIpAddress}";
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"courses:user:{userId}"
+                : $"courses:ip:{httpContext.Connection.RemoteIpAddress}";
 
         return RateLimitPartition.GetFixedWindowLimiter(
             partitionKey,
@@ -237,17 +321,22 @@ builder.Services.AddRateLimiter(options =>
             });
     });
 
-    // ==========================================
-    // Heavy Details Policy (CourseDetails)
-    // ==========================================
+    // ==================================================
+    // COURSE DETAILS
+    // ==================================================
+
     options.AddPolicy("CourseDetailsPolicy", httpContext =>
     {
-        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? httpContext.User.FindFirst("sub")?.Value;
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
 
-        var partitionKey = !string.IsNullOrEmpty(userId)
-            ? $"course-details:user:{userId}"
-            : $"course-details:ip:{httpContext.Connection.RemoteIpAddress}";
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"course-details:user:{userId}"
+                : $"course-details:ip:{httpContext.Connection.RemoteIpAddress}";
 
         return RateLimitPartition.GetFixedWindowLimiter(
             partitionKey,
@@ -260,219 +349,286 @@ builder.Services.AddRateLimiter(options =>
             });
     });
 
-    // ==========================================
-    // Analysis Course Policy 
-    // ==========================================
+    // ==================================================
+    // ANALYSIS
+    // ==================================================
+
     options.AddPolicy("AnalysisPolicy", httpContext =>
     {
-        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? httpContext.User.FindFirst("sub")?.Value;
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
 
-        var partitionKey = !string.IsNullOrEmpty(userId)
-            ? $"analysis:user:{userId}"
-            : $"analysis:ip:{httpContext.Connection.RemoteIpAddress}";
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"analysis:user:{userId}"
+                : $"analysis:ip:{httpContext.Connection.RemoteIpAddress}";
 
         return RateLimitPartition.GetFixedWindowLimiter(
             partitionKey,
             _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 10, // 10 طلبات فقط في الدقيقة لكل مستخدم
+                PermitLimit = 10,
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0,
                 AutoReplenishment = true
             });
     });
 
-    // ==========================================
-    // Request Write Policy (POST / PATCH /api/Request)
-    // ==========================================
+    // ==================================================
+    // REQUEST WRITE
+    // ==================================================
+
     options.AddPolicy("RequestWritePolicy", httpContext =>
     {
-        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? httpContext.User.FindFirst("sub")?.Value;
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
 
-        var partitionKey = !string.IsNullOrEmpty(userId)
-            ? $"req-write:user:{userId}"
-            : $"req-write:ip:{httpContext.Connection.RemoteIpAddress}";
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"req-write:user:{userId}"
+                : $"req-write:ip:{httpContext.Connection.RemoteIpAddress}";
 
         return RateLimitPartition.GetFixedWindowLimiter(
             partitionKey,
             _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 10, // 10 طلبات إنشاء/تعديل في الدقيقة
+                PermitLimit = 10,
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0,
                 AutoReplenishment = true
             });
     });
 
-    // ==========================================
-    // Request Read Policy (GET /api/Request/*)
-    // ==========================================
+    // ==================================================
+    // REQUEST READ
+    // ==================================================
+
     options.AddPolicy("RequestReadPolicy", httpContext =>
     {
-        var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                    ?? httpContext.User.FindFirst("sub")?.Value;
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
 
-        var partitionKey = !string.IsNullOrEmpty(userId)
-            ? $"req-read:user:{userId}"
-            : $"req-read:ip:{httpContext.Connection.RemoteIpAddress}";
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"req-read:user:{userId}"
+                : $"req-read:ip:{httpContext.Connection.RemoteIpAddress}";
 
         return RateLimitPartition.GetFixedWindowLimiter(
             partitionKey,
             _ => new FixedWindowRateLimiterOptions
             {
-                PermitLimit = 30, // 30 طلب استرجاع في الدقيقة
+                PermitLimit = 30,
                 Window = TimeSpan.FromMinutes(1),
                 QueueLimit = 0,
                 AutoReplenishment = true
             });
-        // ==========================================
-        // CourseGrade Read Policy (GET /api/CourseGrade/course-offering/{id}/students)
-        // ==========================================
-        options.AddPolicy("CourseGradeReadPolicy", httpContext =>
-        {
-            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                        ?? httpContext.User.FindFirst("sub")?.Value;
+    });
 
-            var partitionKey = !string.IsNullOrEmpty(userId)
+    // ==================================================
+    // COURSE GRADE READ
+    // ==================================================
+
+    options.AddPolicy("CourseGradeReadPolicy", httpContext =>
+    {
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
+
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
                 ? $"grades-read:user:{userId}"
                 : $"grades-read:ip:{httpContext.Connection.RemoteIpAddress}";
 
-            return RateLimitPartition.GetFixedWindowLimiter(
-                partitionKey,
-                _ => new FixedWindowRateLimiterOptions
-                {
-                    PermitLimit = 20, // 20 طلب استرجاع للدرجات في الدقيقة
-                    Window = TimeSpan.FromMinutes(1),
-                    QueueLimit = 0,
-                    AutoReplenishment = true
-                });
-        });
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
 
-        // ==========================================
-        // CourseGrade Assign Policy (POST /api/CourseGrade/assign)
-        // ==========================================
-        options.AddPolicy("CourseGradeAssignPolicy", httpContext =>
-        {
-            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                        ?? httpContext.User.FindFirst("sub")?.Value;
+    // ==================================================
+    // COURSE GRADE ASSIGN
+    // ==================================================
 
-            var partitionKey = !string.IsNullOrEmpty(userId)
+    options.AddPolicy("CourseGradeAssignPolicy", httpContext =>
+    {
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
+
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
                 ? $"grades-assign:user:{userId}"
                 : $"grades-assign:ip:{httpContext.Connection.RemoteIpAddress}";
 
-            return RateLimitPartition.GetFixedWindowLimiter(
-                partitionKey,
-                _ => new FixedWindowRateLimiterOptions
-                {
-                    PermitLimit = 10, // 10 عمليات إسناد درجات في الدقيقة
-                    Window = TimeSpan.FromMinutes(1),
-                    QueueLimit = 0,
-                    AutoReplenishment = true
-                });
-        });
-        // ==========================================
-        // Rankings Policy (GET /api/semesters/{semesterId}/rankings/*)
-        // ==========================================
-        options.AddPolicy("RankingsPolicy", httpContext =>
-        {
-            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                        ?? httpContext.User.FindFirst("sub")?.Value;
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
 
-            var partitionKey = !string.IsNullOrEmpty(userId)
+    // ==================================================
+    // RANKINGS
+    // ==================================================
+
+    options.AddPolicy("RankingsPolicy", httpContext =>
+    {
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
+
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
                 ? $"rankings:user:{userId}"
                 : $"rankings:ip:{httpContext.Connection.RemoteIpAddress}";
 
-            return RateLimitPartition.GetFixedWindowLimiter(
-                partitionKey,
-                _ => new FixedWindowRateLimiterOptions
-                {
-                    PermitLimit = 20, // 20 طلب استرجاع للترتيب في الدقيقة
-                    Window = TimeSpan.FromMinutes(1),
-                    QueueLimit = 0,
-                    AutoReplenishment = true
-                });
-        });
-        // Policy لقراءة البيانات (GET Profiles)
-        options.AddPolicy("ProfileReadPolicy", httpContext =>
-        {
-            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                        ?? httpContext.User.FindFirst("sub")?.Value;
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 20,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
 
-            var partitionKey = !string.IsNullOrEmpty(userId)
+    // ==================================================
+    // PROFILE READ
+    // ==================================================
+
+    options.AddPolicy("ProfileReadPolicy", httpContext =>
+    {
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
+
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
                 ? $"profile-read:user:{userId}"
                 : $"profile-read:ip:{httpContext.Connection.RemoteIpAddress}";
 
-            return RateLimitPartition.GetFixedWindowLimiter(
-                partitionKey,
-                _ => new FixedWindowRateLimiterOptions
-                {
-                    PermitLimit = 15, // 30 طلب في الدقيقة
-                    Window = TimeSpan.FromMinutes(1),
-                    QueueLimit = 0,
-                    AutoReplenishment = true
-                });
-        });
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 15,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
 
-        // Policy لتحديث البيانات (PUT Profiles)
-        options.AddPolicy("ProfileUpdatePolicy", httpContext =>
-        {
-            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
-                        ?? httpContext.User.FindFirst("sub")?.Value;
+    // ==================================================
+    // PROFILE UPDATE
+    // ==================================================
 
-            var partitionKey = !string.IsNullOrEmpty(userId)
+    options.AddPolicy("ProfileUpdatePolicy", httpContext =>
+    {
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
+
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
                 ? $"profile-update:user:{userId}"
                 : $"profile-update:ip:{httpContext.Connection.RemoteIpAddress}";
 
-            return RateLimitPartition.GetFixedWindowLimiter(
-                partitionKey,
-                _ => new FixedWindowRateLimiterOptions
-                {
-                    PermitLimit = 9, // 10 طلبات في الدقيقة
-                    Window = TimeSpan.FromMinutes(1),
-                    QueueLimit = 0,
-                    AutoReplenishment = true
-                });
-        });
-        // ==========================================
-        // Rejection Response
-        // ==========================================
-        options.OnRejected = async (context, cancellationToken) =>
-        {
-            context.HttpContext.Response.StatusCode =
-                StatusCodes.Status429TooManyRequests;
-
-            context.HttpContext.Response.ContentType =
-                "application/json";
-
-            await context.HttpContext.Response.WriteAsJsonAsync(
-                new
-                {
-                    statusCode = 429,
-                    message = "Too many requests. Please try again later."
-                },
-                cancellationToken);
-        };
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 9,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
     });
+
+    // ==================================================
+    // REJECTION RESPONSE
+    // ==================================================
+
+    options.OnRejected = async (context, cancellationToken) =>
+    {
+        context.HttpContext.Response.StatusCode =
+            StatusCodes.Status429TooManyRequests;
+
+        context.HttpContext.Response.ContentType =
+            "application/json";
+
+        await context.HttpContext.Response.WriteAsJsonAsync(
+            new
+            {
+                statusCode = 429,
+                message = "Too many requests. Please try again later."
+            },
+            cancellationToken);
+    };
 });
 
+// ======================================================
+// Build
+// ======================================================
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// ======================================================
+// Swagger
+// ======================================================
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
     app.UseSwaggerUI();
 }
 
+// ======================================================
+// Middleware Pipeline
+// ======================================================
+
 app.UseHttpsRedirection();
 
+app.UseCors("StudentApiCorsPolicy");
+
 app.UseAuthentication();
+
 app.UseRateLimiter();
+
 app.UseAuthorization();
 
 app.MapControllers();
+
+// ======================================================
+// Run
+// ======================================================
 
 app.Run();
