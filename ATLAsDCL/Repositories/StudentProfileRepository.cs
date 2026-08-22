@@ -21,23 +21,16 @@ namespace ATLAS.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<StudentProfile?> GetByStudentIdAsync(int studentId)
+        public async Task<StudentProfile?> GetByUserIdAsync(int studentId)
         {
+         
+        
             return await _context.StudentProfiles
                 .AsNoTracking()
-                .Where(p => p.Student.StudentId == studentId)
-                .Select(p => new StudentProfile
-                {
-                    StudentProfileID = p.StudentProfileID,
-                    StudentID = p.StudentID,
-                    LinkedInUrl = p.LinkedInUrl,
-                    SectionNumber = p.SectionNumber,
-                    QRCodeUrl = p.QRCodeUrl,
-                    CreatedAt = p.CreatedAt,
-                    UpdatedAt = p.UpdatedAt,
-                    Student = p.Student
-                })
-                .FirstOrDefaultAsync();
+                .Include(p => p.Student)
+                    .ThenInclude(s => s.User)
+                .FirstOrDefaultAsync(p => p.StudentID == studentId);
+       
         }
 
         // IGenericRepository<StudentProfile> implementations

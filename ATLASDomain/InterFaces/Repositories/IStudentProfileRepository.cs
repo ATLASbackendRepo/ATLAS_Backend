@@ -9,7 +9,7 @@ namespace ATLASDomain.InterFaces.Repositories
 {
     public interface IStudentProfileRepository :IGenericRepository<StudentProfile>
     {
-        Task<StudentProfile?> GetByStudentIdAsync(int StudentId);
+        Task<StudentProfile?> GetByUserIdAsync(int UserId);
       
 
     }

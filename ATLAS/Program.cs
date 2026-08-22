@@ -394,6 +394,47 @@ builder.Services.AddRateLimiter(options =>
                     AutoReplenishment = true
                 });
         });
+        // Policy لقراءة البيانات (GET Profiles)
+        options.AddPolicy("ProfileReadPolicy", httpContext =>
+        {
+            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                        ?? httpContext.User.FindFirst("sub")?.Value;
+
+            var partitionKey = !string.IsNullOrEmpty(userId)
+                ? $"profile-read:user:{userId}"
+                : $"profile-read:ip:{httpContext.Connection.RemoteIpAddress}";
+
+            return RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey,
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 15, // 30 طلب في الدقيقة
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                });
+        });
+
+        // Policy لتحديث البيانات (PUT Profiles)
+        options.AddPolicy("ProfileUpdatePolicy", httpContext =>
+        {
+            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                        ?? httpContext.User.FindFirst("sub")?.Value;
+
+            var partitionKey = !string.IsNullOrEmpty(userId)
+                ? $"profile-update:user:{userId}"
+                : $"profile-update:ip:{httpContext.Connection.RemoteIpAddress}";
+
+            return RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey,
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 9, // 10 طلبات في الدقيقة
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                });
+        });
         // ==========================================
         // Rejection Response
         // ==========================================

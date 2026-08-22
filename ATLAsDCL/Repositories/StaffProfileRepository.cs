@@ -1,12 +1,13 @@
-﻿using System;
+﻿using ATLAS.Domain.Entities;
+using ATLAsDCL.Data;
+using ATLASDomain.DTO.Profile;
+using ATLASDomain.InterFaces.Repositories;
+using Microsoft.EntityFrameworkCore;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
-using ATLAS.Domain.Entities;
-using ATLAsDCL.Data;
-using ATLASDomain.InterFaces.Repositories;
-using Microsoft.EntityFrameworkCore;
 
 namespace ATLAS.Persistence.Repositories
 {
@@ -27,11 +28,12 @@ namespace ATLAS.Persistence.Repositories
                 .Select(p => new StaffProfile
                 {
                     StaffProfileID = p.StaffProfileID,
-                    UserID = p.UserID,
+                    AcademicId = p.AcademicId,
                     Role = p.Role,
                     DepartmentID = p.DepartmentID,
                     TeachingYears = p.TeachingYears,
                     User = p.User
+
                 })
                 .FirstOrDefaultAsync();
         }

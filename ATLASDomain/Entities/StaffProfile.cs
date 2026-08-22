@@ -10,7 +10,8 @@ namespace ATLAS.Domain.Entities
         public int UserID { get; set; }              
         public User User { get; set; } = default!;
 
-       
+        public string AcademicId { get; set; }
+
         public string? Role { get; set; }              
         public int? DepartmentID { get; set; }
         public string? TeachingYears { get; set; }    

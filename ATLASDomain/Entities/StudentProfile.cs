@@ -9,9 +9,11 @@ namespace ATLAS.Domain.Entities
 
         public int StudentID { get; set; }         
         public Student Student { get; set; } = default!;
-
+   
         public string? LinkedInUrl { get; set; }
         public int SectionNumber { get; set; }
+
+        public string Faculty { get; set; } = string.Empty;
 
         public string? QRCodeUrl { get; set; }
 

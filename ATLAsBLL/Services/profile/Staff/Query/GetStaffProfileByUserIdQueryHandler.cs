@@ -32,11 +32,12 @@ namespace ATLAsBLL.Services.profile.Staff.Query
             return new StaffProfileResponseDto
             {
                 StaffProfileID = profile.StaffProfileID,
-                UserID = profile.UserID,
-                FullName = profile.User?.FullName ?? string.Empty, // ?? null-coalescing زي الـ convention بتاعك
+                AcademicId = profile.AcademicId ?? string.Empty,
+                FullName = profile.User.FullName ?? string.Empty, 
                 Role = profile.Role.ToString(),
                 DepartmentID = profile.DepartmentID,
                 TeachingYears = profile.TeachingYears,
+             
             };
         }
     }
