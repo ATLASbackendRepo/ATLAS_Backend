@@ -1437,14 +1437,6 @@
               "type": "integer",
               "format": "int32"
             }
-          },
-          {
-            "name": "studentId",
-            "in": "query",
-            "schema": {
-              "type": "integer",
-              "format": "int32"
-            }
           }
         ],
         "responses": {
@@ -1521,6 +1513,14 @@
             "name": "semesterId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "AcademicLevel",
+            "in": "query",
             "schema": {
               "type": "integer",
               "format": "int32"
@@ -2679,7 +2679,8 @@
           },
           "rank": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64",
+            "nullable": true
           }
         },
         "additionalProperties": false
@@ -2986,7 +2987,8 @@
           },
           "rank": {
             "type": "integer",
-            "format": "int32"
+            "format": "int64",
+            "nullable": true
           }
         },
         "additionalProperties": false

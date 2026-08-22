@@ -373,6 +373,28 @@ builder.Services.AddRateLimiter(options =>
                 });
         });
         // ==========================================
+        // Rankings Policy (GET /api/semesters/{semesterId}/rankings/*)
+        // ==========================================
+        options.AddPolicy("RankingsPolicy", httpContext =>
+        {
+            var userId = httpContext.User.FindFirst(ClaimTypes.NameIdentifier)?.Value
+                        ?? httpContext.User.FindFirst("sub")?.Value;
+
+            var partitionKey = !string.IsNullOrEmpty(userId)
+                ? $"rankings:user:{userId}"
+                : $"rankings:ip:{httpContext.Connection.RemoteIpAddress}";
+
+            return RateLimitPartition.GetFixedWindowLimiter(
+                partitionKey,
+                _ => new FixedWindowRateLimiterOptions
+                {
+                    PermitLimit = 20, // 20 طلب استرجاع للترتيب في الدقيقة
+                    Window = TimeSpan.FromMinutes(1),
+                    QueueLimit = 0,
+                    AutoReplenishment = true
+                });
+        });
+        // ==========================================
         // Rejection Response
         // ==========================================
         options.OnRejected = async (context, cancellationToken) =>

@@ -920,11 +920,6 @@
         "Name": "semesterId",
         "Type": "System.Int32",
         "IsRequired": true
-      },
-      {
-        "Name": "studentId",
-        "Type": "System.Int32",
-        "IsRequired": false
       }
     ],
     "ReturnTypes": [
@@ -969,6 +964,11 @@
         "Name": "semesterId",
         "Type": "System.Int32",
         "IsRequired": true
+      },
+      {
+        "Name": "AcademicLevel",
+        "Type": "System.Int32",
+        "IsRequired": false
       },
       {
         "Name": "count",

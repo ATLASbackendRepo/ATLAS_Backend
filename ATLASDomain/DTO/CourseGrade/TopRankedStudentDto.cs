@@ -8,6 +8,6 @@ namespace ATLASDomain.DTO.CourseGrade
         public string StudentCode { get; set; } = string.Empty;
         public string FullName { get; set; } = string.Empty;
         public decimal? TotalDegree { get; set; }
-        public int Rank { get; set; }
+        public long? Rank { get; set; }
     }
 }

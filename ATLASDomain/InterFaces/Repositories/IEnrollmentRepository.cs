@@ -14,8 +14,8 @@ public interface IEnrollmentRepository : IGenericRepository<Enrollment>
     Task<List<int>> GetStudentUserIdsByCourseOfferingAsync(int courseOfferingId);
 
     Task<SemesterStudentRankingView?> GetStudentSemesterRankAsync(
-      int studentId, int semesterId, CancellationToken cancellationToken);
+      int studentId, int semesterId,  CancellationToken cancellationToken);
 
     Task<List<SemesterStudentRankingView>> GetTopRankedStudentsInSemesterAsync(
-        int semesterId, int topCount, CancellationToken cancellationToken);
+        int semesterId, int academicLevel, int topCount, CancellationToken cancellationToken);
 }

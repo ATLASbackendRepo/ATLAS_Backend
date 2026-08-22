@@ -55,16 +55,16 @@ public class EnrollmentRepository
     {
         return await _context.SemesterStudentRankings
             .AsNoTracking()
-            .Where(r => r.SemesterID == semesterId && r.StudentID == studentId)
-            .FirstOrDefaultAsync(cancellationToken);
+            .Where(r => r.SemesterID == semesterId && r.StudentID == studentId )
+            .FirstOrDefaultAsync();
     }
 
     public async Task<List<SemesterStudentRankingView>> GetTopRankedStudentsInSemesterAsync(
-        int semesterId, int topCount, CancellationToken cancellationToken)
+        int semesterId,int AcademicLevel ,int topCount, CancellationToken cancellationToken)
     {
         return await _context.SemesterStudentRankings
             .AsNoTracking()
-            .Where(r => r.SemesterID == semesterId && r.Rank <= topCount)
+            .Where(r => r.SemesterID == semesterId && r.AcademicLevel == AcademicLevel && r.Rank <= topCount)
             .OrderBy(r => r.Rank)
             .ToListAsync(cancellationToken);
     }

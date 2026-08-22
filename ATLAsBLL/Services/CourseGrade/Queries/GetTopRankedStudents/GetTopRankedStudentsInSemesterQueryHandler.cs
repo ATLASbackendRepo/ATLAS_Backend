@@ -18,7 +18,7 @@ public class GetTopRankedStudentsInSemesterQueryHandler
         GetTopRankedStudentsInSemesterQuery request, CancellationToken cancellationToken)
     {
         var rows = await _unitOfWork.Enrollments.GetTopRankedStudentsInSemesterAsync(
-            request.SemesterId, request.TopCount, cancellationToken);
+            request.SemesterId, request.AcademicLevel, request.TopCount, cancellationToken);
 
         return rows.Select(r => new TopRankedStudentDto
         {
