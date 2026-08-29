@@ -12,9 +12,12 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUser
         private readonly IUnitOfWork _unitOfWork;
 
         private readonly IPublisher _publisher;
-        public CreateUserCommandHandler(IUnitOfWork unitOfWork)
+        public CreateUserCommandHandler(
+           IUnitOfWork unitOfWork,
+           IPublisher publisher)
         {
             _unitOfWork = unitOfWork;
+            _publisher = publisher;
         }
 
         public async Task<int> Handle(CreateUserCommand request, CancellationToken cancellationToken)
@@ -23,6 +26,8 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUser
             {
                 FullName = request.FullName,
                 Role = request.Role
+                ,
+                AcademicId = request.AcademicId
             };
 
             user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);

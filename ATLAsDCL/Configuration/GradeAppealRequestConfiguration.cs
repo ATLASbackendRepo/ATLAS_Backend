@@ -81,8 +81,9 @@ public class GradeAppealRequestConfiguration
             .OnDelete(DeleteBehavior.Restrict)
             .HasConstraintName("FK_GradeAppealRequests_Users");
 
-        builder.HasCheckConstraint(
-            "CK_GradeAppealRequests_Status",
-            "[Status] IN ('Pending', 'UnderReview', 'NeedMoreInfo', 'Approved', 'Rejected', 'Closed')");
+        builder.ToTable(t =>
+     t.HasCheckConstraint(
+        "CK_GradeAppealRequests_Status",
+            "[Status] IN ('Pending', 'UnderReview', 'NeedMoreInfo', 'Approved', 'Rejected', 'Closed')"));
     }
 }

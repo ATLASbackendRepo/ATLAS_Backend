@@ -1,16 +1,39 @@
+using ATLAs.API.Middleware;
 using ATLAS;
+using ATLAS.Middleware.Alert;
 using ATLAsBLL;
+using ATLAsBLL.Behaviors;
+using ATLAsBLL.Behaviour;
+using ATLAsBLL.Services;
+using ATLAsBLL.Services.Auth;
+using ATLAsDCL.Data;
 using ATLAsDCL.DependencyInjection;
+using ATLASDomain.InterFaces;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using Serilog;
 using System.Security.Claims;
 using System.Text;
 using System.Threading.RateLimiting;
-
 using DALExt = ATLAsDCL.DependencyInjection.ServiceCollectionExtensions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// ======================================================
+// Serilog (Logging)
+// ======================================================
+builder.Host.UseSerilog((context, configuration) =>
+{
+    configuration
+        .ReadFrom.Configuration(context.Configuration)
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("Application", "ATLAS")
+        .WriteTo.Console()
+        .WriteTo.Seq("http://localhost:5341");
+});
 
 // ======================================================
 // Services
@@ -18,8 +41,8 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-builder.Services.AddScoped<
-    ICourseOfferingAuthorizationService,
+builder.Services.AddScoped
+   <ICourseOfferingAuthorizationService,
     CourseOfferingAuthorizationService>();
 
 // ======================================================
@@ -130,7 +153,7 @@ builder.Services
                 IssuerSigningKey =
                     new SymmetricSecurityKey(
                         Encoding.UTF8.GetBytes(
-                            "ATLAS-Super-Secret-Key-2026-For-JWT-Signing!")),
+                            "ATLAS-Super-Secret-Key-2026-For-JWT-Signing!")), // ⚠️ لسه Hardcoded - متفق إننا مش بنلمسها دلوقتي
 
                 ValidateIssuer = true,
                 ValidIssuer = jwtOptions.Issuer,
@@ -595,6 +618,40 @@ builder.Services.AddRateLimiter(options =>
     };
 });
 
+
+// ======================================================
+// Audit and Correlation ID Services
+// ======================================================
+
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<ICorrelationIdAccessor, CorrelationIdAccessor>();
+//builder.Services.AddScoped<IAuditService, AuditService>();
+//builder.Services.AddScoped<ISecurityEventService, SecurityEventService>(); // ← كانت ناقصة، ده اللي كان بيكسر أي Login فاشل
+builder.Services.AddAuthorization();
+builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, SecurityAuditAuthorizationHandler>();
+
+
+builder.Services.AddDbContextFactory<AtLASDbContext>(options =>
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+    , ServiceLifetime.Scoped);
+
+
+// ======================================================
+// Discord & Email Alerts
+// ======================================================
+
+builder.Services
+    .AddOptions<DiscordOptions>()
+    .Bind(builder.Configuration.GetSection(DiscordOptions.SectionName))
+    .ValidateOnStart();
+
+builder.Services.AddHttpClient<DiscordNotificationProvider>();
+
+builder.Services.AddScoped<INotificationProvider, DiscordNotificationProvider>();
+builder.Services.AddScoped<INotificationProvider, EmailNotificationProvider>();
+
+builder.Services.AddHostedService<AlertBackgroundService>();
+
 // ======================================================
 // Build
 // ======================================================
@@ -618,6 +675,8 @@ if (app.Environment.IsDevelopment())
 app.UseHttpsRedirection();
 
 app.UseCors("StudentApiCorsPolicy");
+
+app.UseMiddleware<CorrelationIdMiddleware>();
 
 app.UseAuthentication();
 

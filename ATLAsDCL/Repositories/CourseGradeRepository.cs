@@ -54,47 +54,56 @@ public class CourseGradeRepository
             .AsNoTracking()
             .Where(e => e.CourseOfferingID == param.CourseOfferingId);
 
-        
+
         if (!string.IsNullOrWhiteSpace(param.SearchTerm))
         {
             var term = param.SearchTerm.Trim().ToLower();
-            query = query.Where(e => e.Student.User.FullName.ToLower().Contains(term)
-                                  || e.Student.AcademicId.Contains(term)
-                                  || e.Student.StudentCode.ToLower().Contains(term));
+
+            query = query.Where(e =>
+                e.Student!.User!.FullName!.ToLower().Contains(term)
+                || e.Student!.AcademicId!.Contains(term)
+                || e.Student!.StudentCode!.ToLower().Contains(term));
         }
 
-        
+
         var totalCount = await query.CountAsync();
 
-      
+
         var items = await query
-            .OrderBy(e => e.Student.User.FullName)
-            .Skip((pageNumber - 1) * pageSize)
-            .Take(pageSize)
-            .Select(e => new StudentCardDto
-            {
-                StudentId = e.StudentID,
-                StudentName = e.Student.User.FullName,
-                StudentCode = e.Student.StudentCode,
-                AcademicId = e.Student.AcademicId,
+           .OrderBy(e => e.Student!.User!.FullName)
+           .Skip((pageNumber - 1) * pageSize)
+           .Take(pageSize)
+           .Select(e => new StudentCardDto
+           {
+               StudentId = e.StudentID,
 
-                EnrollmentId = e.EnrollmentID,
+               StudentName = e.Student!.User!.FullName ?? string.Empty,
 
-                Grades = _context.AssessmentModules
-                    .Where(m => m.CourseOfferingID == param.CourseOfferingId)
-                    .Select(m => new StudentModuleGradeDto
-                    {
-                        ModuleName = m.ModuleName,
-                        MaxDegree = (double)m.MaxDegree,
-                        StudentDegree = _context.CourseGrades
-                            .Where(g => g.EnrollmentID == e.EnrollmentID && g.ModuleID == m.ModuleID)
-                            .Select(g => (double?)g.StudentDegree)
-                            .FirstOrDefault()
-                    }).ToList()
-            })
-            .ToListAsync();
+               StudentCode = e.Student!.StudentCode ?? string.Empty,
 
-        
+               AcademicId = e.Student!.AcademicId ?? string.Empty,
+
+               EnrollmentId = e.EnrollmentID,
+
+               Grades = _context.AssessmentModules
+                   .Where(m => m.CourseOfferingID == param.CourseOfferingId)
+                   .Select(m => new StudentModuleGradeDto
+                   {
+                       ModuleName = m.ModuleName,
+                       MaxDegree = (double)m.MaxDegree,
+
+                       StudentDegree = _context.CourseGrades
+                           .Where(g =>
+                               g.EnrollmentID == e.EnrollmentID &&
+                               g.ModuleID == m.ModuleID)
+                           .Select(g => (double?)g.StudentDegree)
+                           .FirstOrDefault()
+                   })
+                   .ToList()
+           })
+           .ToListAsync();
+
+
         return new PagedResultDto<StudentCardDto>
         {
             Items = items,

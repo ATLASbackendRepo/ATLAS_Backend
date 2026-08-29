@@ -15,10 +15,7 @@ namespace ATLAsDCL.Repositories
         {
         }
 
-        public async Task AddRangeAsync(IEnumerable<Notification> notifications)
-        {
-            await _dbSet.AddRangeAsync(notifications);
-        }
+      
 
         public async Task<IEnumerable<Notification>> GetUnreadForUserAsync(int userId)
         {

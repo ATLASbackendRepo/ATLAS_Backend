@@ -3,7 +3,6 @@ using ATLASDomain.DTO.CourseOffring;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
-using ATLASDomain.DTO.CourseOffring;
 using ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Student;
 
 namespace ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Doctor

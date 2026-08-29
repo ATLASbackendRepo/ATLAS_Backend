@@ -26,7 +26,7 @@ namespace ATLAsBLL.Services.profile.Staff.Query
         {
             var profile = await _unitOfWork.staffProfile.GetByUserIdAsync(request.UserId);
 
-            if (profile == null)
+            if (profile == null|| profile.User == null || profile.Role == null)
                 return null;
 
             return new StaffProfileResponseDto

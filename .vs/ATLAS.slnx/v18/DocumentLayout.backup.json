@@ -1,7 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\vs-communtiy2026\\ATLAS\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{BC073430-342B-1152-8903-33C579A86777}|ATLAsDCL\\ATLAsDCL.csproj|c:\\vs-communtiy2026\\atlas\\atlasdcl\\configuration\\userconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{BC073430-342B-1152-8903-33C579A86777}|ATLAsDCL\\ATLAsDCL.csproj|solutionrelative:atlasdcl\\configuration\\userconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -30,6 +35,23 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{aa2115a1-9712-457b-9047-dbb71ca2cdd2}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "UserConfiguration.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsDCL\\Configuration\\UserConfiguration.cs",
+              "RelativeDocumentMoniker": "ATLAsDCL\\Configuration\\UserConfiguration.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsDCL\\Configuration\\UserConfiguration.cs*",
+              "RelativeToolTip": "ATLAsDCL\\Configuration\\UserConfiguration.cs*",
+              "ViewState": "AgIAABIAAAAAzczMzEwfwBcAAAApAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-08-29T21:24:49.083Z",
+              "EditorCaption": ""
             }
           ]
         }

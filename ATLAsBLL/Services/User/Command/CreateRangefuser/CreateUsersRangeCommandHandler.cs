@@ -26,6 +26,8 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUsersRange
                 {
                     FullName = u.FullName,
                     Role = u.Role
+                    ,
+                    AcademicId = u.AcademicId
                 };
 
                 user.Password = BCrypt.Net.BCrypt.HashPassword(u.Password);

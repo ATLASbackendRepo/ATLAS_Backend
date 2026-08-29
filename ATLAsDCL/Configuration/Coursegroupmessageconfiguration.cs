@@ -40,11 +40,9 @@ namespace ATLAS.Infrastructure.Persistence.Configurations
                 .HasForeignKey(m => m.CourseOfferingID)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            // Helpful for "get latest messages per course offering" queries
-            builder.HasIndex(m => new { m.CourseOfferingID, m.SentAt });
-
+            
             // Soft-delete filter: deleted messages never come back from default queries
-            builder.HasQueryFilter(m => !m.IsDeleted);
+            //builder.HasQueryFilter(m => !m.IsDeleted);
         }
     }
 }       

@@ -110,6 +110,8 @@ public class GradeAndAuthorizationTests
         new CourseGroupMessageRepository(context),
         new NotificationRepository(context),
         new StudentProfileRepository(context), 
-        new StaffProfileRepository(context)
+        new StaffProfileRepository(context) ,
+        new CourseGroupMessageReadRepository(context),
+       new   GradeAppealRequestRepository(context)
     );
 }

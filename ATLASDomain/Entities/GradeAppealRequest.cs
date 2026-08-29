@@ -26,7 +26,7 @@ namespace ATLASDomain.Entities
         public enGradeAppealStatus Status { get; set; } = enGradeAppealStatus.Pending;
         public string? DoctorResponse { get; set; }
 
-        public DateTime SubmittedAt { get; set; }
+        public DateTime SubmittedAt { get; set; }  = DateTime.UtcNow;
         public DateTime? ReviewedAt { get; set; }
    
 

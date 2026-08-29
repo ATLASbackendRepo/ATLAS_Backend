@@ -28,7 +28,7 @@ namespace ATLAS.Tests
             var controller = new ATLAS.API.Controllers.RankingsController(new Mock<IMediator>().Object);
             controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() };
 
-            var result = await controller.GetMyRank(1, 1, CancellationToken.None);
+            var result = await controller.GetMyRank( 1, CancellationToken.None);
 
             Assert.IsType<UnauthorizedResult>(result.Result);
         }
@@ -38,7 +38,7 @@ namespace ATLAS.Tests
         {
             var controller = CreateControllerWithStudent(2);
 
-            var result = await controller.GetMyRank(1, 1, CancellationToken.None);
+            var result = await controller.GetMyRank( 1, CancellationToken.None);
 
             Assert.IsType<ForbidResult>(result.Result);
         }
@@ -49,15 +49,13 @@ namespace ATLAS.Tests
             var controller = CreateControllerWithStudent(1);
 
             var res1 = await controller.GetMyRank(
-                0,
-                1,
+               1,
                 CancellationToken.None);
 
             Assert.IsType<BadRequestObjectResult>(res1.Result);
 
             var res2 = await controller.GetMyRank(
                 1,
-                0,
                 CancellationToken.None);
 
             Assert.IsType<BadRequestObjectResult>(res2.Result);
@@ -79,7 +77,6 @@ namespace ATLAS.Tests
             var controller = CreateControllerWithStudent(1, mediatorMock);
 
             var result = await controller.GetMyRank(
-                1,
                 1,
                 CancellationToken.None);
 

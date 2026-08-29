@@ -122,7 +122,7 @@ public class CourseOfferingRepository
             .Select(cd => new CourseofferingDetailsDTO
             {
                 C_Name = cd.C_Name,
-                Credit_Hours = cd.Credit_Hours,
+                Credit_Hours = Convert.ToInt16(cd.Credit_Hours),
                 ModuleId = cd.ModuleId,
                 ModuleName = cd.ModuleName,
                 maxDegree = cd.maxDegree,

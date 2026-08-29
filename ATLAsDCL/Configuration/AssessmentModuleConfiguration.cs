@@ -18,10 +18,6 @@ namespace ATLASDCL.Configuration
                 .HasColumnType("decimal(5,2)")
                 .IsRequired();
 
-            builder.HasIndex(am => am.CourseOfferingID)
-                .HasDatabaseName("IX_AssessmentModules_CourseOfferingID");
-
-
             builder.HasOne(am => am.CourseOffering)
           .WithMany(co => co.AssessmentModules)
           .HasForeignKey(am => am.CourseOfferingID)

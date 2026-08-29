@@ -10,13 +10,13 @@ namespace ATLASDomain.DTO.CourseOffring
     {
    
         public string C_Name { get; set; } = string.Empty;
-        public int Credit_Hours { get; set; }
+        public short Credit_Hours { get; set; }
 
         public int ModuleId { get; set; }
         public string ModuleName { get; set; } = string.Empty;
-        public int maxDegree { get; set; }
+        public decimal maxDegree { get; set; }
 
-        public int studentdegree { get; set; }
+        public decimal studentdegree { get; set; }
 
        
     }

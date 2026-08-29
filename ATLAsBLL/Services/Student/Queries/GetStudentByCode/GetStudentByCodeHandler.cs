@@ -23,7 +23,12 @@ namespace ATLAsBLL.Services.Student.Queries.GetallStudent
 
             var student = await _unitOfWork.Students.GetStudentByCodeAsync(request.StudentCode);
 
-            if (student == null) return null;
+
+            if (student is null)
+            {
+                throw new KeyNotFoundException(
+                    $"Student with code '{request.StudentCode}' was not found.");
+            }
 
             return student.ToDto();
 

@@ -25,7 +25,9 @@ namespace ATLAsBLL.Services.profile.Staff.command
         {
             var profile = await _unitOfWork.staffProfile.GetByUserIdAsync(request.UserId);
 
-            if (profile == null)
+            if (profile == null || profile.User == null || request.StaffProfileUpdateDTO.FullName
+                
+                == null)
                 return false;
 
             // Update the profile with the new information

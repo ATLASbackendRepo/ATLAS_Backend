@@ -1,43 +1,67 @@
 ﻿using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
-using System.Threading;
-using System.Threading.Tasks;
 
 namespace ATLAsBLL.Behaviors
 {
-    public class PerformanceBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
+    public class PerformanceBehavior<TRequest, TResponse>
+        : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
-        private readonly Stopwatch _timer;
-        private readonly ILogger<TRequest> _logger;
+        private readonly ILogger<PerformanceBehavior<TRequest, TResponse>> _logger;
 
-        public PerformanceBehavior(ILogger<TRequest> logger)
+        public PerformanceBehavior(
+            ILogger<PerformanceBehavior<TRequest, TResponse>> logger)
         {
-            _timer = new Stopwatch();
             _logger = logger;
         }
 
-        public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
+        public async Task<TResponse> Handle(
+            TRequest request,
+            RequestHandlerDelegate<TResponse> next,
+            CancellationToken cancellationToken)
         {
-            _timer.Start();
+            var requestName = typeof(TRequest).Name;
 
-            var response = await next();
+            var stopwatch = Stopwatch.StartNew();
 
-            _timer.Stop();
-
-            var elapsedMilliseconds = _timer.ElapsedMilliseconds;
-
-            // لو العملية خدت وقت طويل (أكتر من 500 مللي ثانية) بيسجل Warning فوراً عشان تلمح الـ Bottlenecks
-            if (elapsedMilliseconds > 500)
+            try
             {
-                var requestName = typeof(TRequest).Name;
+                var response = await next();
 
-                _logger.LogWarning("ATLAS Long Running Request Detected: {Name} ({ElapsedMilliseconds} milliseconds) | Request Details: {@Request}",
-                    requestName, elapsedMilliseconds, request);
+                stopwatch.Stop();
+
+                var elapsedMilliseconds = stopwatch.ElapsedMilliseconds;
+
+                if (elapsedMilliseconds >= 2000)
+                {
+                    _logger.LogError(
+                        "Critical slow request detected. Request: {RequestName}, Duration: {ElapsedMilliseconds} ms",
+                        requestName,
+                        elapsedMilliseconds);
+                }
+                else if (elapsedMilliseconds >= 500)
+                {
+                    _logger.LogWarning(
+                        "Slow request detected. Request: {RequestName}, Duration: {ElapsedMilliseconds} ms",
+                        requestName,
+                        elapsedMilliseconds);
+                }
+                else
+                {
+                    _logger.LogDebug(
+                        "Request {RequestName} completed in {ElapsedMilliseconds} ms",
+                        requestName,
+                        elapsedMilliseconds);
+                }
+
+                return response;
             }
-
-            return response;
+            catch
+            {
+                stopwatch.Stop();
+                throw;
+            }
         }
     }
 }

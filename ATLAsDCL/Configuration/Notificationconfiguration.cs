@@ -21,6 +21,7 @@ namespace ATLAS.Infrastructure.Persistence.Configurations
                 .HasMaxLength(200);
 
             builder.Property(n => n.Body)
+                .IsRequired()
                 .HasMaxLength(500);
 
             builder.Property(n => n.IsRead)
@@ -44,8 +45,6 @@ namespace ATLAS.Infrastructure.Persistence.Configurations
                 .OnDelete(DeleteBehavior.SetNull)
                 .IsRequired(false);
 
-            // Fast lookup for "unread notifications for this user" — the most common query
-            builder.HasIndex(n => new { n.RecipientUserID, n.IsRead });
         }
     }
 }

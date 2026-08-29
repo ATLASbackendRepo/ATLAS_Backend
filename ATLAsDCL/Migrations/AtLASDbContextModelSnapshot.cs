@@ -57,9 +57,9 @@ namespace ATLAsDCL.Migrations
 
                     b.HasKey("MessageID");
 
-                    b.HasIndex("SenderUserID");
+                    b.HasIndex("CourseOfferingID");
 
-                    b.HasIndex("CourseOfferingID", "SentAt");
+                    b.HasIndex("SenderUserID");
 
                     b.ToTable("CourseGroupMessages", (string)null);
                 });
@@ -69,7 +69,7 @@ namespace ATLAsDCL.Migrations
                     b.Property<int>("MessageID")
                         .HasColumnType("int");
 
-                    b.Property<int>("StudentID")
+                    b.Property<int>("UserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("ReadAt")
@@ -77,9 +77,9 @@ namespace ATLAsDCL.Migrations
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETUTCDATE()");
 
-                    b.HasKey("MessageID", "StudentID");
+                    b.HasKey("MessageID", "UserID");
 
-                    b.HasIndex("StudentID");
+                    b.HasIndex("UserID");
 
                     b.ToTable("CourseGroupMessageReads", (string)null);
                 });
@@ -93,6 +93,7 @@ namespace ATLAsDCL.Migrations
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("NotificationID"));
 
                     b.Property<string>("Body")
+                        .IsRequired()
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
 
@@ -124,9 +125,9 @@ namespace ATLAsDCL.Migrations
 
                     b.HasKey("NotificationID");
 
-                    b.HasIndex("RelatedMessageID");
+                    b.HasIndex("RecipientUserID");
 
-                    b.HasIndex("RecipientUserID", "IsRead");
+                    b.HasIndex("RelatedMessageID");
 
                     b.ToTable("Notifications", (string)null);
                 });
@@ -139,6 +140,10 @@ namespace ATLAsDCL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StaffProfileID"));
 
+                    b.Property<string>("AcademicId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -146,6 +151,7 @@ namespace ATLAsDCL.Migrations
                         .HasColumnType("int");
 
                     b.Property<string>("Role")
+                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -160,6 +166,8 @@ namespace ATLAsDCL.Migrations
                         .HasColumnType("int");
 
                     b.HasKey("StaffProfileID");
+
+                    b.HasIndex("DepartmentID");
 
                     b.HasIndex("UserID")
                         .IsUnique();
@@ -178,6 +186,10 @@ namespace ATLAsDCL.Migrations
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("Faculty")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("LinkedInUrl")
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
@@ -186,7 +198,7 @@ namespace ATLAsDCL.Migrations
                         .HasMaxLength(300)
                         .HasColumnType("nvarchar(300)");
 
-                    b.Property<int>("SectionNumber")
+                    b.Property<int?>("SectionNumber")
                         .HasColumnType("int");
 
                     b.Property<int>("StudentID")
@@ -229,8 +241,7 @@ namespace ATLAsDCL.Migrations
 
                     b.HasIndex("CourseGradeCG_ID");
 
-                    b.HasIndex("CourseOfferingID")
-                        .HasDatabaseName("IX_AssessmentModules_CourseOfferingID");
+                    b.HasIndex("CourseOfferingID");
 
                     b.ToTable("AssessmentModules");
                 });
@@ -267,7 +278,7 @@ namespace ATLAsDCL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("CG_ID"));
 
-                    b.Property<int?>("CreatedBy")
+                    b.Property<int>("CreatedBy")
                         .HasColumnType("int");
 
                     b.Property<int>("EnrollmentID")
@@ -275,12 +286,6 @@ namespace ATLAsDCL.Migrations
 
                     b.Property<int>("ModuleID")
                         .HasColumnType("int");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<decimal>("StudentDegree")
                         .HasColumnType("decimal(5,2)");
@@ -290,11 +295,9 @@ namespace ATLAsDCL.Migrations
 
                     b.HasKey("CG_ID");
 
-                    b.HasIndex("ModuleID");
+                    b.HasIndex("EnrollmentID");
 
-                    b.HasIndex("EnrollmentID", "ModuleID")
-                        .IsUnique()
-                        .HasDatabaseName("UX_CourseGrades_EnrollmentID_ModuleID");
+                    b.HasIndex("ModuleID");
 
                     b.ToTable("CourseGrades", (string)null);
                 });
@@ -315,11 +318,10 @@ namespace ATLAsDCL.Migrations
 
                     b.HasKey("CourseOfferingID");
 
+                    b.HasIndex("CourseID");
+
                     b.HasIndex("SemesterID")
                         .HasDatabaseName("UQ_Course_Semester");
-
-                    b.HasIndex("CourseID", "SemesterID")
-                        .IsUnique();
 
                     b.ToTable("CourseOfferings");
                 });
@@ -340,10 +342,9 @@ namespace ATLAsDCL.Migrations
 
                     b.HasKey("CourseOfferingDoctorID");
 
-                    b.HasIndex("DoctorID");
+                    b.HasIndex("CourseOfferingID");
 
-                    b.HasIndex("CourseOfferingID", "DoctorID")
-                        .IsUnique();
+                    b.HasIndex("DoctorID");
 
                     b.ToTable("CourseOfferingDoctors");
                 });
@@ -359,15 +360,14 @@ namespace ATLAsDCL.Migrations
                     b.Property<int>("CourseOfferingID")
                         .HasColumnType("int");
 
-                    b.Property<int>("TAID")
+                    b.Property<int>("TeacherAssistID")
                         .HasColumnType("int");
 
                     b.HasKey("CourseOfferingTAID");
 
-                    b.HasIndex("TAID");
+                    b.HasIndex("CourseOfferingID");
 
-                    b.HasIndex("CourseOfferingID", "TAID")
-                        .IsUnique();
+                    b.HasIndex("TeacherAssistID");
 
                     b.ToTable("CourseOfferingTAs");
                 });
@@ -385,7 +385,12 @@ namespace ATLAsDCL.Migrations
                         .HasMaxLength(100)
                         .HasColumnType("nvarchar(100)");
 
+                    b.Property<int>("InstitutionID")
+                        .HasColumnType("int");
+
                     b.HasKey("DepartmentId");
+
+                    b.HasIndex("InstitutionID");
 
                     b.ToTable("Departments");
                 });
@@ -401,7 +406,7 @@ namespace ATLAsDCL.Migrations
                     b.Property<int>("CourseOfferingID")
                         .HasColumnType("int");
 
-                    b.Property<int>("CreatedBySuperAdminID")
+                    b.Property<int>("CreatedByUserID")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("EnrollmentDate")
@@ -412,14 +417,11 @@ namespace ATLAsDCL.Migrations
 
                     b.HasKey("EnrollmentID");
 
-                    b.HasIndex("CourseOfferingID")
-                        .HasDatabaseName("IX_Enrollments_CourseOfferingID");
+                    b.HasIndex("CourseOfferingID");
 
-                    b.HasIndex("CreatedBySuperAdminID");
+                    b.HasIndex("CreatedByUserID");
 
-                    b.HasIndex("StudentID", "CourseOfferingID")
-                        .IsUnique()
-                        .HasDatabaseName("UX_Enrollments_StudentID_CourseOfferingID");
+                    b.HasIndex("StudentID");
 
                     b.ToTable("Enrollments");
                 });
@@ -462,12 +464,6 @@ namespace ATLAsDCL.Migrations
                     b.Property<DateTime?>("ReviewedAt")
                         .HasColumnType("datetime2")
                         .HasColumnName("ReviewedAt");
-
-                    b.Property<byte[]>("RowVersion")
-                        .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("rowversion");
 
                     b.Property<string>("Status")
                         .IsRequired()
@@ -513,15 +509,57 @@ namespace ATLAsDCL.Migrations
 
                     b.Property<string>("name")
                         .IsRequired()
-                        .HasMaxLength(200)
-                        .HasColumnType("nvarchar(200)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.HasKey("InstitutionID");
 
-                    b.HasIndex("name")
-                        .IsUnique();
-
                     b.ToTable("Institutions", (string)null);
+                });
+
+            modelBuilder.Entity("ATLASDomain.Entities.SecurityEvent", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<DateTime?>("AlertedAtUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("AttemptedAcademicId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CorrelationId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("EventType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("IpAddress")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsAlerted")
+                        .HasColumnType("bit");
+
+                    b.Property<string>("Severity")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("TimestampUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SecurityEvents");
                 });
 
             modelBuilder.Entity("ATLASDomain.Entities.Semester", b =>
@@ -571,7 +609,7 @@ namespace ATLAsDCL.Migrations
 
                     b.Property<int>("DepartmentId")
                         .HasColumnType("int")
-                        .HasColumnName("DepartmentID");
+                        .HasColumnName("DepartmentId");
 
                     b.Property<int>("InstitutionID")
                         .HasColumnType("int")
@@ -591,7 +629,7 @@ namespace ATLAsDCL.Migrations
 
                     b.Property<int>("UserId")
                         .HasColumnType("int")
-                        .HasColumnName("UserID");
+                        .HasColumnName("UserId");
 
                     b.HasKey("StudentId");
 
@@ -616,18 +654,25 @@ namespace ATLAsDCL.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("UserId"));
 
+                    b.Property<string>("AcademicId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("GETDATE()");
 
-                    b.Property<int?>("DepartmentId")
+                    b.Property<int>("DepartmentId")
                         .HasColumnType("int");
 
                     b.Property<string>("FullName")
                         .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
+
+                    b.Property<int>("InstitutionID")
+                        .HasColumnType("int");
 
                     b.Property<bool>("IsActive")
                         .ValueGeneratedOnAdd()
@@ -636,21 +681,34 @@ namespace ATLAsDCL.Migrations
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasMaxLength(300)
-                        .HasColumnType("nvarchar(300)");
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
 
-                    b.Property<int>("Role")
+                    b.Property<DateTime?>("RefreshTokenExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("RefreshTokenHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RefreshTokenRevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Role")
+                        .IsRequired()
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasDefaultValue(1);
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
+                        .HasDefaultValue("Student");
 
                     b.HasKey("UserId");
 
                     b.HasIndex("DepartmentId");
 
+                    b.HasIndex("InstitutionID");
+
                     b.ToTable("Users", t =>
                         {
-                            t.HasCheckConstraint("CK_Users_Role", "[Role] IN ('Student', 'Admin', 'SuperAdmin', 'Doctor', 'TeachingAssistant')");
+                            t.HasCheckConstraint("CK__Users__Role", "[Role] IN ('Student', 'Admin', 'SuperAdmin', 'Doctor', 'TeachingAssistant')");
                         });
                 });
 
@@ -689,6 +747,9 @@ namespace ATLAsDCL.Migrations
 
             modelBuilder.Entity("ATLASDomain.Views.SemesterStudentRankingView", b =>
                 {
+                    b.Property<int>("AcademicLevel")
+                        .HasColumnType("int");
+
                     b.Property<int>("DepartmentID")
                         .HasColumnType("int");
 
@@ -696,8 +757,8 @@ namespace ATLAsDCL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("Rank")
-                        .HasColumnType("int");
+                    b.Property<long?>("Rank")
+                        .HasColumnType("bigint");
 
                     b.Property<int>("SemesterID")
                         .HasColumnType("int");
@@ -747,6 +808,55 @@ namespace ATLAsDCL.Migrations
                     b.ToView("vw_StudentGradeMode", (string)null);
                 });
 
+            modelBuilder.Entity("ATLAsDomain.Entities.AuditLog", b =>
+                {
+                    b.Property<long>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bigint");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasMaxLength(150)
+                        .HasColumnType("nvarchar(150)");
+
+                    b.Property<string>("CorrelationId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("EntityId")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("EntityType")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("IpAddress")
+                        .HasMaxLength(45)
+                        .HasColumnType("nvarchar(45)");
+
+                    b.Property<string>("NewValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("OldValues")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("Success")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime>("TimestampUtc")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("AuditLogs", (string)null);
+                });
+
             modelBuilder.Entity("ATLAS.Domain.Entities.CourseGroupMessage", b =>
                 {
                     b.HasOne("ATLASDomain.Entities.CourseOffering", "CourseOffering")
@@ -774,15 +884,15 @@ namespace ATLAsDCL.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("ATLASDomain.Entities.Student", "Student")
+                    b.HasOne("ATLASDomain.Entities.User", "user")
                         .WithMany()
-                        .HasForeignKey("StudentID")
+                        .HasForeignKey("UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Message");
 
-                    b.Navigation("Student");
+                    b.Navigation("user");
                 });
 
             modelBuilder.Entity("ATLAS.Domain.Entities.Notification", b =>
@@ -805,11 +915,18 @@ namespace ATLAsDCL.Migrations
 
             modelBuilder.Entity("ATLAS.Domain.Entities.StaffProfile", b =>
                 {
+                    b.HasOne("ATLASDomain.Entities.Department", "Department")
+                        .WithMany()
+                        .HasForeignKey("DepartmentID")
+                        .OnDelete(DeleteBehavior.Cascade);
+
                     b.HasOne("ATLASDomain.Entities.User", "User")
                         .WithOne()
                         .HasForeignKey("ATLAS.Domain.Entities.StaffProfile", "UserID")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.Navigation("Department");
 
                     b.Navigation("User");
                 });
@@ -907,13 +1024,24 @@ namespace ATLAsDCL.Migrations
 
                     b.HasOne("ATLASDomain.Entities.User", "TeachingAssistant")
                         .WithMany("CourseOfferingTAs")
-                        .HasForeignKey("TAID")
+                        .HasForeignKey("TeacherAssistID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("CourseOffering");
 
                     b.Navigation("TeachingAssistant");
+                });
+
+            modelBuilder.Entity("ATLASDomain.Entities.Department", b =>
+                {
+                    b.HasOne("ATLASDomain.Entities.Institution", "Institution")
+                        .WithMany("Departments")
+                        .HasForeignKey("InstitutionID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Institution");
                 });
 
             modelBuilder.Entity("ATLASDomain.Entities.Enrollment", b =>
@@ -926,7 +1054,7 @@ namespace ATLAsDCL.Migrations
 
                     b.HasOne("ATLASDomain.Entities.User", "CreatedBySuperAdmin")
                         .WithMany("Enrollments")
-                        .HasForeignKey("CreatedBySuperAdminID")
+                        .HasForeignKey("CreatedByUserID")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
@@ -1010,9 +1138,23 @@ namespace ATLAsDCL.Migrations
 
             modelBuilder.Entity("ATLASDomain.Entities.User", b =>
                 {
-                    b.HasOne("ATLASDomain.Entities.Department", null)
-                        .WithMany("Doctors")
-                        .HasForeignKey("DepartmentId");
+                    b.HasOne("ATLASDomain.Entities.Department", "Department")
+                        .WithMany("Users")
+                        .HasForeignKey("DepartmentId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_Users_Departments");
+
+                    b.HasOne("ATLASDomain.Entities.Institution", "Institution")
+                        .WithMany("Users")
+                        .HasForeignKey("InstitutionID")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired()
+                        .HasConstraintName("FK_User_Insutition");
+
+                    b.Navigation("Department");
+
+                    b.Navigation("Institution");
                 });
 
             modelBuilder.Entity("ATLAS.Domain.Entities.CourseGroupMessage", b =>
@@ -1050,9 +1192,9 @@ namespace ATLAsDCL.Migrations
 
             modelBuilder.Entity("ATLASDomain.Entities.Department", b =>
                 {
-                    b.Navigation("Doctors");
-
                     b.Navigation("Students");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("ATLASDomain.Entities.Enrollment", b =>
@@ -1062,7 +1204,11 @@ namespace ATLAsDCL.Migrations
 
             modelBuilder.Entity("ATLASDomain.Entities.Institution", b =>
                 {
+                    b.Navigation("Departments");
+
                     b.Navigation("Students");
+
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("ATLASDomain.Entities.Semester", b =>

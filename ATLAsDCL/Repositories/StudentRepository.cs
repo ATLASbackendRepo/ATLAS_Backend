@@ -108,7 +108,7 @@ public class StudentRepository
             })
             .ToListAsync();
     }
-    public async Task<StudentGradeDto> GetStudentWithModeAsync(int courseOfferingID, int modelId, string StudentCode)
+    public async Task<StudentGradeDto?> GetStudentWithModeAsync(int courseOfferingID, int modelId, string StudentCode)
     {
         return await _context.StudentGradeModels
             .AsNoTracking()

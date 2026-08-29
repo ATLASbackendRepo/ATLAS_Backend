@@ -22,6 +22,6 @@ public interface IStudentRepository : IGenericRepository<Student>
    Task<IEnumerable<Student>> GetAllStudentWithLevelAsync(int level);
    Task <IEnumerable<Student>> GetAllStudentWithCoursefferingAsync( int courseOfferingID);
    Task <IEnumerable<StudentGradeDto>> GetAllStudentWithModeAsync( int courseOfferingID,int modelId);
-   Task <StudentGradeDto> GetStudentWithModeAsync( int courseOfferingID,int modelId , string StudentCode);
+   Task <StudentGradeDto?> GetStudentWithModeAsync( int courseOfferingID,int modelId , string StudentCode);
 }
 

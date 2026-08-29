@@ -1,4 +1,5 @@
 ﻿using ATLAS.Domain.Entities;
+using ATLAsDomain.Entities;
 using ATLASDomain.Entities;
 using ATLASDomain.Views;
 using Microsoft.EntityFrameworkCore;
@@ -11,14 +12,14 @@ namespace ATLAsDCL.Data
             : base(options)
         {
         }
-
+        public DbSet<AuditLog> AuditLogs { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<AssessmentModule> AssessmentModules { get; set; }
 
         public DbSet<Student> Students { get; set; }
 
-        
 
+        public DbSet<SecurityEvent> SecurityEvents { get; set; }
         public DbSet<Department> Departments { get; set; }
         public DbSet<Institution> Institutions { get; set; }
 

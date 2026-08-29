@@ -14,9 +14,9 @@ namespace ATLAS.Tests
         public async Task GetByUserId_ReturnsBadRequest_OnInvalidUserId()
         {
             var mediatorMock = new Mock<IMediator>();
-            var controller = new ATLAS.API.Controllers.Profile.StaffProfilesController(mediatorMock.Object);
+            var controller = new ATLAS.API.Controllers.Profile.ProfilesController(mediatorMock.Object);
 
-            var result = await controller.GetByUserId(0);
+            var result = await controller.GetByUserId();
 
             Assert.IsType<BadRequestObjectResult>(result.Result);
         }
@@ -27,9 +27,9 @@ namespace ATLAS.Tests
             var mediatorMock = new Mock<IMediator>();
             mediatorMock.Setup(m => m.Send(It.IsAny<object>(), default)).ReturnsAsync((object?)null);
 
-            var controller = new ATLAS.API.Controllers.Profile.StaffProfilesController(mediatorMock.Object);
+            var controller = new ATLAS.API.Controllers.Profile.ProfilesController(mediatorMock.Object);
 
-            var result = await controller.GetByUserId(1);
+            var result = await controller.GetByUserId();
 
             Assert.IsType<NotFoundObjectResult>(result.Result);
         }
@@ -48,10 +48,10 @@ namespace ATLAS.Tests
                 .ReturnsAsync(dto);
 
             var controller =
-                new ATLAS.API.Controllers.Profile.StaffProfilesController(
+                new ATLAS.API.Controllers.Profile.ProfilesController(
                     mediatorMock.Object);
 
-            var result = await controller.GetByUserId(1);
+            var result = await controller.GetByUserId();
 
             var ok = Assert.IsType<OkObjectResult>(result.Result);
 

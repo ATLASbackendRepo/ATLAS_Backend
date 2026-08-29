@@ -14,12 +14,7 @@ namespace ATLAsDCL.Configuration
             builder.Property(e => e.StudentID).IsRequired();
             builder.Property(e => e.CreatedByUserID).IsRequired();
             builder.Property(e => e.CourseOfferingID).IsRequired();
-            builder.HasIndex(e => new { e.StudentID, e.CourseOfferingID })
-                   .IsUnique()
-                   .HasDatabaseName("UX_Enrollments_StudentID_CourseOfferingID");
-            builder.HasIndex(e => e.CourseOfferingID)
-                   .HasDatabaseName("IX_Enrollments_CourseOfferingID");
-          
+           
             builder.HasOne(e => e.Student)
                    .WithMany(s => s.Enrollments)
                    .HasForeignKey(e => e.StudentID)

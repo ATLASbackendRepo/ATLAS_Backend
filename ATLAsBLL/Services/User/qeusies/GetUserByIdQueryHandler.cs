@@ -21,6 +21,8 @@ namespace ATLAsBLL.Services.User.qeusies
             GetUserByIdQuery request,
             CancellationToken cancellationToken)
         {
+            
+
             if (request.UserId <= 0)
                 throw new ArgumentException(
                     "User ID must be greater than zero.",

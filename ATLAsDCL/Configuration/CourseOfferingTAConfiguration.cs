@@ -10,9 +10,7 @@ namespace ATLAsDCL.Configuration
         {
             builder.HasKey(cot => cot.CourseOfferingTAID);
             
-            builder.HasIndex(cot => new { cot.CourseOfferingID, cot.TeacherAssistID })
-                   .IsUnique();
-    
+         
 
         builder.HasOne(cot => cot.CourseOffering)
                    .WithMany(co => co.CourseOfferingTAs)

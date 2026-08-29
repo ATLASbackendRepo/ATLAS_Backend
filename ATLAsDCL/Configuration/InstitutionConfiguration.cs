@@ -12,15 +12,11 @@ namespace ATLAsDCL.Configuration
 
             builder.HasKey(i => i.InstitutionID);
 
-            builder.Property(i => i.InstitutionID)
-                .ValueGeneratedOnAdd();
-
             builder.Property(i => i.name)
                 .IsRequired()
-                .HasMaxLength(200);
+                .HasMaxLength(100);
 
-            builder.HasIndex(i => i.name)
-                .IsUnique();
+   
         }
     }
 }

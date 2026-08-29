@@ -24,7 +24,7 @@ public class CourseAccessServiceTests
         using var context = CreateDbContext();
         var courseAccessService = new CourseAccessService(context);
 
-        var doctor = new User { UserId = 1, FullName = "Dr. Smith", Password = "TestPassword123", IsActive = true };
+        var doctor = new User { UserId = 1, FullName = "Dr. Smith", Password = "TestPassword123", IsActive = true, AcademicId = "DOC001" };
         var semester = new Semester { SemesterID = 1, SemesterName = "Spring", AcademicYear = "2024"};
         var course = new Course { CourseID = 1, C_Name = "Math 101", Credit_Hours = 3 };
         var courseOffering = new CourseOffering { CourseOfferingID = 1, CourseID = 1, SemesterID = 1 };
@@ -51,11 +51,11 @@ public class CourseAccessServiceTests
         using var context = CreateDbContext();
         var courseAccessService = new CourseAccessService(context);
 
-        var ta = new User { UserId = 2, FullName = "TA Smith", IsActive = true , Password = "TestPassword123" };
+        var ta = new User { UserId = 2, FullName = "TA Smith", IsActive = true , Password = "TestPassword123", AcademicId = "TA001" };
         var semester = new Semester { SemesterID = 1, SemesterName = "Spring", AcademicYear = "2024" };
         var course = new Course { CourseID = 2, C_Name = "Physics 101", Credit_Hours = 3 };
         var courseOffering = new CourseOffering { CourseOfferingID = 2, CourseID = 2, SemesterID = 2 };
-        var courseOfferingTA = new CourseOfferingTA { CourseOfferingID = 2, TAID = 2 };
+        var courseOfferingTA = new CourseOfferingTA { CourseOfferingID = 2, TeacherAssistID = 2 };
 
         context.Users.Add(ta);
         context.Semesters.Add(semester);
@@ -78,7 +78,7 @@ public class CourseAccessServiceTests
         using var context = CreateDbContext();
         var courseAccessService = new CourseAccessService(context);
 
-        var student = new User { UserId = 3, FullName = "Student John", Password = "TestPassword123", IsActive = true };
+        var student = new User { UserId = 3, FullName = "Student John", Password = "TestPassword123", IsActive = true, AcademicId = "STU001" };
         var semester = new Semester { SemesterID = 1, SemesterName = "Spring", AcademicYear = "2024" };
         var course = new Course { CourseID = 3, C_Name = "Chemistry 101", Credit_Hours = 3 };
 
@@ -108,7 +108,7 @@ public class CourseAccessServiceTests
         using var context = CreateDbContext();
         var courseAccessService = new CourseAccessService(context);
 
-        var doctor = new User { UserId = 4, FullName = "Dr. Johnson", Password = "TestPassword123", IsActive = true };
+        var doctor = new User { UserId = 4, FullName = "Dr. Johnson", Password = "TestPassword123", IsActive = true, AcademicId = "DOC001" };
         var semester = new Semester { SemesterID = 1, SemesterName = "Spring", AcademicYear = "2024" };
         var course = new Course { CourseID = 4, C_Name = "History 101", Credit_Hours = 3 };
         var courseOffering = new CourseOffering { CourseOfferingID = 4, CourseID = 4, SemesterID = 4 };
@@ -135,11 +135,11 @@ public class CourseAccessServiceTests
         using var context = CreateDbContext();
         var courseAccessService = new CourseAccessService(context);
 
-        var ta = new User { UserId = 5, FullName = "TA Johnson", Password = "TestPassword123", IsActive = true };
+        var ta = new User { UserId = 5, FullName = "TA Johnson", Password = "TestPassword123", IsActive = true, AcademicId = "TA001"     };
         var semester = new Semester { SemesterID = 1, SemesterName = "Spring", AcademicYear = "2024" };
         var course = new Course { CourseID = 5, C_Name = "Art 101", Credit_Hours = 3 };
         var courseOffering = new CourseOffering { CourseOfferingID = 5, CourseID = 5, SemesterID = 5 };
-        var courseOfferingTA = new CourseOfferingTA { CourseOfferingID = 5, TAID = 5 };
+        var courseOfferingTA = new CourseOfferingTA { CourseOfferingID = 5, TeacherAssistID = 5 };
 
         context.Users.Add(ta);
         context.Semesters.Add(semester);
@@ -162,7 +162,7 @@ public class CourseAccessServiceTests
         using var context = CreateDbContext();
         var courseAccessService = new CourseAccessService(context);
 
-        var student = new User { UserId = 6, FullName = "Student Jane", Password = "TestPassword123", IsActive = true  };
+        var student = new User { UserId = 6, FullName = "Student Jane", Password = "TestPassword123", IsActive = true, AcademicId = "STU002" };
         var semester = new Semester { SemesterID = 1, SemesterName = "Spring", AcademicYear = "2024" };
         var course = new Course { CourseID = 6, C_Name = "Biology 101", Credit_Hours = 3 };
         var courseOffering = new CourseOffering { CourseOfferingID = 6, CourseID = 6, SemesterID = 6 };
@@ -191,8 +191,8 @@ public class CourseAccessServiceTests
         using var context = CreateDbContext();
         var courseAccessService = new CourseAccessService(context);
 
-        var student1 = new User { UserId = 7, FullName = "Student NoAccess", Password = "TestPassword123", IsActive = true };
-        var student2 = new User { UserId = 8, FullName = "Student Enrolled", Password = "TestPassword123", IsActive = true };
+        var student1 = new User { UserId = 7, FullName = "Student NoAccess", Password = "TestPassword123", IsActive = true, AcademicId = "STU003" };
+        var student2 = new User { UserId = 8, FullName = "Student Enrolled", Password = "TestPassword123", IsActive = true, AcademicId = "STU004" };
         var semester = new Semester { SemesterID = 1, SemesterName = "Spring", AcademicYear = "2024" };
         var course = new Course { CourseID = 7, C_Name = "Geography 101", Credit_Hours = 3 };
         var courseOffering = new CourseOffering { CourseOfferingID = 7, CourseID = 7, SemesterID = 7 };

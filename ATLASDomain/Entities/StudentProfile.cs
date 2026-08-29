@@ -11,7 +11,7 @@ namespace ATLAS.Domain.Entities
         public Student Student { get; set; } = default!;
    
         public string? LinkedInUrl { get; set; }
-        public int SectionNumber { get; set; }
+        public int? SectionNumber { get; set; }
 
         public string Faculty { get; set; } = string.Empty;
 

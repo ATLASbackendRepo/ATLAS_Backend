@@ -23,6 +23,10 @@ namespace ATLAS.Persistence.Configurations
                    .OnDelete(DeleteBehavior.Cascade);
 
             builder.HasIndex(p => p.UserID).IsUnique();
+            builder.HasOne(p => p.Department)
+                 .WithMany()
+                 .HasForeignKey(p => p.DepartmentID)
+                 .OnDelete(DeleteBehavior.Cascade);
         }
     }
 }

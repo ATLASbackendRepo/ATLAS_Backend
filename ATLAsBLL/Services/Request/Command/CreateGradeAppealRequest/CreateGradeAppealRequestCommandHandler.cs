@@ -44,7 +44,12 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
                 throw new ArgumentException("Invalid Request ");
             }
 
-            ATLASDomain.Entities.Student student = await _UnitOfWork.Students.FirstOrDefaultAsync(s => s.UserId == command.UserId);
+            ATLASDomain.Entities.Student? student = await _UnitOfWork.Students.FirstOrDefaultAsync(s => s.UserId == command.UserId);
+
+            if (student is null)
+            {
+                throw new KeyNotFoundException($"Student with ID '{command.UserId}' was not found.");
+            }
 
             return await _UnitOfWork.GradeAppealRequests.AddAsync(
                 command.Request,

@@ -51,7 +51,7 @@ namespace ATLAS.Tests
                 HttpContext = new DefaultHttpContext()
             };
 
-            var result = await controller.GetStudentMyCourses(1);
+            var result = await controller.GetStudentMyCourses();
 
             Assert.IsType<UnauthorizedResult>(result.Result);
         }
@@ -65,7 +65,7 @@ namespace ATLAS.Tests
                 mediatorMock,
                 2);
 
-            var result = await controller.GetStudentMyCourses(1);
+            var result = await controller.GetStudentMyCourses();
 
             Assert.IsType<ForbidResult>(result.Result);
         }
@@ -91,7 +91,7 @@ namespace ATLAS.Tests
                 mediatorMock,
                 1);
 
-            var result = await controller.GetStudentMyCourses(1);
+            var result = await controller.GetStudentMyCourses();
 
             var ok = Assert.IsType<OkObjectResult>(result.Result);
 

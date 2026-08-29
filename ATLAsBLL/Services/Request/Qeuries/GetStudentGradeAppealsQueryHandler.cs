@@ -21,7 +21,13 @@ namespace ATLAsBLL.Services.Request.Qeuries
             CancellationToken cancellationToken)
         {
 
-           ATLASDomain.Entities.Student student = await  _unitOfWork.Students.GetStudentByUserIDAsync(query.UserId);
+           ATLASDomain.Entities.Student? student = await  _unitOfWork.Students.GetStudentByUserIDAsync(query.UserId);
+
+            if (student is null)
+            {
+                throw new KeyNotFoundException(
+                    $"Student with ID '{query.UserId}' was not found.");
+            }
 
             return await _unitOfWork.GradeAppealRequests.GetByStudentIdAsync(student.StudentId);
         }

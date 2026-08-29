@@ -13,8 +13,7 @@ namespace ATLAsDCL.Configuration
             builder.Property(co => co.SemesterID).IsRequired();
             builder.Property(co => co.CourseID).IsRequired();
 
-            builder.HasIndex(x => new { x.CourseID, x.SemesterID })
-                .IsUnique();
+        
             builder.HasIndex(x => x.SemesterID)
                 .HasDatabaseName("UQ_Course_Semester");
 

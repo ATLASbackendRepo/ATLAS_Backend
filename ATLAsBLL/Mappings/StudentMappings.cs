@@ -13,8 +13,8 @@ public static class StudentMappings
         return new()
         {
             StudentCode = student.StudentCode,
-            StudentName = student.User.FullName,
-            AcademicId = student.AcademicId,
+            StudentName = student.User.FullName ?? string.Empty,
+            AcademicId = student.AcademicId ?? string.Empty,
             AcademicLevel = student.AcademicLevel
         };
     }

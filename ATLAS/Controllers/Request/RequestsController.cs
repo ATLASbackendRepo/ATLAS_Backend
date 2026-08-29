@@ -45,7 +45,7 @@ public class RequestController : ControllerBase
             new { requestId },
             new { requestId });
          }
-        catch (ForbiddenAccessException ex)
+        catch (ForbiddenAccessException)
         {
             return Forbid();
 }

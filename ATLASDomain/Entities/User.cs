@@ -23,14 +23,14 @@ public class User
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public enUserRole Role { get; set; }
 
-    public string AcademicId { get; set; }
+    public required string AcademicId { get; set; }
     public int InstitutionID { get; set; }
     public int DepartmentId { get; set; }
 
    
-    public Institution Institution { get; set; }
+    public Institution? Institution { get; set; }
 
-    public Department Department { get; set; }
+    public Department? Department { get; set; }
 
 
 

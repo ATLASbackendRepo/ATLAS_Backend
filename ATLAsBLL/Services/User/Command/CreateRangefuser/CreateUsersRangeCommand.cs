@@ -7,5 +7,5 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUsersRange
     
     public record CreateUsersRangeCommand(List<UserItemDto> Users) : ICommand<string>;
 
-    public record UserItemDto(string FullName, string Password, enUserRole Role);
+    public record UserItemDto(string FullName, string Password, string AcademicId, enUserRole Role);
 }

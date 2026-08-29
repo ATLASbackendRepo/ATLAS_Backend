@@ -1,14 +1,15 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
 using ATLAS;
 using ATLAS.Controllers.Authtenication;
 using ATLAsBLL.Services.Auth.Queries;
 using ATLASDomain.DTO.Login;
 using ATLASDomain.Entities;
+using ATLASDomain.InterFaces;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using System.IdentityModel.Tokens.Jwt;
+using System.Security.Claims;
 using Xunit;
 
 namespace ATLAS.Tests;
@@ -18,115 +19,250 @@ public class AuthenticationAndAuthorizationTests
     [Fact]
     public async Task StudentLogin_ValidCredentials_ReturnsTokenWithStudentClaims()
     {
+        // Arrange
         var user = new User
         {
-          
             UserId = 42,
             AcademicId = "A-100",
-          
             IsActive = true,
-          
-             
-                FullName = "Test Student",
-                
-                Password = BCrypt.Net.BCrypt.HashPassword("correct-password")
-            
+            FullName = "Test Student",
+            Password = BCrypt.Net.BCrypt.HashPassword("correct-password")
         };
 
         var services = new ServiceCollection();
-        services.AddSingleton<IRequestHandler<GetUserByAcademicIdQuery, User?>>(new StudentLookupHandler(user));
-        using var provider = services.BuildServiceProvider();
-        var controller = new AuthController(
-            new FakeMediator(provider),
-            Options.Create(new JwtOptions
-            {
-                Key = "test-signing-key-must-be-at-least-32-characters",
-                Issuer = "ATLAS.Tests",
-                Audience = "ATLAS.Tests",
-                ExpiryMinutes = 30
-            }));
 
-        var result = await controller.Login(new LoginDTO
+        services.AddSingleton<IRequestHandler<GetUserByAcademicIdQuery, User?>>(
+            new StudentLookupHandler(user));
+
+        using var provider = services.BuildServiceProvider();
+
+        var mediator = new FakeMediator(provider);
+
+        var jwtOptions = Options.Create(new JwtOptions
+        {
+            Key = "test-signing-key-must-be-at-least-32-characters",
+            Issuer = "ATLAS.Tests",
+            Audience = "ATLAS.Tests",
+            ExpiryMinutes = 30
+        });
+
+        // لو AuthController بيستخدم ISecurityEventService أثناء Login
+        // استخدم implementation/fake مناسب للـ interface عندك.
+        var securityEventService = default(ISecurityEventService)!;
+
+        var controller = new AuthController(
+            mediator,
+            jwtOptions,
+            securityEventService
+        );
+
+        var loginDto = new LoginDTO
         {
             AcademicId = "A-100",
             Password = "correct-password"
-        });
+        };
 
+        // Act
+        var result = await controller.Login(loginDto);
+
+        // Assert
         var ok = Assert.IsType<OkObjectResult>(result);
-        var token = (string)ok.Value!.GetType().GetProperty("token")!.GetValue(ok.Value)!;
+
+        Assert.NotNull(ok.Value);
+
+        var tokenProperty = ok.Value!
+            .GetType()
+            .GetProperty("token");
+
+        Assert.NotNull(tokenProperty);
+
+        var token = Assert.IsType<string>(
+            tokenProperty!.GetValue(ok.Value)
+        );
+
+        Assert.False(string.IsNullOrWhiteSpace(token));
+
         var jwt = new JwtSecurityTokenHandler().ReadJwtToken(token);
 
-        Assert.Contains(jwt.Claims, x => x.Type == ClaimTypes.NameIdentifier && x.Value == "42");
-      
-        Assert.Contains(jwt.Claims, x => x.Type == ClaimTypes.Name && x.Value == "Test Student");
-        Assert.Contains(jwt.Claims, x => x.Type == ClaimTypes.Role && x.Value == "Student");
-        Assert.Contains(jwt.Claims, x => x.Type == "AcademicId" && x.Value == "A-100");
+        Assert.Contains(
+            jwt.Claims,
+            x => x.Type == ClaimTypes.NameIdentifier &&
+                 x.Value == "42"
+        );
 
+        Assert.Contains(
+            jwt.Claims,
+            x => x.Type == ClaimTypes.Name &&
+                 x.Value == "Test Student"
+        );
+
+        Assert.Contains(
+            jwt.Claims,
+            x => x.Type == ClaimTypes.Role &&
+                 x.Value == "Student"
+        );
+
+        Assert.Contains(
+            jwt.Claims,
+            x => x.Type == "AcademicId" &&
+                 x.Value == "A-100"
+        );
     }
 
     [Fact]
     public async Task StudentLogin_MissingCredentials_ReturnsBadRequest()
     {
+        // Arrange
+        var services = new ServiceCollection();
+        using var provider = services.BuildServiceProvider();
+
+        var mediator = new FakeMediator(provider);
+
+        var jwtOptions = Options.Create(new JwtOptions
+        {
+            Key = "test-signing-key-must-be-at-least-32-characters",
+            Issuer = "ATLAS.Tests",
+            Audience = "ATLAS.Tests",
+            ExpiryMinutes = 30
+        });
+
+        var securityEventService = default(ISecurityEventService)!;
+
         var controller = new AuthController(
-            new FakeMediator(new ServiceCollection().BuildServiceProvider()),
-            Options.Create(new JwtOptions()));
+            mediator,
+            jwtOptions,
+            securityEventService
+        );
 
-        var result = await controller.Login(new LoginDTO());
+        var loginDto = new LoginDTO();
 
+        // Act
+        var result = await controller.Login(loginDto);
+
+        // Assert
         Assert.IsType<BadRequestObjectResult>(result);
     }
 
-    private sealed class StudentLookupHandler(User user)
+    private sealed class StudentLookupHandler
         : IRequestHandler<GetUserByAcademicIdQuery, User?>
     {
-        public Task<User?> Handle(GetUserByAcademicIdQuery request, CancellationToken cancellationToken) =>
-            Task.FromResult<User?>(request.AcademicId == user.AcademicId ? user : null);
+        private readonly User _user;
+
+        public StudentLookupHandler(User user)
+        {
+            _user = user;
+        }
+
+        public Task<User?> Handle(
+            GetUserByAcademicIdQuery request,
+            CancellationToken cancellationToken)
+        {
+            User? result = request.AcademicId == _user.AcademicId
+                ? _user
+                : null;
+
+            return Task.FromResult(result);
+        }
     }
 
     private sealed class FakeMediator : IMediator
     {
         private readonly IServiceProvider _provider;
 
-        public FakeMediator(IServiceProvider provider) => _provider = provider;
-
-        public Task<TResponse> Send<TResponse>(IRequest<TResponse> request, CancellationToken cancellationToken = default)
+        public FakeMediator(IServiceProvider provider)
         {
-            if (request == null) throw new ArgumentNullException(nameof(request));
-
-            var handlerType = typeof(IRequestHandler<,>).MakeGenericType(request.GetType(), typeof(TResponse));
-            var handler = _provider.GetService(handlerType);
-            if (handler == null)
-                throw new InvalidOperationException($"No handler registered for {request.GetType()}");
-
-            var method = handlerType.GetMethod("Handle");
-            return (Task<TResponse>)method.Invoke(handler, new object[] { request, cancellationToken })!;
+            _provider = provider;
         }
 
-        public Task<object?> Send(object request, CancellationToken cancellationToken = default) =>
-            throw new NotImplementedException();
-
-        // Implement the void-style Send<TRequest>(TRequest) required by ISender
-        public Task Send<TRequest>(TRequest request, CancellationToken cancellationToken = default) where TRequest : IRequest
+        public Task<TResponse> Send<TResponse>(
+            IRequest<TResponse> request,
+            CancellationToken cancellationToken = default)
         {
-            // no-op for tests; if you need behavior, add dispatch logic similar to the generic Send above
+            if (request == null)
+                throw new ArgumentNullException(nameof(request));
+
+            var handlerType = typeof(IRequestHandler<,>)
+                .MakeGenericType(
+                    request.GetType(),
+                    typeof(TResponse)
+                );
+
+            var handler = _provider.GetService(handlerType);
+
+            if (handler == null)
+            {
+                throw new InvalidOperationException(
+                    $"No handler registered for {request.GetType().Name}"
+                );
+            }
+
+            var method = handlerType.GetMethod("Handle");
+
+            if (method == null)
+            {
+                throw new InvalidOperationException(
+                    $"Handle method not found on {handlerType.Name}"
+                );
+            }
+
+            return (Task<TResponse>)method.Invoke(
+                handler,
+                new object[]
+                {
+                    request,
+                    cancellationToken
+                }
+            )!;
+        }
+
+        public Task Send<TRequest>(
+            TRequest request,
+            CancellationToken cancellationToken = default)
+            where TRequest : IRequest
+        {
             return Task.CompletedTask;
         }
 
-        // Implement stream-returning members required by ISender
-        public async IAsyncEnumerable<TResponse> CreateStream<TResponse>(IStreamRequest<TResponse> request, CancellationToken cancellationToken = default)
+        public Task<object?> Send(
+            object request,
+            CancellationToken cancellationToken = default)
         {
-            // return an empty stream; implement actual streaming behavior if needed by tests
-            yield break;
+            throw new NotImplementedException();
         }
 
-        public async IAsyncEnumerable<object?> CreateStream(object request, CancellationToken cancellationToken = default)
+        public IAsyncEnumerable<TResponse> CreateStream<TResponse>(
+            IStreamRequest<TResponse> request,
+            CancellationToken cancellationToken = default)
         {
-            // return an empty stream; implement actual streaming behavior if needed by tests
-            yield break;
+            return EmptyStream<TResponse>();
         }
 
-        public Task Publish(object notification, CancellationToken cancellationToken = default) => Task.CompletedTask;
+        public IAsyncEnumerable<object?> CreateStream(
+            object request,
+            CancellationToken cancellationToken = default)
+        {
+            return EmptyStream<object?>();
+        }
 
-        public Task Publish<TNotification>(TNotification notification, CancellationToken cancellationToken = default) where TNotification : INotification => Task.CompletedTask;
+        public Task Publish(
+            object notification,
+            CancellationToken cancellationToken = default)
+        {
+            return Task.CompletedTask;
+        }
+
+        public Task Publish<TNotification>(
+            TNotification notification,
+            CancellationToken cancellationToken = default)
+            where TNotification : INotification
+        {
+            return Task.CompletedTask;
+        }
+
+        private static async IAsyncEnumerable<T> EmptyStream<T>()
+        {
+            await Task.CompletedTask;
+            yield break;
+        }
     }
 }

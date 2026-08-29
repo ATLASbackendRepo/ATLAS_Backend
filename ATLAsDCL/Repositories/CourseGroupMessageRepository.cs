@@ -17,19 +17,8 @@ namespace ATLAsDCL.Repositories
             _Context = context;
         }
 
-        public async Task AddAsync(CourseGroupMessage message)
-        {
-            await _Context.CourseGroupMessages.AddAsync(message);
-        }
 
-        public async Task<CourseGroupMessage?> GetByIdAsync(int messageId)
-        {
-            return await _Context.CourseGroupMessages
-                .Include(m => m.SenderUser)
-                .Include(m => m.ReadReceipts)
-                .Include(m => m.Notifications)
-                .FirstOrDefaultAsync(m => m.MessageID == messageId && !m.IsDeleted);
-        }
+      
 
         public async Task<IEnumerable<CourseGroupMessage>> GetByCourseOfferingAsync(int courseOfferingId, int page, int pageSize)
         {

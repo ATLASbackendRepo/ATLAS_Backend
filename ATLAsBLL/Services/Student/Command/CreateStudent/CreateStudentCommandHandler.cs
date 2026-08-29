@@ -26,6 +26,8 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
             var user = new User
             {
                 FullName = request.FullName
+                ,
+                AcademicId = request.AcademicId 
             };
 
             user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);

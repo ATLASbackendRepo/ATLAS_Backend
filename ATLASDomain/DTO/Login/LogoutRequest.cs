@@ -8,7 +8,7 @@ namespace ATLASDomain.DTO.Login
 {
     public class LogoutRequest
     {
-        public string AcdimicID { get; set; }
-        public string RefreshToken { get; set; }
+        public string? AcdimicID { get; set; }
+        public string? RefreshToken { get; set; }
     }
 }

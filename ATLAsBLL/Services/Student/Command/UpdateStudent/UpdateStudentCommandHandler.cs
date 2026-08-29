@@ -19,9 +19,10 @@ namespace ATLAsBLL.Features.Students.Commands.UpdateStudent
             // جلب الطالب مع الـ User المرتبط به من قاعدة البيانات
             var student = await _unitOfWork.Students.GetStudentWithUserAsync(request.StudentId);
 
-            if (student == null)
+            if (student == null || student.User == null)
             {
-                throw new System.Collections.Generic.KeyNotFoundException($"Student with ID {request.StudentId} was not found.");
+                    throw new System.Collections.Generic.KeyNotFoundException($"Student with ID {request.StudentId} was not found.");
+                
             }
 
             // 1. تحديث بيانات جدول الـ User الأساسية

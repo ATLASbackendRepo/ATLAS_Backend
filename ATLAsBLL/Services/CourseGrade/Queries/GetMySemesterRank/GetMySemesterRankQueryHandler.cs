@@ -17,7 +17,12 @@ public class GetMySemesterRankQueryHandler : IRequestHandler<GetMySemesterRankQu
 
     public async Task<MyRankDto?> Handle(GetMySemesterRankQuery request, CancellationToken cancellationToken)
     {
-        ATLASDomain.Entities.Student student = await _unitOfWork.Students.GetStudentByUserIDAsync(request.UserId);
+        ATLASDomain.Entities.Student? student = await _unitOfWork.Students.GetStudentByUserIDAsync(request.UserId);
+
+        if (student is null)
+        {
+            throw new KeyNotFoundException($"Student with ID '{request.UserId}' was not found.");
+        }
 
         var row = await _unitOfWork.Enrollments.GetStudentSemesterRankAsync(
             student.StudentId, request.SemesterId, cancellationToken);

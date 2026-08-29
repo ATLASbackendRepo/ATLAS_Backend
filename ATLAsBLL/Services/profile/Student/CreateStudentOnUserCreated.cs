@@ -3,7 +3,6 @@
     using ATLASDomain.Entities;
     using global::ATLAsBLL.Events;
     using MediatR;
-using ATLASDomain.Entities;
     using System.Threading;
     using System.Threading.Tasks;
 using ATLAS.Domain.Entities;

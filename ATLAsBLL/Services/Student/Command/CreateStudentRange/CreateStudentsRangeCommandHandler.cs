@@ -30,6 +30,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                 var user = new User
                 {
                     FullName = item.FullName
+                    ,AcademicId = item.AcademicId 
                 };
 
                 user.Password = BCrypt.Net.BCrypt.HashPassword(item.Password);

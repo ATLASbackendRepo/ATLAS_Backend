@@ -1,37 +1,77 @@
-﻿using MediatR;
-using System.Threading;
+﻿using ATLAsBLL.Behaviors;
+using MediatR;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
-namespace ATLAsBLL.Behaviors
+namespace ATLAsBLL.Behaviour
 {
-    // الواجهة دي بنعملها عشان نعلم بيها الـ Commands اللي محتاجة تسجيل مين اللي نفذها
-    public interface IAuditableCommand
-    {
-        int ExecutingUserId { get; set; }
-    }
+
+
 
     public class AuditBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
-        where TRequest : IRequest<TResponse>
+      where TRequest : IRequest<TResponse>
     {
-        private readonly ICurrentUserService _currentUserService;
+        private static readonly string[] AuditedPrefixes = { "Create", "Update", "Delete" };
+        private const string AdminRole = "Admin"; // لو الـ Role اسمه مختلف عندك، غيّرها هنا
 
-        public AuditBehavior(ICurrentUserService currentUserService)
+        private readonly ICurrentUserService _currentUserService;
+        private readonly IAuditService _auditService;
+        private readonly ICorrelationIdAccessor _correlationIdAccessor;
+
+        public AuditBehavior(
+            ICurrentUserService currentUserService,
+            IAuditService auditService,
+            ICorrelationIdAccessor correlationIdAccessor)
         {
             _currentUserService = currentUserService;
+            _auditService = auditService;
+            _correlationIdAccessor = correlationIdAccessor;
         }
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-            if (request is IAuditableCommand auditableCommand)
+            // الـ Queries مستبعدة تمامًا حتى لو الـ Admin هو اللي بيعمل الاستعلام
+            if (request is not ICommand<TResponse>)
             {
-                // سحب الـ User ID الموثق من الـ Token وحقنه في الـ Command أوتوماتيكياً
-                if (_currentUserService.UserId.HasValue)
-                {
-                    auditableCommand.ExecutingUserId = _currentUserService.UserId.Value;
-                }
+                return await next();
             }
 
-            return await next();
+            var requestName = typeof(TRequest).Name;
+            var isAdmin = string.Equals(_currentUserService.Role?.ToString(), AdminRole, StringComparison.OrdinalIgnoreCase);
+            var matchesPrefix = AuditedPrefixes.Any(prefix => requestName.StartsWith(prefix));
+
+            // نسجل لو: العملية من النوع اللي بنتابعه عادي، أو منفذها Admin (أيًا كان اسم الـ Command)
+            var shouldAudit = matchesPrefix || isAdmin;
+
+            if (!shouldAudit)
+            {
+                return await next();
+            }
+
+            var success = true;
+
+            try
+            {
+                return await next();
+            }
+            catch
+            {
+                success = false;
+                throw;
+            }
+            finally
+            {
+                await _auditService.LogAsync(new AuditLogEntry
+                {
+                    UserId = _currentUserService.UserId,
+                    Action = requestName,
+                    Success = success,
+                    CorrelationId = _correlationIdAccessor.CorrelationId
+                }, cancellationToken);
+            }
         }
     }
 }

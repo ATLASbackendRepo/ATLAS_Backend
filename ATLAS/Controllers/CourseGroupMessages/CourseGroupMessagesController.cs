@@ -54,7 +54,7 @@ public class CourseGroupMessagesController : ControllerBase
             var result = await _mediator.Send(query, cancellationToken);
             return Ok(result);
         }
-        catch (ForbiddenAccessException ex)
+        catch (ForbiddenAccessException)
         {
             return Forbid();
         }

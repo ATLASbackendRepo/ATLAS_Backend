@@ -2626,12 +2626,12 @@
             "nullable": true
           },
           "maxDegree": {
-            "type": "integer",
-            "format": "int32"
+            "type": "number",
+            "format": "double"
           },
           "studentdegree": {
-            "type": "integer",
-            "format": "int32"
+            "type": "number",
+            "format": "double"
           }
         },
         "additionalProperties": false
@@ -2981,7 +2981,8 @@
         "properties": {
           "staffProfileID": {
             "type": "integer",
-            "format": "int32"
+            "format": "int32",
+            "nullable": true
           },
           "academicId": {
             "type": "string",

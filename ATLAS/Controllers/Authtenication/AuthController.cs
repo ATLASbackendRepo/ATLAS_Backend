@@ -1,9 +1,11 @@
 ﻿using ATLAS;
+using ATLAsBLL.Services;
 using ATLAsBLL.Services.Auth;
 using ATLAsBLL.Services.Auth.Queries;
 using ATLASDomain.DTO.Login;
 using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
+using ATLASDomain.InterFaces;
 using Azure.Core;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -25,14 +27,44 @@ namespace ATLAS.Controllers.Authtenication
     public class AuthController : ControllerBase
     {
         private readonly IMediator _mediator;
+        private readonly ISecurityEventService _securityEventService;
         private readonly JwtOptions _jwtOptions;
 
 
-        public AuthController(IMediator mediator, IOptions<JwtOptions> jwtOptions)
+        public AuthController(IMediator mediator, IOptions<JwtOptions> jwtOptions, ISecurityEventService securityEventService)
         {
             _mediator = mediator;
+            _securityEventService = securityEventService;
             _jwtOptions = jwtOptions.Value;
         }
+
+
+        //[HttpPost("test-discord")]
+        //public async Task<IActionResult> TestDiscord()
+        //{
+        //    var webhookUrl = "https://discord.com/api/webhooks/1543276524961005569/DiWYEsz8u7julzUaD-vrqzqb-8i7krBymPZIA6sDCixjjL2hp7yo6Rrjd9Fh67iDGjT6";
+
+        //    using var client = new HttpClient();
+
+        //    var payload = new
+        //    {
+        //        content = "🔥 ATLAS Discord Test From ASP.NET Core"
+        //    };
+
+        //    var response = await client.PostAsJsonAsync(
+        //        webhookUrl,
+        //        payload);
+
+        //    var body = await response.Content.ReadAsStringAsync();
+
+        //    return StatusCode(
+        //        (int)response.StatusCode,
+        //        new
+        //        {
+        //            StatusCode = (int)response.StatusCode,
+        //            Response = body
+        //        });
+        //}
 
 
         private static string GenerateRefreshToken()
@@ -59,17 +91,27 @@ namespace ATLAS.Controllers.Authtenication
             var User = await _mediator.Send(new GetUserByAcademicIdQuery(request.AcademicId));
 
 
-            
-            if (User == null || !User.IsActive)
-                return Unauthorized("Invalid credentials");
 
-            bool isValidPassword =
-                BCrypt.Net.BCrypt.Verify(request.Password, User.Password);
+            if (User == null || !BCrypt.Net.BCrypt.Verify(request.Password, User.Password))
+            {
+                var recentFailures = await _securityEventService.CountRecentFailedLoginsAsync(
+                          request.AcademicId, TimeSpan.FromMinutes(9));
 
+                var severity = recentFailures >= 5 ? "High"
+                             : recentFailures >= 3 ? "Medium"
+                             : "Low";
 
-     
-            if (!isValidPassword)
-                return Unauthorized("Invalid credentials");
+                await _securityEventService.LogAsync(new SecurityEventEntry
+                {
+                    EventType = "FailedLogin",
+                    AttemptedAcademicId = request.AcademicId,
+                    Severity = severity,
+                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                    CorrelationId = HttpContext.TraceIdentifier
+                });
+
+                return Unauthorized();
+            }
 
 
 
@@ -127,6 +169,14 @@ namespace ATLAS.Controllers.Authtenication
         [EnableRateLimiting("AuthLimiter")]
         public async Task<IActionResult> Refresh([FromBody] ATLASDomain.DTO.Login.RefreshRequest request)
         {
+            if (request is null ||
+                string.IsNullOrWhiteSpace(request.RefreshToken) ||
+                string.IsNullOrWhiteSpace(request.AcdimicID))
+            {
+                return BadRequest("Refresh token and Academic ID are required.");
+            }
+
+
             var User = await _mediator.Send(new GetUserByAcademicIdQuery(request.AcdimicID));
 
 
@@ -187,6 +237,13 @@ namespace ATLAS.Controllers.Authtenication
         [HttpPost("logout")]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
         {
+            if (request is null ||
+                string.IsNullOrWhiteSpace(request.RefreshToken) ||
+                string.IsNullOrWhiteSpace(request.AcdimicID))
+            {
+                return BadRequest("Refresh token and Academic ID are required.");
+            }
+
             var user = await _mediator.Send(new GetUserByAcademicIdQuery(request.AcdimicID));
                
 

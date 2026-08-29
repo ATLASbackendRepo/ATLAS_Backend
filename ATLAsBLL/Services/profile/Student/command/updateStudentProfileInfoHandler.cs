@@ -29,7 +29,7 @@ namespace ATLAsBLL.Services.profile.Student.command
 
             var profile = await _unitOfWork.StudentProfile.GetByUserIdAsync(student.StudentId);
 
-            if (profile == null)
+            if (profile == null || profile.Student == null || profile.Student.User == null)
                 return false;
 
             // Update the profile with the new information

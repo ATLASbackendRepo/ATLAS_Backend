@@ -29,10 +29,14 @@ namespace ATLAsBLL.Behaviors.Caching
 
             var cacheKey = cachableQuery.CacheKey;
 
-            // محاولة جلب البيانات من الكاش
-            if (_cache.TryGetValue(cacheKey, out TResponse cachedResponse))
+
+            if (_cache.TryGetValue(cacheKey, out object? cachedValue) &&
+                cachedValue is TResponse cachedResponse)
             {
-                _logger.LogInformation("--> [CACHE HIT] Returning cached data for Key: {CacheKey}", cacheKey);
+                _logger.LogInformation(
+                    "--> [CACHE HIT] Returning cached data for Key: {CacheKey}",
+                    cacheKey);
+
                 return cachedResponse;
             }
 

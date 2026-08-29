@@ -9,7 +9,7 @@ public class Department
 
      public int  InstitutionID { get; set; }
 
-    public Institution Institution { get; set; }
+    public Institution? Institution { get; set; }
 
     public ICollection<Student> Students { get; set; } = new List<Student>();
 

@@ -11,7 +11,7 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
         // Primary Key
         builder.HasKey(x => x.StudentId);
 
-        // Properties
+     
         builder.Property(x => x.StudentId)
                .HasColumnName("StudentId");
 
@@ -21,7 +21,7 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
                .HasMaxLength(20);
 
         builder.Property(x => x.UserId)
-               .HasColumnName("UserID")
+               .HasColumnName("UserId")
                .IsRequired();
 
         builder.Property(x => x.AcademicId)
@@ -42,12 +42,16 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
                .IsRequired();
 
         builder.Property(x => x.DepartmentId)
-               .HasColumnName("DepartmentID")
+               .HasColumnName("DepartmentId")
                .IsRequired();
 
         // Unique StudentCode
         builder.HasIndex(x => x.StudentCode)
                .IsUnique();
+        builder.HasIndex(x => x.UserId);
+        builder.HasIndex(x => x.DepartmentId);
+        builder.HasIndex(x => x.InstitutionID);
+
 
         // Student -> Department
         builder.HasOne(x => x.Department)
