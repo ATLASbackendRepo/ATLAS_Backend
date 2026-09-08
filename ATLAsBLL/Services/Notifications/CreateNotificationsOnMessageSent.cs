@@ -36,9 +36,11 @@ namespace ATLAsBLL.Services.Notifications
             var notifications = new List<Notification>();
             foreach (var uid in studentUserIds)
             {
+                if(uid == null ) { continue; }
+
                 notifications.Add(new Notification
                 {
-                    RecipientUserID = uid,
+                    RecipientUserID = (int) uid,
                     Type = "CourseGroupMessage",
                     Title = title,
                     Body = notification.Content,

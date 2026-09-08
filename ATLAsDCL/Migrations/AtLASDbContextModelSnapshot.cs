@@ -134,24 +134,23 @@ namespace ATLAsDCL.Migrations
 
             modelBuilder.Entity("ATLAS.Domain.Entities.StaffProfile", b =>
                 {
-                    b.Property<int>("StaffProfileID")
+                    b.Property<int?>("StaffProfileID")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("StaffProfileID"));
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int?>("StaffProfileID"));
 
                     b.Property<string>("AcademicId")
-                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("CreatedAt")
+                    b.Property<DateTime?>("CreatedAt")
+                        .IsRequired()
                         .HasColumnType("datetime2");
 
                     b.Property<int?>("DepartmentID")
                         .HasColumnType("int");
 
                     b.Property<string>("Role")
-                        .IsRequired()
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
@@ -162,7 +161,7 @@ namespace ATLAsDCL.Migrations
                     b.Property<DateTime?>("UpdatedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("UserID")
+                    b.Property<int?>("UserID")
                         .HasColumnType("int");
 
                     b.HasKey("StaffProfileID");
@@ -170,7 +169,8 @@ namespace ATLAsDCL.Migrations
                     b.HasIndex("DepartmentID");
 
                     b.HasIndex("UserID")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasFilter("[UserID] IS NOT NULL");
 
                     b.ToTable("StaffProfiles", (string)null);
                 });
@@ -627,7 +627,8 @@ namespace ATLAsDCL.Migrations
                         .HasColumnType("nvarchar(20)")
                         .HasColumnName("StudentCode");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
+                        .IsRequired()
                         .HasColumnType("int")
                         .HasColumnName("UserId");
 
@@ -643,7 +644,12 @@ namespace ATLAsDCL.Migrations
                     b.HasIndex("UserId")
                         .IsUnique();
 
-                    b.ToTable("Students", (string)null);
+                    b.ToTable("Students", null, t =>
+                        {
+                            t.HasTrigger("TR_Students_GenerateCode");
+                        });
+
+                    b.HasAnnotation("SqlServer:UseSqlOutputClause", false);
                 });
 
             modelBuilder.Entity("ATLASDomain.Entities.User", b =>
@@ -695,10 +701,8 @@ namespace ATLAsDCL.Migrations
 
                     b.Property<string>("Role")
                         .IsRequired()
-                        .ValueGeneratedOnAdd()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)")
-                        .HasDefaultValue("Student");
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("UserId");
 
@@ -923,8 +927,7 @@ namespace ATLAsDCL.Migrations
                     b.HasOne("ATLASDomain.Entities.User", "User")
                         .WithOne()
                         .HasForeignKey("ATLAS.Domain.Entities.StaffProfile", "UserID")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .OnDelete(DeleteBehavior.Cascade);
 
                     b.Navigation("Department");
 

@@ -39,6 +39,8 @@ public interface IUnitOfWork : IDisposable
 
     IGradeAppealRequestRepository GradeAppealRequests { get; }
 
+    IinstitutionRepository Institutions { get; }
+
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);
     Task BeginTransactionAsync(CancellationToken cancellationToken = default);
     Task CommitTransactionAsync(CancellationToken cancellationToken = default);

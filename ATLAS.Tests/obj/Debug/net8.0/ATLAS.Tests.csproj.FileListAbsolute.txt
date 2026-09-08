@@ -194,3 +194,4 @@ C:\vs-communtiy2026\ATLAS\ATLAS.Tests\obj\Debug\net8.0\refint\ATLAS.Tests.dll
 C:\vs-communtiy2026\ATLAS\ATLAS.Tests\obj\Debug\net8.0\ATLAS.Tests.pdb
 C:\vs-communtiy2026\ATLAS\ATLAS.Tests\obj\Debug\net8.0\ATLAS.Tests.genruntimeconfig.cache
 C:\vs-communtiy2026\ATLAS\ATLAS.Tests\obj\Debug\net8.0\ref\ATLAS.Tests.dll
+C:\vs-communtiy2026\ATLAS\ATLAS.Tests\bin\Debug\net8.0\ExcelDataReader.dll

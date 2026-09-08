@@ -27,4 +27,27 @@ public class DepartmentRepository
             .Include(d => d.Users)
             .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
     }
+
+    public async Task<int> GetDepartmentWithnameAsync(string departmentName, int institutionId)
+    {
+        var departmentId = await _context.Departments
+            .AsNoTracking()
+            .Where(d => d.D_Name == departmentName && d.InstitutionID == institutionId)
+            .Select(d => (int?)d.DepartmentId)
+            .FirstOrDefaultAsync();
+
+        if (departmentId.HasValue)
+        {
+            return departmentId.Value;
+        }
+
+       var newDepartment = new Department
+       {
+           D_Name = departmentName,
+           InstitutionID = institutionId
+       };
+        _context.Departments.Add(newDepartment);
+        await _context.SaveChangesAsync();
+        return newDepartment.DepartmentId;
+    }
 }

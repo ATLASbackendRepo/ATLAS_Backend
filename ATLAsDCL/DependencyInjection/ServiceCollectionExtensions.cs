@@ -32,6 +32,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IStaffProfileRepository, StaffProfileRepository>();
         services.AddScoped<IStudentProfileRepository, StudentProfileRepository>();
+        services.AddScoped<IinstitutionRepository, institutionRepository>();
 
         services.AddScoped<IGradeAppealRequestRepository,
                                   GradeAppealRequestRepository>();

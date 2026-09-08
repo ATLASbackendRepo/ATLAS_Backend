@@ -4,4 +4,7 @@
   <Project Path="ATLAsDCL/ATLAsDCL.csproj" />
   <Project Path="ATLASDomain/ATLASDomain.csproj" />
   <Project Path="ATLAS.Tests/ATLAS.Tests.csproj" />
+  <Project Path="docker-compose.dcproj">
+    <Build />
+  </Project>
 </Solution>

@@ -1,4 +1,7 @@
-﻿using ATLAsBLL.Services.Student.Queries.GetallStudent;
+﻿using ATLAS;
+using ATLAsBLL.Features.Students.Commands.CreateStudent;
+using ATLAsBLL.Features.Students.Commands.CreateStudentsRange;
+using ATLAsBLL.Services.Student.Queries.GetallStudent;
 using ATLAsBLL.Services.Student.Queries.GetStudentByCode;
 using ATLAsBLL.Services.Student.Queries.GetSTudentGrade;
 using ATLAsBLL.Services.Student.Queries.GetStudentsByLevel;
@@ -6,10 +9,10 @@ using ATLAsBLL.Services.Student.Queries.GetStudentsByOferringCoures;
 using ATLAsBLL.Services.Student.Queries.GetStudentWithMode;
 using ATLASDomain.DTO.Student;
 using MediatR;
-using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Authorization;
-using ATLAS;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
 
 namespace ATLAS.Controllers.Student
 {
@@ -146,7 +149,48 @@ namespace ATLAS.Controllers.Student
 
 
 
-    
+
+        [HttpPost("upload")]
+        //[Authorize(Roles = "SAdmin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult> CreateStudents(IFormFile file)
+        {
+            try
+            {
+                if (file == null || file.Length == 0)
+                {
+                    return BadRequest("No file uploaded.");
+                }
+
+                var uploadsFolder = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var extension = Path.GetExtension(file.FileName);
+                var filename = $"{Guid.NewGuid()}{extension}";
+                var filePath = Path.Combine(uploadsFolder, filename);
+
+                using (var stream = new FileStream(filePath, FileMode.Create))
+                {
+                    file.CopyTo(stream);
+                }
+
+
+
+                bool insertSecessfully = await _mediator.Send(new CreateStudentsRangeCommand(filePath));
+
+                return Ok(new { message = "File uploaded and data saved successfully." });
+            }
+            catch
+            {
+                return BadRequest("invaliddata");
+
+
+            }
+        }
 
 
 
@@ -159,7 +203,8 @@ namespace ATLAS.Controllers.Student
 
 
 
-      
+
+
 
 
     }

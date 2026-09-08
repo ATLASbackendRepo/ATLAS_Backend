@@ -63,6 +63,10 @@
               "target": "Package",
               "version": "[4.0.2, )"
             },
+            "ExcelDataReader": {
+              "target": "Package",
+              "version": "[3.9.0, )"
+            },
             "FluentValidation": {
               "target": "Package",
               "version": "[12.1.1, )"

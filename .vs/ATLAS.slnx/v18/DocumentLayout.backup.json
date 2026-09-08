@@ -3,8 +3,16 @@
   "WorkspaceRootPath": "C:\\vs-communtiy2026\\ATLAS\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{BC073430-342B-1152-8903-33C579A86777}|ATLAsDCL\\ATLAsDCL.csproj|c:\\vs-communtiy2026\\atlas\\atlasdcl\\configuration\\userconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{BC073430-342B-1152-8903-33C579A86777}|ATLAsDCL\\ATLAsDCL.csproj|solutionrelative:atlasdcl\\configuration\\userconfiguration.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|c:\\vs-communtiy2026\\atlas\\atlas\\controllers\\courseoffering\\courseoffringcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|solutionrelative:atlas\\controllers\\courseoffering\\courseoffringcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\courseofferingdoctor\\query\\getdoctoridquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\courseofferingdoctor\\query\\getdoctoridquery.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|c:\\vs-communtiy2026\\atlas\\atlasbll\\services\\courseofferingdoctor\\query\\getdoctoridqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{18F4439E-0F1B-E36D-A22C-3706B8A33919}|ATLAsBLL\\ATLAsBLL.csproj|solutionrelative:atlasbll\\services\\courseofferingdoctor\\query\\getdoctoridqueryhandler.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -43,14 +51,40 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "UserConfiguration.cs",
-              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsDCL\\Configuration\\UserConfiguration.cs",
-              "RelativeDocumentMoniker": "ATLAsDCL\\Configuration\\UserConfiguration.cs",
-              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsDCL\\Configuration\\UserConfiguration.cs*",
-              "RelativeToolTip": "ATLAsDCL\\Configuration\\UserConfiguration.cs*",
-              "ViewState": "AgIAABIAAAAAzczMzEwfwBcAAAApAAAAAAAAAA==",
+              "Title": "CourseOffringController.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\CourseOffering\\CourseOffringController.cs",
+              "RelativeDocumentMoniker": "ATLAS\\Controllers\\CourseOffering\\CourseOffringController.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\CourseOffering\\CourseOffringController.cs*",
+              "RelativeToolTip": "ATLAS\\Controllers\\CourseOffering\\CourseOffringController.cs*",
+              "ViewState": "AgIAAFgAAAAAiJmZmZkQwFsAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-08-29T21:24:49.083Z",
+              "WhenOpened": "2026-09-08T00:07:11.001Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "GetDoctorIDQueryHandler.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseOfferingDoctor\\Query\\GetDoctorIDQueryHandler.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseOfferingDoctor\\Query\\GetDoctorIDQueryHandler.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseOfferingDoctor\\Query\\GetDoctorIDQueryHandler.cs*",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseOfferingDoctor\\Query\\GetDoctorIDQueryHandler.cs*",
+              "ViewState": "AgIAAAQAAABQZmZmZmYwwBUAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-08T00:04:23.713Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "GetDoctorIDQuery.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseOfferingDoctor\\Query\\GetDoctorIDQuery.cs",
+              "RelativeDocumentMoniker": "ATLAsBLL\\Services\\CourseOfferingDoctor\\Query\\GetDoctorIDQuery.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAsBLL\\Services\\CourseOfferingDoctor\\Query\\GetDoctorIDQuery.cs*",
+              "RelativeToolTip": "ATLAsBLL\\Services\\CourseOfferingDoctor\\Query\\GetDoctorIDQuery.cs*",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-08T00:03:21.296Z",
               "EditorCaption": ""
             }
           ]

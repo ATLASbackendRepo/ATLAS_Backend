@@ -8,4 +8,6 @@ public interface IDepartmentRepository : IGenericRepository<Department>
     Task<Department?> GetDepartmentWithStudentsAsync(int departmentId);
 
     Task<Department?> GetDepartmentWithDoctorsAsync(int departmentId);
+
+    Task<int> GetDepartmentWithnameAsync(string departmentName, int institutionId);
 }

@@ -1,4 +1,5 @@
 ﻿using ATLAsDCL.Data;
+using ATLASDomain.DTO.AssessmentModule;
 using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -11,12 +12,18 @@ public class AssessmentModuleRepository
     {
     }
 
-    public async Task<IEnumerable<AssessmentModule>> GetModulesByCourseOfferingAsync(int courseOfferingId)
+    public async Task<IEnumerable<AssessmentModelDisplayDTO>> GetModulesByCourseOfferingAsync(int courseOfferingId)
     {
         return await _context.AssessmentModules
             .AsNoTracking()
             .Where(a => a.CourseOfferingID == courseOfferingId)
-            .OrderBy(a => a.ModuleID)
+            .Select(a => new AssessmentModelDisplayDTO
+            {
+                ModuleId = a.ModuleID,
+                ModuleName = a.ModuleName,
+                MaxDegree = a.MaxDegree
+            })
+            .OrderBy(a => a.ModuleId)
             .ToListAsync();
     }
 

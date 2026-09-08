@@ -1,0 +1,98 @@
+name: dockercompose3663906732100333096
+services:
+  atlas:
+    build:
+      context: C:\vs-communtiy2026\ATLAS
+      dockerfile: ATLAS/Dockerfile
+    depends_on:
+      seq:
+        condition: service_started
+        required: true
+      sqlserver:
+        condition: service_started
+        required: true
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_HTTP_PORTS: "8080"
+      ASPNETCORE_HTTPS_PORTS: "8081"
+    image: atlas
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 8080
+        protocol: tcp
+      - mode: ingress
+        target: 8081
+        protocol: tcp
+    restart: always
+    volumes:
+      - type: bind
+        source: C:\Users\nabil\AppData\Roaming/Microsoft/UserSecrets
+        target: /home/app/.microsoft/usersecrets
+        read_only: true
+        bind: {}
+      - type: bind
+        source: C:\Users\nabil\AppData\Roaming/Microsoft/UserSecrets
+        target: /root/.microsoft/usersecrets
+        read_only: true
+        bind: {}
+      - type: bind
+        source: C:\Users\nabil\AppData\Roaming/ASP.NET/Https
+        target: /home/app/.aspnet/https
+        read_only: true
+        bind: {}
+      - type: bind
+        source: C:\Users\nabil\AppData\Roaming/ASP.NET/Https
+        target: /root/.aspnet/https
+        read_only: true
+        bind: {}
+  seq:
+    container_name: Atlas_seq
+    environment:
+      ACCEPT_EULA: 'Y'
+    image: datalust/seq:latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 80
+        published: "5341"
+        protocol: tcp
+    restart: always
+    volumes:
+      - type: volume
+        source: seq_data
+        target: /data
+        volume: {}
+  sqlserver:
+    container_name: Atlas_sqlserver
+    environment:
+      ACCEPT_EULA: 'Y'
+      MSSQL_SA_PASSWORD: YourStrongPassword123!
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    networks:
+      default: null
+    ports:
+      - mode: ingress
+        target: 1433
+        published: "1433"
+        protocol: tcp
+    restart: always
+    volumes:
+      - type: volume
+        source: sql_data
+        target: /var/opt/mssql
+        volume: {}
+      - type: bind
+        source: C:\vs-communtiy2026\ATLAS\sql-backups
+        target: /var/opt/mssql/backup
+        bind: {}
+networks:
+  default:
+    name: dockercompose3663906732100333096_default
+volumes:
+  seq_data:
+    name: dockercompose3663906732100333096_seq_data
+  sql_data:
+    name: dockercompose3663906732100333096_sql_data

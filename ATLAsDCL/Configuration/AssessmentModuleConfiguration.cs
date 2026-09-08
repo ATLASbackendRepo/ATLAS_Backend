@@ -21,7 +21,8 @@ namespace ATLASDCL.Configuration
             builder.HasOne(am => am.CourseOffering)
           .WithMany(co => co.AssessmentModules)
           .HasForeignKey(am => am.CourseOfferingID)
-          .OnDelete(DeleteBehavior.Restrict); 
+          .OnDelete(DeleteBehavior.Restrict);
+
         }
     }
 }

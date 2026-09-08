@@ -170,6 +170,10 @@
               "target": "Package",
               "version": "[4.0.2, )"
             },
+            "ExcelDataReader": {
+              "target": "Package",
+              "version": "[3.9.0, )"
+            },
             "FluentValidation": {
               "target": "Package",
               "version": "[12.1.1, )"
@@ -446,6 +450,10 @@
               "suppressParent": "All",
               "target": "Package",
               "version": "[8.0.10, )"
+            },
+            "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
+              "target": "Package",
+              "version": "[1.24.2-preview.1, )"
             },
             "Serilog.AspNetCore": {
               "target": "Package",

@@ -90,7 +90,37 @@ namespace ATLAS.Controllers.CourseOffering
             return Ok(courses);
         }
 
-
+        [HttpGet("DoctorIDs", Name = "GetDoctorIDs")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [Authorize(Roles = "Student")]
+        [EnableRateLimiting("CourseQueryPolicy")]
+        public async Task<ActionResult<IEnumerable<int>>> GetDoctorIDs(int courseOfferingId)
+        {
+            try
+            {
+                var userId = GetCurrentUserId();
+                if (userId < 1 || courseOfferingId < 1)
+                {
+                    return BadRequest("Invalid user ID or course offering ID.");
+                }
+                var doctorIDs = await _mediator.Send(new ATLAsBLL.Services.CourseOfferingDoctor.Query.GetDoctorIDQuery(courseOfferingId));
+                if (doctorIDs == null || !doctorIDs.Any())
+                {
+                    return NotFound($"No doctors found for CourseOfferingId {courseOfferingId}.");
+                }
+                return Ok(doctorIDs);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
+            }
+        }
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);

@@ -1,5 +1,6 @@
 ﻿using ATLAsDCL.Data;
 using ATLAsDCL.Repositories;
+using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
 using ATLASDomain.InterFaces.Repositories;
 using Microsoft.EntityFrameworkCore.Storage;
@@ -29,7 +30,7 @@ public sealed class UnitOfWork : IUnitOfWork
     public IStudentProfileRepository StudentProfile { get; }
     public IUserRepository Users { get; }
 
- 
+ public IinstitutionRepository iinstitutions { get; }
 
     public UnitOfWork(
         AtLASDbContext context,
@@ -49,7 +50,8 @@ public sealed class UnitOfWork : IUnitOfWork
         IStudentProfileRepository studentProfileRepository,
         IStaffProfileRepository staffProfileRepository,
         ICourseGroupMessageReadRepository courseGroupMessageRead
-        , IGradeAppealRequestRepository gradeAppealRequestRepository)
+        , IGradeAppealRequestRepository gradeAppealRequestRepository
+        , IinstitutionRepository iinstitution)
     {
         _context = context;
 
@@ -70,6 +72,7 @@ public sealed class UnitOfWork : IUnitOfWork
         StaffProfile = staffProfileRepository;
         CourseGroupMessageRead = courseGroupMessageRead;
         GradeAppealRequest = gradeAppealRequestRepository;
+        iinstitutions = iinstitution;
     }
 
     public async Task<int> SaveChangesAsync(
@@ -155,9 +158,26 @@ public sealed class UnitOfWork : IUnitOfWork
             return _courseGroupMessagesRead;
         }
     }
+ 
+
 
     public IGradeAppealRequestRepository GradeAppealRequest { get; }
 
     public IGradeAppealRequestRepository GradeAppealRequests
         => GradeAppealRequest;
+
+    private IinstitutionRepository? _institution;
+    public IinstitutionRepository Institutions
+    {
+        get
+        {
+            if (_institution == null)
+            {
+                _institution =
+                    new institutionRepository(_context);
+            }
+
+            return _institution;
+        }
+    }
 }

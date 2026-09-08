@@ -20,13 +20,14 @@ public class CourseOfferingDoctorRepository
             .ToListAsync();
     }
 
-    public async Task<IEnumerable<CourseOfferingDoctor>> GetDoctorsByOfferingAsync(int offeringId)
+    public async Task<IEnumerable<int>> GetDoctorsByOfferingAsync(int offeringId)
     {
         return await _context.CourseOfferingDoctors
-            .AsNoTracking()
-            .Include(c => c.CourseOffering)
-            .Where(c => c.CourseOfferingID == offeringId)
-            .ToListAsync();
+       .AsNoTracking()
+       .Where(c => c.CourseOfferingID == offeringId)
+       .Select(c => c.DoctorID)
+       .Distinct()
+       .ToListAsync();
     }
     public async Task<IEnumerable<int>> GetDoctorIdsByCourseOfferingIdAsync(int offeringId)
     {

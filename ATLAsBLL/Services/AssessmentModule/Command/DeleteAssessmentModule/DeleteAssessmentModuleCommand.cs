@@ -1,6 +1,7 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace ATLAsBLL.Features.AssessmentModules.Commands.DeleteAssessmentModule
 {
-    public record DeleteAssessmentModuleCommand(int ModuleId) : ICommand<bool>;
+    public record DeleteAssessmentModuleCommand(int ModuleId) : IRequest<bool>;
 }

@@ -1,0 +1,165 @@
+﻿using ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule;
+using ATLAsBLL.Features.AssessmentModules.Commands.DeleteAssessmentModule;
+using ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule;
+using ATLAsBLL.Services.AssessmentModule.Qureies;
+using ATLASDomain.DTO.AssessmentModule;
+using MediatR;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Claims;
+
+namespace ATLAS.Controllers.AssessmentModule
+{
+
+    [Authorize]
+    [Route("api/Module")]
+    public class ModuleController : Controller
+    {
+        private readonly IMediator _mediator;
+
+        public ModuleController(IMediator mediator)
+        {
+            _mediator = mediator;
+        }
+
+        private int GetCurrentUserId()
+        {
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
+            {
+                throw new UnauthorizedAccessException("User ID not found in token.");
+            }
+            return userId;
+        }
+
+        [HttpGet("DisplayAssessmentModule")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Doctor,TeachingAssistant")]
+        [EnableRateLimiting("CourseGradeReadPolicy")]
+        public async Task<ActionResult<IEnumerable<AssessmentModelDisplayDTO>>> DisplayAssessmentModule([FromQuery] int courseOfferingId, CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                var command = new AssessmentModelDisplayQuery(courseOfferingId);
+                var modules = await _mediator.Send(command, cancellationToken);
+                return Ok(modules);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+        [HttpPost("CreateAssessmentModule")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Doctor,TeachingAssistant")]
+        [EnableRateLimiting("CourseGradeReadPolicy")]
+        public async Task<ActionResult<int>> CreateAssessmentModule([FromBody] CreateModeDTO createModeDTO, CancellationToken cancellationToken = default)
+        { 
+            try
+            {
+                var userId = GetCurrentUserId();
+                var command = new CreateAssessmentModuleCommand(createModeDTO , userId);
+                var moduleId = await _mediator.Send(command, cancellationToken);
+                return Ok(moduleId);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+        [HttpPut("UpdateAssessmentModule")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Doctor,TeachingAssistant")]
+        [EnableRateLimiting("CourseGradeReadPolicy")]
+        public async Task<ActionResult<int>> UpdateAssessmentModule([FromBody] UpdateModeDTO updateModeDTO, CancellationToken cancellationToken = default)
+        { 
+            try
+            {
+                var command = new UpdateAssessmentModuleCommand(updateModeDTO);
+                var moduleId = await _mediator.Send(command, cancellationToken);
+                return Ok(moduleId);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+        [HttpDelete("DeleteAssessmentModule")]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Doctor,TeachingAssistant")]
+        [EnableRateLimiting("CourseGradeReadPolicy")]
+        public async Task<ActionResult<int>> DeleteAssessmentModule([FromQuery] int moduleId, CancellationToken cancellationToken = default)
+        { 
+            try
+            {
+                var command = new DeleteAssessmentModuleCommand(moduleId);
+                var result = await _mediator.Send(command, cancellationToken);
+                return Ok(moduleId);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Unauthorized(new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
+
+
+    }
+}

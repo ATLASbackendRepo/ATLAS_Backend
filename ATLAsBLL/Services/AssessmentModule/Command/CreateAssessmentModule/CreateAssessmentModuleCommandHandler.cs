@@ -13,11 +13,25 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule
 
         public async Task<int> Handle(CreateAssessmentModuleCommand request, CancellationToken cancellationToken)
         {
+            var DoctorsID = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(request.DTO.CourseOfferingId);
+            if (!DoctorsID.ToList().Contains(request.UserId))
+            {
+                throw new UnauthorizedAccessException("No doctors found for the specified course offering.");
+            }
+            if (request.DTO.MaxDegree < 0 || request.DTO.MaxDegree > 40)
+            {
+                throw new ArgumentException("MaxDegree must be a value between 0 and 100.");
+            }
+            if(string.IsNullOrWhiteSpace(request.DTO.ModuleName))
+            {
+                throw new ArgumentException("ModuleName cannot be null or empty.");
+            }
+
             var module = new AssessmentModule
             {
-                CourseOfferingID = request.CourseOfferingId,
-                ModuleName = request.ModuleName,
-                MaxDegree = request.MaxDegree
+                CourseOfferingID = request.DTO.CourseOfferingId,
+                ModuleName = request.DTO.ModuleName ,
+                MaxDegree = request.DTO.MaxDegree
             };
             await _unitOfWork.AssessmentModules.AddAsync(module);
             await _unitOfWork.SaveChangesAsync(cancellationToken);

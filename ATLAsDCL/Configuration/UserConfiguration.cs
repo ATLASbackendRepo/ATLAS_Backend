@@ -18,6 +18,7 @@ namespace ATLAsDCL.Configuration
                 .HasMaxLength(255);
             builder.Property(u => u.IsActive)
                 .HasDefaultValue(true);
+
             builder.Property(u => u.CreatedAt)
                 .HasDefaultValueSql("GETDATE()");
 

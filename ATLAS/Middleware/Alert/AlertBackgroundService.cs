@@ -42,7 +42,7 @@ namespace ATLAS.Middleware.Alert
 
             await using var context = await contextFactory.CreateDbContextAsync(cancellationToken);
 
-            // بس الأحداث اللي تستاهل Alert فعلي - مش كل حاجة متسجلة في SecurityEvents
+          
             var pendingEvents = await context.Set<SecurityEvent>()
                   .Where(e => !e.IsAlerted && (e.Severity == "Medium" || e.Severity == "High" || e.Severity == "Critical"))
                   .OrderBy(e => e.TimestampUtc)

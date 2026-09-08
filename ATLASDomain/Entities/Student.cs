@@ -4,7 +4,7 @@ public class Student
 {
     public int StudentId { get; set; }
     public string StudentCode { get; set; } = null!;
-    public int UserId { get; set; }
+    public int? UserId { get; set; }
     public int AcademicLevel { get; set; }
     public bool IsActive { get; set; }
     public string? AcademicId { get; set; } 

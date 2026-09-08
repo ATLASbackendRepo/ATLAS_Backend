@@ -112,6 +112,7 @@ public class GradeAndAuthorizationTests
         new StudentProfileRepository(context), 
         new StaffProfileRepository(context) ,
         new CourseGroupMessageReadRepository(context),
-       new   GradeAppealRequestRepository(context)
+       new   GradeAppealRequestRepository(context),
+       new institutionRepository(context)
     );
 }

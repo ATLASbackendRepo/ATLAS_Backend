@@ -1,6 +1,7 @@
 ﻿using ATLASDomain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
+using System.Reflection.Emit;
 
 public class StudentConfiguration : IEntityTypeConfiguration<Student>
 {
@@ -32,7 +33,10 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
                .HasColumnName("AcademicLevel")
                .HasConversion<int>()
                .IsRequired();
-
+        builder
+          .ToTable("Students", tb => tb.HasTrigger("TR_Students_GenerateCode"));
+        
+        
         builder.Property(x => x.IsActive)
                .HasColumnName("IsActive")
                .HasDefaultValue(true);
