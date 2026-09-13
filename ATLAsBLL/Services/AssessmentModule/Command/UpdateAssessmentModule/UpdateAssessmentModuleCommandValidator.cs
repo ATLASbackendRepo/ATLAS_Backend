@@ -1,6 +1,6 @@
 ﻿using ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule;
 using FluentValidation;
-using ATLASDomain.Entities;
+using AssessmentModuleEntity = ATLASDomain.Entities.AssessmentModule;
 
 namespace ATLAsBLL.Services.AssessmentModule.Command.UpdateAssessmentModule
 {
@@ -13,7 +13,7 @@ namespace ATLAsBLL.Services.AssessmentModule.Command.UpdateAssessmentModule
                 .MaximumLength(150).WithMessage("Module name cannot exceed 150 characters.");
             RuleFor(c => c.DTO.MaxDegree)
                 .NotEmpty().WithMessage("Max degree is required.")
-                .InclusiveBetween(AssessmentModule.MinimumMaxDegree, AssessmentModule.MaximumMaxDegree)
+                .InclusiveBetween(AssessmentModuleEntity.MinimumMaxDegree, AssessmentModuleEntity.MaximumMaxDegree)
                 .WithMessage("Max degree must be a value between 1 and 100.");
         }
     }
