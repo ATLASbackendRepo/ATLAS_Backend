@@ -72,9 +72,9 @@ public class NotificationsController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return BadRequest(new { message = ex.Message });
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
         }
     }
 
@@ -94,9 +94,9 @@ public class NotificationsController : ControllerBase
             var count = await _mediator.Send(command, cancellationToken);
             return Ok(new { count, message = "All notifications marked as read." });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return BadRequest(new { message = ex.Message });
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
         }
     }
 

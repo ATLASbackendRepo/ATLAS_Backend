@@ -6,9 +6,9 @@ namespace ATLAsBLL.Features.Users.Commands.DeleteUser
     {
         public DeleteUserCommandValidator()
         {
-            RuleFor(u => u.UserId)
+            RuleFor(u => u.AcademicId)
                 .NotEmpty().WithMessage("User ID is required for deletion.")
-                .GreaterThan(0).WithMessage("Invalid User ID.");
+                .MaximumLength(150).WithMessage("Invalid User ID.");
         }
     }
 }

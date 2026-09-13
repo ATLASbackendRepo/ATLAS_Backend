@@ -70,15 +70,8 @@ public class AuthenticationAndAuthorizationTests
 
         Assert.NotNull(ok.Value);
 
-        var tokenProperty = ok.Value!
-            .GetType()
-            .GetProperty("token");
-
-        Assert.NotNull(tokenProperty);
-
-        var token = Assert.IsType<string>(
-            tokenProperty!.GetValue(ok.Value)
-        );
+        var tokenResponse = Assert.IsType<TokenResponse>(ok.Value);
+        var token = tokenResponse.AccessToken;
 
         Assert.False(string.IsNullOrWhiteSpace(token));
 

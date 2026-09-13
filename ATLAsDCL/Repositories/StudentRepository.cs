@@ -3,6 +3,7 @@ using ATLASDomain.DTO.Student;
 using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 public class StudentRepository
     : GenericRepository<Student>, IStudentRepository
@@ -20,13 +21,43 @@ public class StudentRepository
             .FirstOrDefaultAsync(s => s.StudentId == studentId);
     }
 
-    public async Task<List<Student>> GetAllStudents()
+    public async Task<List<StudentDTO>> GetAllStudents(StudentFilterDTO fillter)
     {
-        var students = await _context.Students
-            .AsNoTracking()
-            .Include(s => s.User)
+        var students = _context.Students
+               .AsNoTracking()
+               .AsQueryable();
+
+         if(!string.IsNullOrEmpty(fillter.Search))
+         {
+            students = students.Where(s => s.User.FullName.Contains(fillter.Search)
+            || s.StudentCode.Contains(fillter.Search)|| s.AcademicId.Contains(fillter.Search));
+         }
+
+         if(fillter.DepartmentId.HasValue)
+         {
+            students = students.Where(s => s.DepartmentId == fillter.DepartmentId.Value);
+         }
+         if(fillter.Level.HasValue)
+         {
+            students = students.Where(s => s.AcademicLevel == fillter.Level.Value);
+         }
+         if(fillter.Status.HasValue)
+         {
+            students = students.Where(s => s.IsActive == fillter.Status.Value);
+         }
+
+         var studentDtos = await students
+            .Select(s => new StudentDTO
+            {
+                StudentCode = s.StudentCode,
+                StudentName = s.User.FullName ?? string.Empty,
+                AcademicId = s.AcademicId??string.Empty,
+                AcademicLevel = s.AcademicLevel,
+                Departmentname = s.Department.D_Name ?? string.Empty,
+                IsActive = s.IsActive
+            })
             .ToListAsync();
-        return students;
+        return studentDtos;
     }
 
     public async Task<Student?> GetStudentWithEnrollmentsAsync(int studentId)
@@ -40,11 +71,12 @@ public class StudentRepository
             .FirstOrDefaultAsync(s => s.StudentId == studentId);
     }
 
-    public async Task<Student?> GetStudentWithUserAsync(int studentId)
+    public async Task<Student?> GetStudentWithUserAsync(string studentCode)
     {
         return await _context.Students
+            .AsNoTracking()
             .Include(s => s.User)
-            .FirstOrDefaultAsync(s => s.StudentId == studentId);
+            .FirstOrDefaultAsync(s => s.StudentCode.Contains(studentCode));
     }
     public async Task<Student?> GetStudentByUserIDAsync(int UserID)
     {

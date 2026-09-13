@@ -20,7 +20,7 @@ namespace ATLAsBLL.Services.Student.Queries.GetallStudent
         public async Task<IEnumerable<StudentDTO>> Handle(GetAllStudentsQuery request, CancellationToken cancellationToken)
         {
           
-            var students = await _unitOfWork.Students.GetAllStudents();
+            var students = await _unitOfWork.Students.GetAllStudents(request.StudentFilter);
 
             if (students == null) return Enumerable.Empty<StudentDTO>();
 
@@ -28,7 +28,7 @@ namespace ATLAsBLL.Services.Student.Queries.GetallStudent
            
 
             
-            return students.Select(s => s.ToDto());
+            return students;
         }
     }
 }

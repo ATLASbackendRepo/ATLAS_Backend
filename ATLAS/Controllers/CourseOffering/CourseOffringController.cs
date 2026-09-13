@@ -116,9 +116,9 @@ namespace ATLAS.Controllers.CourseOffering
             {
                 return Unauthorized(ex.Message);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return StatusCode(StatusCodes.Status500InternalServerError, $"An error occurred: {ex.Message}");
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
             }
         }
         private int GetCurrentUserId()

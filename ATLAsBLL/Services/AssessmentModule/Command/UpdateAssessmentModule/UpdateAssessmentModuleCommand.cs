@@ -3,5 +3,5 @@ using MediatR;
 
 namespace ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule
 {
-    public record UpdateAssessmentModuleCommand(UpdateModeDTO DTO) : IRequest<bool>;
+    public record UpdateAssessmentModuleCommand(UpdateModeDTO DTO, int UserId) : IRequest<bool>;
 }

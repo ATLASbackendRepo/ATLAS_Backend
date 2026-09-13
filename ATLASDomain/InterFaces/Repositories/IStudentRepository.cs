@@ -6,9 +6,9 @@ namespace ATLASDomain.Interfaces.Repositories;
 
 public interface IStudentRepository : IGenericRepository<Student>
 {
-    Task<Student?> GetStudentWithUserAsync(int studentId);
+    Task<Student?> GetStudentWithUserAsync(string studentCode);
 
-    Task<List<Student>> GetAllStudents();
+    Task<List<StudentDTO>> GetAllStudents(StudentFilterDTO filter);
     Task<Student?> GetStudentWithDepartmentAsync(int studentId);
 
     Task<Student?> GetStudentWithEnrollmentsAsync(int studentId);

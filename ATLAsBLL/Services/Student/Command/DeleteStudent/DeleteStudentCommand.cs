@@ -2,5 +2,5 @@ using MediatR;
 
 namespace ATLAsBLL.Features.Students.Commands.DeleteStudent
 {
-    public record DeleteStudentCommand(int StudentId) : ICommand<bool>;
+    public record DeleteStudentCommand(string StudentCode) : ICommand<bool>;
 }

@@ -24,16 +24,19 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUser
         {
             var user = new User
             {
-                FullName = request.FullName,
-                Role = request.Role
+                FullName = request.create_StaffDto.FullName,
+                Role = request.create_StaffDto.Role
                 ,
-                AcademicId = request.AcademicId
+                AcademicId = request.create_StaffDto.AcademicId
+                ,DepartmentId = request.create_StaffDto.DepartmentId
+                ,InstitutionID = request.create_StaffDto.InstituteId       
+                ,IsActive = true
             };
 
-            user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
-
-            await _unitOfWork.Users.AddAsync(user);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+                user.Password = BCrypt.Net.BCrypt.HashPassword("12345678");
+               
+                await _unitOfWork.Users.AddAsync(user);
+                await _unitOfWork.SaveChangesAsync(cancellationToken);
 
      
                 await _publisher.Publish(

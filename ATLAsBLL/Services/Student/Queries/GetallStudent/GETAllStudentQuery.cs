@@ -6,5 +6,5 @@ using ATLASDomain.DTO.Student;
 namespace ATLAsBLL.Services.Student.Queries.GetallStudent
 {
   
-    public record GetAllStudentsQuery() : IQuery<IEnumerable<StudentDTO>>;
+    public record GetAllStudentsQuery(StudentFilterDTO  StudentFilter) : IQuery<IEnumerable<StudentDTO>>;
 }

@@ -16,9 +16,11 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule
             var DoctorsID = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(request.DTO.CourseOfferingId);
             if (!DoctorsID.ToList().Contains(request.UserId))
             {
-                throw new UnauthorizedAccessException("No doctors found for the specified course offering.");
+                var teachingAssistants = await _unitOfWork.CourseOfferingTAs.GetTAsByOfferingAsync(request.DTO.CourseOfferingId);
+                if (!teachingAssistants.Any(ta => ta.TeacherAssistID == request.UserId))
+                    throw new UnauthorizedAccessException("You are not assigned to the specified course offering.");
             }
-            if (request.DTO.MaxDegree < 0 || request.DTO.MaxDegree > 40)
+            if (request.DTO.MaxDegree < AssessmentModule.MinimumMaxDegree || request.DTO.MaxDegree > AssessmentModule.MaximumMaxDegree)
             {
                 throw new ArgumentException("MaxDegree must be a value between 0 and 100.");
             }

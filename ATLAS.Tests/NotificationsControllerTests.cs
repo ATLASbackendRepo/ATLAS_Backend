@@ -165,7 +165,7 @@ namespace ATLAS.Tests
         }
 
         [Fact]
-        public async Task MarkAsRead_ReturnsBadRequest_OnException()
+        public async Task MarkAsRead_ReturnsProblemDetails_OnUnexpectedException()
         {
             // Arrange
             var mediatorMock = new Mock<IMediator>();
@@ -183,7 +183,8 @@ namespace ATLAS.Tests
             var result = await controller.MarkAsRead(5);
 
             // Assert
-            Assert.IsType<BadRequestObjectResult>(result);
+            var problem = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(StatusCodes.Status500InternalServerError, problem.StatusCode);
         }
 
         [Fact]
@@ -208,7 +209,7 @@ namespace ATLAS.Tests
         }
 
         [Fact]
-        public async Task MarkAllAsRead_ReturnsBadRequest_OnException()
+        public async Task MarkAllAsRead_ReturnsProblemDetails_OnUnexpectedException()
         {
             // Arrange
             var mediatorMock = new Mock<IMediator>();
@@ -226,7 +227,8 @@ namespace ATLAS.Tests
             var result = await controller.MarkAllAsRead();
 
             // Assert
-            Assert.IsType<BadRequestObjectResult>(result);
+            var problem = Assert.IsType<ObjectResult>(result);
+            Assert.Equal(StatusCodes.Status500InternalServerError, problem.StatusCode);
         }
     }
 }

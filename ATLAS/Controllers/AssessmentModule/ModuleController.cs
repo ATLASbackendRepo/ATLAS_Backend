@@ -17,10 +17,12 @@ namespace ATLAS.Controllers.AssessmentModule
     public class ModuleController : Controller
     {
         private readonly IMediator _mediator;
+        private readonly ICourseOfferingAuthorizationService _courseAuthorization;
 
-        public ModuleController(IMediator mediator)
+        public ModuleController(IMediator mediator, ICourseOfferingAuthorizationService courseAuthorization)
         {
             _mediator = mediator;
+            _courseAuthorization = courseAuthorization;
         }
 
         private int GetCurrentUserId()
@@ -43,6 +45,8 @@ namespace ATLAS.Controllers.AssessmentModule
         {
             try
             {
+                if (!await _courseAuthorization.CanAccessOfferingAsync(User, courseOfferingId, cancellationToken))
+                    return Forbid();
                 var command = new AssessmentModelDisplayQuery(courseOfferingId);
                 var modules = await _mediator.Send(command, cancellationToken);
                 return Ok(modules);
@@ -59,9 +63,9 @@ namespace ATLAS.Controllers.AssessmentModule
             {
                 return BadRequest(new { message = ex.Message });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
             }
         }
 
@@ -88,10 +92,9 @@ namespace ATLAS.Controllers.AssessmentModule
             {
                 return BadRequest(new { message = ex.Message });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-
-                return BadRequest(new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
             }
         }
 
@@ -106,7 +109,7 @@ namespace ATLAS.Controllers.AssessmentModule
         { 
             try
             {
-                var command = new UpdateAssessmentModuleCommand(updateModeDTO);
+                var command = new UpdateAssessmentModuleCommand(updateModeDTO, GetCurrentUserId());
                 var moduleId = await _mediator.Send(command, cancellationToken);
                 return Ok(moduleId);
             }
@@ -122,9 +125,9 @@ namespace ATLAS.Controllers.AssessmentModule
             {
                 return BadRequest(new { message = ex.Message });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
             }
         }
         [HttpDelete("DeleteAssessmentModule")]
@@ -137,7 +140,7 @@ namespace ATLAS.Controllers.AssessmentModule
         { 
             try
             {
-                var command = new DeleteAssessmentModuleCommand(moduleId);
+                var command = new DeleteAssessmentModuleCommand(moduleId, GetCurrentUserId());
                 var result = await _mediator.Send(command, cancellationToken);
                 return Ok(moduleId);
             }
@@ -153,9 +156,9 @@ namespace ATLAS.Controllers.AssessmentModule
             {
                 return BadRequest(new { message = ex.Message });
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                return BadRequest(new { message = ex.Message });
+                return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
             }
         }
 

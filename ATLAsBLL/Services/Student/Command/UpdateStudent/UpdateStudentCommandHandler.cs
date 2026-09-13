@@ -16,25 +16,28 @@ namespace ATLAsBLL.Features.Students.Commands.UpdateStudent
 
         public async Task<bool> Handle(UpdateStudentCommand request, CancellationToken cancellationToken)
         {
-            // جلب الطالب مع الـ User المرتبط به من قاعدة البيانات
-            var student = await _unitOfWork.Students.GetStudentWithUserAsync(request.StudentId);
+            
+            var student = await _unitOfWork.Students.GetStudentWithUserAsync(request.UpdateStudentDto.StudentCode);
 
             if (student == null || student.User == null)
             {
-                    throw new System.Collections.Generic.KeyNotFoundException($"Student with ID {request.StudentId} was not found.");
+                    throw new System.Collections.Generic.KeyNotFoundException($"Student with ID {request.UpdateStudentDto.StudentCode} was not found.");
                 
             }
 
-            // 1. تحديث بيانات جدول الـ User الأساسية
-            student.User.FullName = request.FullName;
-     
+            if(!string.IsNullOrEmpty(request.UpdateStudentDto.FullName))
+            {
+                student.User.FullName = request.UpdateStudentDto.FullName;
+            }
+            if(request.UpdateStudentDto.AcademicLevel.HasValue)
+            {
+                student.AcademicLevel = request.UpdateStudentDto.AcademicLevel.Value;
+            }
+            if(request.UpdateStudentDto.DepartmentId.HasValue)
+            {
+                student.DepartmentId = request.UpdateStudentDto.DepartmentId.Value;
+            }
 
-            // 2. تحديث بيانات جدول الـ Student الخاصة به
-            student.StudentCode = request.StudentCode;
-            student.AcademicLevel = request.AcademicLevel;
-            student.DepartmentId = request.DepartmentId;
-
-            // 3. حفظ التعديلات للجدولين معاً كـ Transaction واحدة
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return true;

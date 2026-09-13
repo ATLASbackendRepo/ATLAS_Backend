@@ -15,7 +15,7 @@ namespace ATLAS.Tests
         private ControllerBase CreateControllerWithStudentUser(Moq.Mock<IMediator> mediatorMock, int studentId, out ATLAS.Controllers.Requests.RequestController controller)
         {
             controller = new ATLAS.Controllers.Requests.RequestController(mediatorMock.Object);
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim("StudentId", studentId.ToString()) }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, studentId.ToString()) }));
             controller.ControllerContext = new ControllerContext
             {
                 HttpContext = new DefaultHttpContext { User = user }
@@ -47,7 +47,7 @@ namespace ATLAS.Tests
             mediatorMock.Setup(m => m.Send(It.IsAny<object>(), It.IsAny<CancellationToken>())).ReturnsAsync(5);
 
             var controller = new ATLAS.Controllers.Requests.RequestController(mediatorMock.Object);
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim("StudentId", "1") }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, "1") }));
             controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = user } };
 
             var result = await controller.Create(

@@ -3,6 +3,7 @@ using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Moq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -10,15 +11,30 @@ namespace ATLAS.Tests
 {
     public class StaffProfilesControllerTests
     {
+        private static ATLAS.API.Controllers.Profile.ProfilesController CreateController(IMediator mediator, int userId = 1)
+        {
+            var controller = new ATLAS.API.Controllers.Profile.ProfilesController(mediator);
+            controller.ControllerContext = new ControllerContext
+            {
+                HttpContext = new DefaultHttpContext
+                {
+                    User = new ClaimsPrincipal(new ClaimsIdentity(
+                        [new Claim(ClaimTypes.NameIdentifier, userId.ToString())], "test"))
+                }
+            };
+            return controller;
+        }
+
         [Fact]
-        public async Task GetByUserId_ReturnsBadRequest_OnInvalidUserId()
+        public async Task GetByUserId_ThrowsUnauthorized_OnMissingUserClaim()
         {
             var mediatorMock = new Mock<IMediator>();
-            var controller = new ATLAS.API.Controllers.Profile.ProfilesController(mediatorMock.Object);
+            var controller = new ATLAS.API.Controllers.Profile.ProfilesController(mediatorMock.Object)
+            {
+                ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext() }
+            };
 
-            var result = await controller.GetByUserId();
-
-            Assert.IsType<BadRequestObjectResult>(result.Result);
+            await Assert.ThrowsAsync<UnauthorizedAccessException>(() => controller.GetByUserId());
         }
 
         [Fact]
@@ -27,7 +43,7 @@ namespace ATLAS.Tests
             var mediatorMock = new Mock<IMediator>();
             mediatorMock.Setup(m => m.Send(It.IsAny<object>(), default)).ReturnsAsync((object?)null);
 
-            var controller = new ATLAS.API.Controllers.Profile.ProfilesController(mediatorMock.Object);
+            var controller = CreateController(mediatorMock.Object);
 
             var result = await controller.GetByUserId();
 
@@ -47,9 +63,7 @@ namespace ATLAS.Tests
                     It.IsAny<CancellationToken>()))
                 .ReturnsAsync(dto);
 
-            var controller =
-                new ATLAS.API.Controllers.Profile.ProfilesController(
-                    mediatorMock.Object);
+            var controller = CreateController(mediatorMock.Object);
 
             var result = await controller.GetByUserId();
 

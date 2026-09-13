@@ -126,7 +126,7 @@ namespace ATLAS.Controllers.Authtenication
             
 
             var key1 = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes( "ATLAS-Super-Secret-Key-2026-For-JWT-Signing!"));
+                Encoding.UTF8.GetBytes(_jwtOptions.Key));
 
             var creds1 = new SigningCredentials(
                 key1,
@@ -205,7 +205,7 @@ namespace ATLAS.Controllers.Authtenication
 
 
             var key1 = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes("ATLAS-Super-Secret-Key-2026-For-JWT-Signing!"));
+                Encoding.UTF8.GetBytes(_jwtOptions.Key));
 
             var creds1 = new SigningCredentials(
                 key1,
@@ -226,6 +226,7 @@ namespace ATLAS.Controllers.Authtenication
             User.RefreshTokenHash = BCrypt.Net.BCrypt.HashPassword(newRefreshToken);
             User.RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);
             User.RefreshTokenRevokedAt = null;
+            await _mediator.Send(new SaveRefreshTokenCommand(User.UserId, newRefreshToken));
 
             return Ok(new TokenResponse
             {
@@ -254,7 +255,7 @@ namespace ATLAS.Controllers.Authtenication
             if (!refreshValid)
                 return Ok();
 
-            user.RefreshTokenRevokedAt = DateTime.UtcNow;
+            await _mediator.Send(new RevokeRefreshTokenCommand(user.UserId));
             return Ok("Logged out successfully");
         }
 

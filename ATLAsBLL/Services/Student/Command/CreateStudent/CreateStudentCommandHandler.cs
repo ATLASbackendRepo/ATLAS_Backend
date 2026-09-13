@@ -20,35 +20,38 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
 
         public async Task<int> Handle(CreateStudentCommand request, CancellationToken cancellationToken)
         {
-            if (await _unitOfWork.Students.StudentCodeExistsAsync(request.StudentCode))
-                throw new InvalidOperationException("Student code already exists.");
+            
 
             var user = new User
             {
-                FullName = request.FullName
+                FullName = request.CreateStudentDTO.FullName
                 ,
-                AcademicId = request.AcademicId 
+                AcademicId = request.CreateStudentDTO.AcademicId 
+                , Role = enUserRole.Student,
+                IsActive =true
+
             };
 
-            user.Password = BCrypt.Net.BCrypt.HashPassword(request.Password);
+            user.Password = BCrypt.Net.BCrypt.HashPassword("12345678");
 
-            // 2. إنشاء كائن الـ Studentوربطه بكائن الـ User مباشرة
+         
             var student = new Student
             {
-                StudentCode = request.StudentCode,
-                AcademicId = request.AcademicId,
-                AcademicLevel = request.AcademicLevel,
-                DepartmentId = request.DepartmentId,
-                User = user // الربط المباشر هنا بيخلي الـ EF يتعامل مع الـ IDs تلقائياً
+                AcademicId = request.CreateStudentDTO.AcademicId,
+                AcademicLevel = request.CreateStudentDTO.AcademicLevel,
+                DepartmentId = request.CreateStudentDTO.DepartmentId,
+                InstitutionID = request.CreateStudentDTO.InstitutionId,
+                User = user 
+                ,IsActive = true
             };
 
-            // 3. إضافة الطالب (الـ EF هيفهم تلقائياً إنه لازم يضيف الـ User المرتبط بيه كمان)
+           
             await _unitOfWork.Students.AddAsync(student);
 
-            // 4. حفظ الاتنين معاً كـ Transaction واحدة
+            
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // 5. إعلام بأن الطالب تم إنشاؤه
+            
             await _publisher.Publish(new StudentCreatedDomainEvent(student.StudentId), cancellationToken);
 
             return student.StudentId;

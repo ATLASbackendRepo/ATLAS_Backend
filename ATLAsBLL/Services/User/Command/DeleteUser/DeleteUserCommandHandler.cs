@@ -16,11 +16,11 @@ namespace ATLAsBLL.Features.Users.Commands.DeleteUser
 
         public async Task<bool> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _unitOfWork.Users.GetByIdAsync(request.UserId);
+            var user = await _unitOfWork.Users.GetUserByAcademicIDAsync(request.AcademicId);
 
             if (user == null)
             {
-                throw new System.Collections.Generic.KeyNotFoundException($"User with ID {request.UserId} does not exist.");
+                throw new System.Collections.Generic.KeyNotFoundException($"User with ID {request.AcademicId} does not exist.");
             }
 
             user.IsActive = false;

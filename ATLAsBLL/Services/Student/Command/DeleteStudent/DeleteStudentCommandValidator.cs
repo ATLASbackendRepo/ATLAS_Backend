@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+﻿        using FluentValidation;
 
 namespace ATLAsBLL.Features.Students.Commands.DeleteStudent
 {
@@ -6,9 +6,9 @@ namespace ATLAsBLL.Features.Students.Commands.DeleteStudent
     {
         public DeleteStudentCommandValidator()
         {
-            RuleFor(s => s.StudentId)
-                .NotEmpty().WithMessage("Student ID is required to perform deletion.")
-                .GreaterThan(0).WithMessage("Invalid Student ID.");
+            RuleFor(s => s.StudentCode)
+                .NotEmpty().WithMessage("Student Code is required to perform deletion.")
+                .MaximumLength(50).WithMessage("Student Code cannot exceed 50 characters.");
         }
     }
 }

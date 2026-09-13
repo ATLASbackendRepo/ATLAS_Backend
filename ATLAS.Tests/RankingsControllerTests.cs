@@ -17,7 +17,7 @@ namespace ATLAS.Tests
         {
             var mediator = mediatorMock?.Object ?? new Mock<IMediator>().Object;
             var controller = new ATLAS.API.Controllers.RankingsController(mediator);
-            var user = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim("StudentId", studentId.ToString()) }));
+            var user = new ClaimsPrincipal(new ClaimsIdentity(new[] { new Claim(ClaimTypes.NameIdentifier, studentId.ToString()) }));
             controller.ControllerContext = new ControllerContext { HttpContext = new DefaultHttpContext { User = user } };
             return controller;
         }

@@ -58,9 +58,9 @@ public class CourseGroupMessagesController : ControllerBase
         {
             return Forbid();
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return BadRequest(new { message = ex.Message });
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
         }
     }
 
@@ -99,9 +99,9 @@ public class CourseGroupMessagesController : ControllerBase
         {
             return BadRequest(new { errors = ex.Message });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return BadRequest(new { message = ex.Message });
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
         }
     }
 
@@ -136,9 +136,9 @@ public class CourseGroupMessagesController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return BadRequest(new { message = ex.Message });
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
         }
     }
 
@@ -172,9 +172,9 @@ public class CourseGroupMessagesController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return BadRequest(new { message = ex.Message });
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
         }
     }
 
@@ -208,9 +208,9 @@ public class CourseGroupMessagesController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return BadRequest(new { message = ex.Message });
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
         }
     }
 
@@ -243,9 +243,9 @@ public class CourseGroupMessagesController : ControllerBase
         {
             return NotFound(new { message = ex.Message });
         }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return BadRequest(new { message = ex.Message });
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
         }
     }  // Done Integration test
 

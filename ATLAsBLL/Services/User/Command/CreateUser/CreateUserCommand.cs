@@ -1,13 +1,11 @@
 using ATLASDomain.Entities;
 using MediatR;
+using ATLASDomain.DTO.Staff;
 
 
 namespace ATLAsBLL.Features.Users.Commands.CreateUser
 {
     public record CreateUserCommand(
-        string FullName,
-        string Password
-        , string AcademicId
-        , enUserRole Role
+       Create_Update_StaffDto create_StaffDto
     ) : ICommand<int>;
 }

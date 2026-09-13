@@ -25,7 +25,7 @@ namespace ATLAS.Tests
                 new ClaimsIdentity(
                     new[]
                     {
-                new Claim("StudentId", studentId.ToString())
+                new Claim(ClaimTypes.NameIdentifier, studentId.ToString())
                     }));
 
             controller.ControllerContext = new ControllerContext

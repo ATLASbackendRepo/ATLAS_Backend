@@ -40,6 +40,7 @@ builder.Host.UseSerilog((context, configuration) =>
 // ======================================================
 
 builder.Services.AddControllers();
+builder.Services.AddProblemDetails();
 
 builder.Services.AddScoped
    <ICourseOfferingAuthorizationService,
@@ -151,9 +152,7 @@ builder.Services
                 ValidateIssuerSigningKey = true,
 
                 IssuerSigningKey =
-                    new SymmetricSecurityKey(
-                        Encoding.UTF8.GetBytes(
-                            "ATLAS-Super-Secret-Key-2026-For-JWT-Signing!")), // ⚠️ لسه Hardcoded - متفق إننا مش بنلمسها دلوقتي
+                    new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtOptions.Key)),
 
                 ValidateIssuer = true,
                 ValidIssuer = jwtOptions.Issuer,
@@ -597,6 +596,120 @@ builder.Services.AddRateLimiter(options =>
     });
 
     // ==================================================
+    // ADMIN - CREATE RANGE
+    // ==================================================
+
+    options.AddPolicy("AdminCreateRangePolicy", httpContext =>
+    {
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
+
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"admin-create-range:user:{userId}"
+                : $"admin-create-range:ip:{httpContext.Connection.RemoteIpAddress}";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+
+
+    // ==================================================
+    // ADMIN - UPDATE
+    // ==================================================
+
+    options.AddPolicy("AdminUpdatePolicy", httpContext =>
+    {
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
+
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"admin-update:user:{userId}"
+                : $"admin-update:ip:{httpContext.Connection.RemoteIpAddress}";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+
+
+    // ==================================================
+    // ADMIN - SOFT DELETE
+    // ==================================================
+
+    options.AddPolicy("AdminSoftDeletePolicy", httpContext =>
+    {
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
+
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"admin-soft-delete:user:{userId}"
+                : $"admin-soft-delete:ip:{httpContext.Connection.RemoteIpAddress}";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 5,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+
+
+    // ==================================================
+    // ADMIN - GET ALL
+    // ==================================================
+
+    options.AddPolicy("AdminGetAllPolicy", httpContext =>
+    {
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
+
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"admin-get-all:user:{userId}"
+                : $"admin-get-all:ip:{httpContext.Connection.RemoteIpAddress}";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 30,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+    // ==================================================
     // REJECTION RESPONSE
     // ==================================================
 
@@ -677,6 +790,8 @@ app.UseHttpsRedirection();
 app.UseCors("StudentApiCorsPolicy");
 
 app.UseMiddleware<CorrelationIdMiddleware>();
+
+app.UseExceptionHandler();
 
 app.UseAuthentication();
 

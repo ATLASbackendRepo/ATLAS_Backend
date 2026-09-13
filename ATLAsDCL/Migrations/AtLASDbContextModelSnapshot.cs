@@ -297,6 +297,10 @@ namespace ATLAsDCL.Migrations
 
                     b.HasIndex("EnrollmentID");
 
+                    b.HasIndex("EnrollmentID", "ModuleID")
+                        .IsUnique()
+                        .HasDatabaseName("UX_CourseGrades_EnrollmentID_ModuleID");
+
                     b.HasIndex("ModuleID");
 
                     b.ToTable("CourseGrades", (string)null);
@@ -422,6 +426,10 @@ namespace ATLAsDCL.Migrations
                     b.HasIndex("CreatedByUserID");
 
                     b.HasIndex("StudentID");
+
+                    b.HasIndex("StudentID", "CourseOfferingID")
+                        .IsUnique()
+                        .HasDatabaseName("UX_Enrollments_StudentID_CourseOfferingID");
 
                     b.ToTable("Enrollments");
                 });

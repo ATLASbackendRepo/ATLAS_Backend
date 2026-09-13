@@ -13,6 +13,9 @@ namespace ATLAsDCL.Configuration
 
             builder.Property(cg => cg.EnrollmentID).IsRequired();
             builder.Property(cg => cg.ModuleID).IsRequired();
+            builder.HasIndex(cg => new { cg.EnrollmentID, cg.ModuleID })
+                .IsUnique()
+                .HasDatabaseName("UX_CourseGrades_EnrollmentID_ModuleID");
       
 
            

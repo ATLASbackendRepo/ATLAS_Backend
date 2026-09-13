@@ -49,9 +49,9 @@ public class RequestController : ControllerBase
         {
             return Forbid();
 }
-        catch (Exception ex)
+        catch (Exception)
         {
-            return BadRequest(new { message = ex.Message });
+            return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
         }
     }
 

@@ -9,7 +9,6 @@ namespace ATLAS.Middleware.Alert
         private readonly HttpClient _httpClient;
         private readonly DiscordOptions _options;
         private readonly ILogger<DiscordNotificationProvider> _logger;
-        private readonly string _webhookUrl = "https://discord.com/api/webhooks/1543346071244116039/_Pv272BVt_ehnjWfEQ8fSIS01TaD1d12fLR3R9yRpBFwd9wJBP-BrDPRPoeRwJTj2-1e";
         public string Name => "Discord";
 
         public DiscordNotificationProvider(HttpClient httpClient, IOptions<DiscordOptions> options, ILogger<DiscordNotificationProvider> logger)
@@ -23,7 +22,10 @@ namespace ATLAS.Middleware.Alert
     SecurityEvent securityEvent,
     CancellationToken cancellationToken)
         {
-            var webhookUrl = _webhookUrl;
+            if (!_options.Enabled || string.IsNullOrWhiteSpace(_options.WebhookUrl))
+                return;
+
+            var webhookUrl = _options.WebhookUrl;
 
 
 

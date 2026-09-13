@@ -2,6 +2,7 @@
 using System.Threading;
 using System.Threading.Tasks;
 using ATLAsDCL.UnitOfWork;
+using ATLASDomain.Entities;
 
 namespace ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule
 {
@@ -15,7 +16,11 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule
             
             var module = await _unitOfWork.AssessmentModules.GetByIdAsync(request.DTO.ModuleId);
             if (module == null) throw new System.Collections.Generic.KeyNotFoundException("Module not found.");
-            if (request.DTO.MaxDegree < 0 || request.DTO.MaxDegree > 100)
+            var doctors = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(module.CourseOfferingID);
+            var teachingAssistants = await _unitOfWork.CourseOfferingTAs.GetTAsByOfferingAsync(module.CourseOfferingID);
+            if (!doctors.Contains(request.UserId) && !teachingAssistants.Any(ta => ta.TeacherAssistID == request.UserId))
+                throw new UnauthorizedAccessException("You are not assigned to this course offering.");
+            if (request.DTO.MaxDegree < AssessmentModule.MinimumMaxDegree || request.DTO.MaxDegree > AssessmentModule.MaximumMaxDegree)
             {
                 throw new ArgumentException("MaxDegree must be a value between 0 and 100.");
             }
