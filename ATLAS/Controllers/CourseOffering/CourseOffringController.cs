@@ -112,9 +112,9 @@ namespace ATLAS.Controllers.CourseOffering
                 }
                 return Ok(doctorIDs);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
-                return Unauthorized(ex.Message);
+                return Unauthorized(new { message = "Authentication is required to perform this operation." });
             }
             catch (Exception)
             {

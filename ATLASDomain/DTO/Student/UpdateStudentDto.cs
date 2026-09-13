@@ -2,7 +2,7 @@
 {
     public  class UpdateStudentDto
     {
-       public string StudentCode { get; set; }
+       public required string StudentCode { get; set; }
         public string? FullName { get; set; }
         public string? AcademicId { get; set; }
         public int? AcademicLevel { get; set; }

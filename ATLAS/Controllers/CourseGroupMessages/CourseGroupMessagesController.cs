@@ -91,13 +91,13 @@ public class CourseGroupMessagesController : ControllerBase
         {
             return Forbid();
         }
-        catch (KeyNotFoundException ex)
+        catch (KeyNotFoundException)
         {
-            return NotFound(new { message = ex.Message });
+            return NotFound(new { message = "The requested resource was not found." });
         }
-        catch (ValidationException ex)
+        catch (ValidationException)
         {
-            return BadRequest(new { errors = ex.Message });
+            return BadRequest(new { errors = "The request is invalid." });
         }
         catch (Exception)
         {
@@ -132,9 +132,9 @@ public class CourseGroupMessagesController : ControllerBase
         {
             return Forbid();
         }
-        catch (KeyNotFoundException ex)
+        catch (KeyNotFoundException)
         {
-            return NotFound(new { message = ex.Message });
+            return NotFound(new { message = "The requested resource was not found." });
         }
         catch (Exception)
         {
@@ -168,9 +168,9 @@ public class CourseGroupMessagesController : ControllerBase
         {
             return Forbid();
         }
-        catch (KeyNotFoundException ex)
+        catch (KeyNotFoundException)
         {
-            return NotFound(new { message = ex.Message });
+            return NotFound(new { message = "The requested resource was not found." });
         }
         catch (Exception)
         {
@@ -204,9 +204,9 @@ public class CourseGroupMessagesController : ControllerBase
         {
             return Forbid();
         }
-        catch (KeyNotFoundException ex)
+        catch (KeyNotFoundException)
         {
-            return NotFound(new { message = ex.Message });
+            return NotFound(new { message = "The requested resource was not found." });
         }
         catch (Exception)
         {
@@ -239,9 +239,9 @@ public class CourseGroupMessagesController : ControllerBase
         {
             return Forbid();
         }
-        catch (KeyNotFoundException ex)
+        catch (KeyNotFoundException)
         {
-            return NotFound(new { message = ex.Message });
+            return NotFound(new { message = "The requested resource was not found." });
         }
         catch (Exception)
         {

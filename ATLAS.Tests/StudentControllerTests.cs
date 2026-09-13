@@ -24,7 +24,7 @@ namespace ATLAS.Tests
 
             var controller = new StudentController(mediatorMock.Object, Mock.Of<ATLAS.ICourseOfferingAuthorizationService>());
 
-            var result = await controller.GetAllStudent();
+            var result = await controller.GetAllStudent(new StudentFilterDTO());
 
             Assert.IsType<NotFoundObjectResult>(result.Result);
         }
@@ -49,21 +49,11 @@ namespace ATLAS.Tests
                 mediatorMock.Object,
                 Mock.Of<ATLAS.ICourseOfferingAuthorizationService>());
 
-            var result = await controller.GetAllStudent();
+            var result = await controller.GetAllStudent(new StudentFilterDTO());
 
             var ok = Assert.IsType<OkObjectResult>(result.Result);
 
             Assert.Equal(list, ok.Value);
-        }
-        [Fact]
-        public async Task GetAllStudentWithLevel_ReturnsBadRequest_OnInvalidLevel()
-        {
-            var mediatorMock = new Mock<IMediator>();
-            var controller = new StudentController(mediatorMock.Object, Mock.Of<ATLAS.ICourseOfferingAuthorizationService>());
-
-            var result = await controller.GetAllStudentWithLevel(0);
-
-            Assert.IsType<BadRequestObjectResult>(result.Result);
         }
     }
 }

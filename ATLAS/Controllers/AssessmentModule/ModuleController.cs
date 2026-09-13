@@ -51,17 +51,17 @@ namespace ATLAS.Controllers.AssessmentModule
                 var modules = await _mediator.Send(command, cancellationToken);
                 return Ok(modules);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
-                return Unauthorized(new { message = ex.Message });
+                return Unauthorized(new { message = "Authentication is required to perform this operation." });
             }
-            catch (KeyNotFoundException ex)
+            catch (KeyNotFoundException)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = "The requested resource was not found." });
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "The request is invalid." });
             }
             catch (Exception)
             {
@@ -84,13 +84,13 @@ namespace ATLAS.Controllers.AssessmentModule
                 var moduleId = await _mediator.Send(command, cancellationToken);
                 return Ok(moduleId);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
-                return Unauthorized(new { message = ex.Message });
+                return Unauthorized(new { message = "Authentication is required to perform this operation." });
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "The request is invalid." });
             }
             catch (Exception)
             {
@@ -113,17 +113,17 @@ namespace ATLAS.Controllers.AssessmentModule
                 var moduleId = await _mediator.Send(command, cancellationToken);
                 return Ok(moduleId);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
-                return Unauthorized(new { message = ex.Message });
+                return Unauthorized(new { message = "Authentication is required to perform this operation." });
             }
-            catch (KeyNotFoundException ex)
+            catch (KeyNotFoundException)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = "The requested resource was not found." });
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "The request is invalid." });
             }
             catch (Exception)
             {
@@ -144,17 +144,17 @@ namespace ATLAS.Controllers.AssessmentModule
                 var result = await _mediator.Send(command, cancellationToken);
                 return Ok(moduleId);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
-                return Unauthorized(new { message = ex.Message });
+                return Unauthorized(new { message = "Authentication is required to perform this operation." });
             }
-            catch (KeyNotFoundException ex)
+            catch (KeyNotFoundException)
             {
-                return NotFound(new { message = ex.Message });
+                return NotFound(new { message = "The requested resource was not found." });
             }
-            catch (ArgumentException ex)
+            catch (ArgumentException)
             {
-                return BadRequest(new { message = ex.Message });
+                return BadRequest(new { message = "The request is invalid." });
             }
             catch (Exception)
             {

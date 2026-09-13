@@ -20,7 +20,7 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule
             var teachingAssistants = await _unitOfWork.CourseOfferingTAs.GetTAsByOfferingAsync(module.CourseOfferingID);
             if (!doctors.Contains(request.UserId) && !teachingAssistants.Any(ta => ta.TeacherAssistID == request.UserId))
                 throw new UnauthorizedAccessException("You are not assigned to this course offering.");
-            if (request.DTO.MaxDegree < AssessmentModule.MinimumMaxDegree || request.DTO.MaxDegree > AssessmentModule.MaximumMaxDegree)
+            if (request.DTO.MaxDegree < ATLASDomain.Entities.AssessmentModule.MinimumMaxDegree || request.DTO.MaxDegree > ATLASDomain.Entities.AssessmentModule.MaximumMaxDegree)
             {
                 throw new ArgumentException("MaxDegree must be a value between 0 and 100.");
             }

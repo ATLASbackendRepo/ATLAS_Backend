@@ -29,8 +29,10 @@ public class StudentRepository
 
          if(!string.IsNullOrEmpty(fillter.Search))
          {
-            students = students.Where(s => s.User.FullName.Contains(fillter.Search)
-            || s.StudentCode.Contains(fillter.Search)|| s.AcademicId.Contains(fillter.Search));
+            students = students.Where(s =>
+                (s.User != null && s.User.FullName.Contains(fillter.Search))
+                || s.StudentCode.Contains(fillter.Search)
+                || (s.AcademicId != null && s.AcademicId.Contains(fillter.Search)));
          }
 
          if(fillter.DepartmentId.HasValue)
@@ -53,7 +55,7 @@ public class StudentRepository
                 StudentName = s.User.FullName ?? string.Empty,
                 AcademicId = s.AcademicId??string.Empty,
                 AcademicLevel = s.AcademicLevel,
-                Departmentname = s.Department.D_Name ?? string.Empty,
+                Departmentname = s.Department != null ? s.Department.D_Name ?? string.Empty : string.Empty,
                 IsActive = s.IsActive
             })
             .ToListAsync();

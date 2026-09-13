@@ -20,7 +20,7 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule
                 if (!teachingAssistants.Any(ta => ta.TeacherAssistID == request.UserId))
                     throw new UnauthorizedAccessException("You are not assigned to the specified course offering.");
             }
-            if (request.DTO.MaxDegree < AssessmentModule.MinimumMaxDegree || request.DTO.MaxDegree > AssessmentModule.MaximumMaxDegree)
+            if (request.DTO.MaxDegree < ATLASDomain.Entities.AssessmentModule.MinimumMaxDegree || request.DTO.MaxDegree > ATLASDomain.Entities.AssessmentModule.MaximumMaxDegree)
             {
                 throw new ArgumentException("MaxDegree must be a value between 0 and 100.");
             }

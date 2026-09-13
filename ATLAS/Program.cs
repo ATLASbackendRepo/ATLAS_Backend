@@ -53,8 +53,8 @@ builder.Services.AddScoped
 builder.Services.AddOptions<JwtOptions>()
     .Bind(builder.Configuration.GetSection(JwtOptions.SectionName))
     .Validate(
-        o => !string.IsNullOrWhiteSpace(o.Key),
-        "Jwt:Key must be supplied through a secure configuration provider.")
+        o => !string.IsNullOrWhiteSpace(o.Key) && o.Key.Length >= 32,
+        "Jwt:Key must be supplied through a secure configuration provider and be at least 32 characters long.")
     .Validate(
         o => !string.IsNullOrWhiteSpace(o.Issuer),
         "Jwt:Issuer is required.")

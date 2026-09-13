@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ATLAsBLL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7543856e9fa1e1a78a0b1c4415a6925179e436c8")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+45a64990153daa1ff13c681093406a2d6ff28782")]
 [assembly: System.Reflection.AssemblyProductAttribute("ATLAsBLL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ATLAsBLL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

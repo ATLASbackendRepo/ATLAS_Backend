@@ -67,7 +67,7 @@ namespace ATLAS.Controllers.Staff
             {
                 return NotFound("One or more required entities not found.");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest("An error occurred while creating the staff");
             }
@@ -97,7 +97,7 @@ namespace ATLAS.Controllers.Staff
             {
                 return NotFound("One or more required entities not found.");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest("An error occurred while updating the staff");
             }
@@ -126,7 +126,7 @@ namespace ATLAS.Controllers.Staff
             {
                 return NotFound("One or more required entities not found.");
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 return BadRequest("An error occurred while deleting the staff");
             }

@@ -43,7 +43,7 @@ public class UserRepository
 
         if(!string.IsNullOrEmpty(filter.Search))
         {
-            query = query.Where(u => u.FullName.Contains(filter.Search) || u.AcademicId.Contains(filter.Search));
+            query = query.Where(u => u.FullName.Contains(filter.Search) || (u.AcademicId != null && u.AcademicId.Contains(filter.Search)));
         }
         if (filter.DepartmentId.HasValue)
         {
@@ -71,7 +71,7 @@ public class UserRepository
 
                         : 0,
 
-                departmentname = u.Department.D_Name,
+                departmentname = u.Department != null ? u.Department.D_Name : string.Empty,
                 IsActive = u.IsActive
             });
 
