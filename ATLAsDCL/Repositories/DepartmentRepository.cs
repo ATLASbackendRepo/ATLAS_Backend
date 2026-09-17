@@ -1,4 +1,5 @@
 ﻿using ATLAsDCL.Data;
+using ATLASDomain.DTO.Department;
 using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -49,5 +50,32 @@ public class DepartmentRepository
         _context.Departments.Add(newDepartment);
         await _context.SaveChangesAsync();
         return newDepartment.DepartmentId;
+    }
+
+    public async Task<List<DepartmentDTO>> GetDepartments(string? departmentName)
+    {
+        var query = _context.Departments
+            .AsNoTracking()
+            .AsQueryable();
+
+        if (!string.IsNullOrWhiteSpace(departmentName))
+        {
+            var searchTerm = $"%{departmentName}%";
+            query = query.Where(d => EF.Functions.Like(d.D_Name, searchTerm));
+        }
+
+
+        var departments = await query
+       .Select(d => new DepartmentDTO
+            {
+                Id = d.DepartmentId,
+                DepartmentName = d.D_Name,
+                NumOfStudents = d.Students.Count,
+                NumOfDoctors = d.Users.Count(u => u.Role == enUserRole.Doctor),
+                NumOfTeacherAssistants = d.Users.Count(u => u.Role == enUserRole.TeachingAssistant)
+            })
+            .ToListAsync();
+
+        return departments;
     }
 }

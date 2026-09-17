@@ -35,7 +35,7 @@ public class UserRepository
         return await _dbSet.AnyAsync(u => u.FullName == userName);
     }
 
-    public Task<IEnumerable<StaffDto>> GetAllStaffAsync(enUserRole role, StaffFilterDTO filter)
+    public async Task<IEnumerable<StaffDto>> GetAllStaffAsync(enUserRole role, StaffFilterDTO filter)
     {
         var query = _context.Users
             .AsNoTracking()
@@ -75,6 +75,17 @@ public class UserRepository
                 IsActive = u.IsActive
             });
 
-        return Task.FromResult(staffList.AsEnumerable());
+        return await staffList.ToListAsync();
+    }
+  
+
+    public async Task<int?> GetUserIdByAcdimicId(string AcdimicID, CancellationToken cancellationToken)
+    {
+        return await _context.Users
+            .AsNoTracking()
+            .Where(u => u.AcademicId == AcdimicID)
+            .Select(u => (int?)u.UserId)
+            .FirstOrDefaultAsync(cancellationToken);
+     
     }
 }

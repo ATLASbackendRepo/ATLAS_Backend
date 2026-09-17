@@ -24,15 +24,10 @@ namespace ATLAsDCL.Repositories
                 .ToListAsync();
         }
 
-        public Task MarkAllAsReadAsync(int userId)
+        public async Task MarkAllAsReadAsync(int userId)
         {
-            var items = _dbSet.Where(n => n.RecipientUserID == userId && !n.IsRead);
-            foreach (var n in items)
-            {
-                n.IsRead = true;
-            }
-            _dbSet.UpdateRange(items);
-            return Task.CompletedTask;
+            await _dbSet.Where(n => n.RecipientUserID == userId && !n.IsRead)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(n => n.IsRead, true));
         }
 
         public async Task MarkAsReadAsync(int notificationId)

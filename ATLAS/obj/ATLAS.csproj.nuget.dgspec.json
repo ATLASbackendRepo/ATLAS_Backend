@@ -63,6 +63,10 @@
               "target": "Package",
               "version": "[4.0.2, )"
             },
+            "ClosedXML": {
+              "target": "Package",
+              "version": "[0.105.1, )"
+            },
             "ExcelDataReader": {
               "target": "Package",
               "version": "[3.9.0, )"
@@ -90,6 +94,10 @@
             "Microsoft.Extensions.DependencyInjection": {
               "target": "Package",
               "version": "[8.0.1, )"
+            },
+            "QuestPDF": {
+              "target": "Package",
+              "version": "[2026.9.0, )"
             }
           },
           "imports": [
@@ -347,6 +355,10 @@
             "Microsoft.VisualStudio.Azure.Containers.Tools.Targets": {
               "target": "Package",
               "version": "[1.24.2-preview.1, )"
+            },
+            "QuestPDF": {
+              "target": "Package",
+              "version": "[2026.9.0, )"
             },
             "Serilog.AspNetCore": {
               "target": "Package",

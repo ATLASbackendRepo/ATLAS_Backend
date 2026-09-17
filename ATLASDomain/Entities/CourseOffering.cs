@@ -18,4 +18,5 @@ public class CourseOffering
 
     public ICollection<CourseOfferingTA> CourseOfferingTAs { get; set; } = new List<CourseOfferingTA>();
     public ICollection<AssessmentModule> AssessmentModules { get; set; } = new List<AssessmentModule>();
+    public ICollection<AttendanceSession> AttendanceSessions { get; set; } = new List<AttendanceSession>();
 }

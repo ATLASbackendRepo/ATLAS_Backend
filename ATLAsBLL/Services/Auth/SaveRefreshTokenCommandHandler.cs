@@ -28,6 +28,11 @@ namespace ATLAsBLL.Services.Auth
             if (user == null)
                 throw new KeyNotFoundException("User not found.");
 
+            // Refresh-token rotation with reuse detection:
+            // slide the current token into the "previous" slot so a rotated
+            // token that is later replayed can be detected and the family revoked.
+            user.PreviousRefreshTokenHash = user.RefreshTokenHash;
+
             user.RefreshTokenHash =
                 BCrypt.Net.BCrypt.HashPassword(request.RefreshToken);
 

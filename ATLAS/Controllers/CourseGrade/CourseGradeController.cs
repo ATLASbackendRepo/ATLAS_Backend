@@ -1,13 +1,15 @@
 ﻿//using ATLAsBLL.Features.CourseGrades.Commands.CreateCourseGradesRange;
+using ATLAS;
+using ATLAsBLL.Features.CourseGrades.Commands.CreateCourseGradesRange;
 using ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade;
+using ATLAsBLL.Features.CourseGrades.Queries.ExportCourseGrades;
 using ATLAsBLL.Services.CourseGrade.Queries;
 using ATLASDomain.DTO.CourseGrade;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
-using ATLAS;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Threading.Tasks;
 namespace ATLASAPI.Controllers
 {
     [ApiController]
@@ -74,7 +76,7 @@ namespace ATLASAPI.Controllers
         public async Task<IActionResult> AssignGrade(
              [FromBody] AssignCourseGradeCommand command)
         {
-            if(command == null || command.EnrollmentId <= 0 || command.ModuleId <= 0)
+            if (command == null || command.EnrollmentId <= 0 || command.ModuleId <= 0)
             {
                 return BadRequest("Invalid grade data.");
             }
@@ -135,7 +137,205 @@ namespace ATLASAPI.Controllers
         //    });
         //}
 
+        [HttpPost("assign-range")]
+        [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
+        [EnableRateLimiting("CourseGradeAssignPolicy")]
+        public async Task<ActionResult> AssignGradesRange(
+            IFormFile file,
+            int courseOfferingId,
+            int modelId,
+            CancellationToken cancellationToken)
+                {
+            try
+            {
+                const long maxUploadBytes = 10 * 1024 * 1024;
+
+                var extension = Path
+                    .GetExtension(file?.FileName ?? string.Empty)
+                    .ToLowerInvariant();
+
+                if (file == null ||
+                    file.Length == 0 ||
+                    file.Length > maxUploadBytes ||
+                    extension is not ".xlsx" and not ".xls")
+                {
+                    return BadRequest(
+                        "Upload a non-empty Excel file no larger than 10 MB.");
+                }
+
+                // Validate Excel file signature
+                var signature = new byte[8];
+
+                await using (var stream = file.OpenReadStream())
+                {
+                    var bytesRead = await stream.ReadAsync(
+                        signature,
+                        cancellationToken);
+
+                    var isXlsx = bytesRead >= 2 &&
+                                 signature.Take(2)
+                                     .SequenceEqual(
+                                         new byte[] { 0x50, 0x4B });
+
+                    var isXls = bytesRead >= 8 &&
+                                signature
+                                    .Take(8)
+                                    .SequenceEqual(
+                                        new byte[]
+                                        {
+                                    0xD0, 0xCF, 0x11, 0xE0,
+                                    0xA1, 0xB1, 0x1A, 0xE1
+                                        });
+
+                    if ((extension == ".xlsx" && !isXlsx) ||
+                        (extension == ".xls" && !isXls))
+                    {
+                        return BadRequest(
+                            "The uploaded file does not match its Excel format.");
+                    }
+                }
+
+                // Get current user ID
+                if (!await _courseAuthorization.CanAccessOfferingAsync(User, courseOfferingId, cancellationToken))
+                    return Forbid();
+
+                var userIdClaim = User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier);
+
+                if (userIdClaim == null ||
+                    !int.TryParse(userIdClaim.Value, out var userId))
+                {
+                    return Unauthorized("Invalid user identity.");
+                }
+
+                // Create temporary upload folder
+                var uploadsFolder = Path.Combine(
+                    Path.GetTempPath(),
+                    "ATLAS",
+                    "uploads");
+
+                if (!Directory.Exists(uploadsFolder))
+                {
+                    Directory.CreateDirectory(uploadsFolder);
+                }
+
+                var filename = $"{Guid.NewGuid()}{extension}";
+                var filePath = Path.Combine(
+                    uploadsFolder,
+                    filename);
+
+                // Save uploaded file
+                await using (var stream = new FileStream(
+                    filePath,
+                    FileMode.CreateNew,
+                    FileAccess.Write,
+                    FileShare.None))
+                {
+                    await file.CopyToAsync(
+                        stream,
+                        cancellationToken);
+                }
+
+                var command = new AssignCourseGradesRangeCommand(
+                    filePath,
+                    courseOfferingId,
+                    userId,
+                    modelId);
+
+                var result = await _mediator.Send(
+                    command,
+                    cancellationToken);
+
+                return Ok(new
+                {
+                    success = result,
+                    message = "Course grades assigned successfully."
+                });
+            }
+            catch (OperationCanceledException)
+            {
+                return BadRequest("The upload was canceled.");
+            }
+            catch (InvalidDataException ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new
+                {
+                    message = ex.Message
+                });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return Conflict(new
+                {
+                    message = ex.Message
+                });
+            }
+            catch (Exception)
+            {
+                return BadRequest("Invalid data.");
+            }
+        }
+
+
+
+
+
+
+
+
+        [HttpGet("export")]
+        [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
+        [EnableRateLimiting("CourseGradeAssignPolicy")]
+        public async Task<IActionResult> ExportGrades(
+         [FromQuery] int courseOfferingId,
+         [FromQuery] string format = "excel",
+         CancellationToken cancellationToken = default)
+        {
+            try
+            {
+                if (courseOfferingId <= 0)
+                    return BadRequest(new { message = "Course offering ID must be greater than zero." });
+
+                if (!await _courseAuthorization.CanAccessOfferingAsync(User, courseOfferingId, cancellationToken))
+                    return Forbid();
+
+                var result = await _mediator.Send(
+                    new ExportCourseGradesQuery(
+                        courseOfferingId,
+                        format),
+                    cancellationToken);
+
+                return File(
+                    result.File,
+                    result.ContentType,
+                    result.FileName);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new
+                {
+                    message = ex.Message
+                });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new
+                {
+                    message = ex.Message
+                });
+            }
+        }
+
+
 
 
     }
+
+
 }

@@ -17,11 +17,17 @@ namespace ATLAsBLL.Features.Courses.Commands.CreateCourse
 
         public async Task<int> Handle(CreateCourseCommand request, CancellationToken cancellationToken)
         {
+            if(string.IsNullOrEmpty(request.CreateCourseDTO.CourseName))
+            {
+                throw new ArgumentNullException();
+            }
+
+
             var course = new Course
             {
-                C_Name = request.CourseName,
-                Credit_Hours = request.CreditHours,
-                IsPractical = request.IsPractical
+                C_Name = request.CreateCourseDTO.CourseName,
+                Credit_Hours = request.CreateCourseDTO.CreditHours,
+                IsPractical = request.CreateCourseDTO.IsPractical
             };
 
             await _unitOfWork.Courses.AddAsync(course);

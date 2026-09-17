@@ -12,6 +12,13 @@ namespace ATLASDomain.InterFaces.Repositories
     {
 
       Task<int> GetInstitutionWithNameAsync(string institutionName);
-  
+
+        Task<List<InstitutionDto>> GetAllInstitutionsAsync();
+        Task<InstitutionDto> GetInstitutionByIdAsync(int id);
+        Task<InstitutionDto> CreateInstitutionAsync(CreateInstitutionDto dto);
+        Task<bool> UpdateInstitutionAsync(UpdateInstitutionDto dto);
+        Task<bool> DeleteInstitutionAsync(int id);
+
+
     }
 }

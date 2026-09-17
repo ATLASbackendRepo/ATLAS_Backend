@@ -1,0 +1,121 @@
+using System.Security.Cryptography;
+using System.Text;
+using ATLAsDCL.Data;
+using ATLASDomain.Entities;
+using Microsoft.EntityFrameworkCore;
+
+namespace ATLAS.Attendance;
+
+public interface IAttendanceService
+{
+    Task<AttendanceSessionDto> StartAsync(int courseOfferingId, int userId, int durationMinutes, CancellationToken cancellationToken);
+    Task<AttendanceQrDto?> GetCurrentQrAsync(Guid sessionId, CancellationToken cancellationToken);
+    Task<AttendanceScanResult> RecordScanAsync(string qrToken, int studentUserId, string deviceId, CancellationToken cancellationToken);
+    Task<AttendanceSessionDto?> EndAsync(Guid sessionId, CancellationToken cancellationToken);
+    Task<AttendanceReportDto?> GetReportAsync(Guid sessionId, CancellationToken cancellationToken);
+}
+
+public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeProvider) : IAttendanceService
+{
+    // QR payloads are verified server-side; a captured payload is valid for one five-second slot only.
+    private const int RotationSeconds = 5;
+
+    public async Task<AttendanceSessionDto> StartAsync(int courseOfferingId, int userId, int durationMinutes, CancellationToken cancellationToken)
+    {
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+        if (!await context.CourseOfferings.AnyAsync(x => x.CourseOfferingID == courseOfferingId, cancellationToken))
+            throw new AttendanceValidationException("The course offering was not found.");
+        var active = await context.AttendanceSessions
+            .AnyAsync(x => x.CourseOfferingId == courseOfferingId && x.Status == AttendanceSessionStatus.Active && x.ExpiresAt > now, cancellationToken);
+        if (active) throw new AttendanceConflictException("An attendance session is already active for this course offering.");
+
+        var session = new AttendanceSession
+        {
+            CourseOfferingId = courseOfferingId,
+            CreatedByUserId = userId,
+            StartedAt = now,
+            ExpiresAt = now.AddMinutes(durationMinutes),
+            SigningKey = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))
+        };
+        context.AttendanceSessions.Add(session);
+        await context.SaveChangesAsync(cancellationToken);
+        return ToDto(session, 0);
+    }
+
+    public async Task<AttendanceQrDto?> GetCurrentQrAsync(Guid sessionId, CancellationToken cancellationToken)
+    {
+        var session = await context.AttendanceSessions.SingleOrDefaultAsync(x => x.AttendanceSessionId == sessionId, cancellationToken);
+        if (session is null) return null;
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+        ExpireIfNeeded(session, now);
+        if (session.Status != AttendanceSessionStatus.Active) return null;
+        if (context.Entry(session).State == EntityState.Modified) await context.SaveChangesAsync(cancellationToken);
+
+        var slot = new DateTimeOffset(now).ToUnixTimeSeconds() / RotationSeconds;
+        var validUntil = DateTimeOffset.FromUnixTimeSeconds((slot + 1) * RotationSeconds).UtcDateTime;
+        return new AttendanceQrDto(session.AttendanceSessionId, BuildToken(session, slot), validUntil, session.ExpiresAt);
+    }
+
+    public async Task<AttendanceScanResult> RecordScanAsync(string qrToken, int studentUserId, string deviceId, CancellationToken cancellationToken)
+    {
+        if (string.IsNullOrWhiteSpace(deviceId) || deviceId.Length < 16 || deviceId.Length > 256)
+            throw new AttendanceValidationException("A valid app-generated device identifier is required.");
+        var parsed = ParseToken(qrToken);
+        if (parsed is null) throw new AttendanceValidationException("The QR code is malformed.");
+
+        var session = await context.AttendanceSessions.SingleOrDefaultAsync(x => x.AttendanceSessionId == parsed.Value.SessionId, cancellationToken);
+        if (session is null) throw new AttendanceValidationException("The attendance session was not found.");
+        var now = timeProvider.GetUtcNow().UtcDateTime;
+        ExpireIfNeeded(session, now);
+        if (session.Status != AttendanceSessionStatus.Active) throw new AttendanceValidationException("This attendance session is closed.");
+        var currentSlot = new DateTimeOffset(now).ToUnixTimeSeconds() / RotationSeconds;
+        if (parsed.Value.Slot != currentSlot || !CryptographicOperations.FixedTimeEquals(
+                Encoding.UTF8.GetBytes(parsed.Value.Signature), Encoding.UTF8.GetBytes(Sign(session, parsed.Value.Slot))))
+            throw new AttendanceValidationException("This QR code has expired. Scan the currently displayed code.");
+
+        var student = await context.Students.SingleOrDefaultAsync(x => x.UserId == studentUserId && x.IsActive, cancellationToken);
+        if (student is null) throw new AttendanceValidationException("The signed-in account is not an active student.");
+        var enrolled = await context.Enrollments.AnyAsync(x => x.StudentID == student.StudentId && x.CourseOfferingID == session.CourseOfferingId, cancellationToken);
+        if (!enrolled) throw new AttendanceValidationException("You are not enrolled in this course offering.");
+
+        var deviceHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(deviceId)));
+        if (await context.AttendanceRecords.AnyAsync(x => x.AttendanceSessionId == session.AttendanceSessionId && x.StudentId == student.StudentId, cancellationToken))
+            throw new AttendanceConflictException("Attendance has already been recorded for this student.");
+        if (await context.AttendanceRecords.AnyAsync(x => x.AttendanceSessionId == session.AttendanceSessionId && x.DeviceHash == deviceHash, cancellationToken))
+            throw new AttendanceConflictException("This device has already recorded attendance for another student in this session.");
+
+        context.AttendanceRecords.Add(new AttendanceRecord { AttendanceSessionId = session.AttendanceSessionId, StudentId = student.StudentId, DeviceHash = deviceHash, RecordedAt = now });
+        try { await context.SaveChangesAsync(cancellationToken); }
+        catch (DbUpdateException) { throw new AttendanceConflictException("Attendance was already recorded by this student or device."); }
+        return new AttendanceScanResult(session.AttendanceSessionId, now, "Attendance recorded.");
+    }
+
+    public async Task<AttendanceSessionDto?> EndAsync(Guid sessionId, CancellationToken cancellationToken)
+    {
+        var session = await context.AttendanceSessions.Include(x => x.Records).SingleOrDefaultAsync(x => x.AttendanceSessionId == sessionId, cancellationToken);
+        if (session is null) return null;
+        if (session.Status == AttendanceSessionStatus.Active) { session.Status = AttendanceSessionStatus.Ended; session.EndedAt = timeProvider.GetUtcNow().UtcDateTime; await context.SaveChangesAsync(cancellationToken); }
+        return ToDto(session, session.Records.Count);
+    }
+
+    public async Task<AttendanceReportDto?> GetReportAsync(Guid sessionId, CancellationToken cancellationToken)
+    {
+        var session = await context.AttendanceSessions.AsNoTracking().SingleOrDefaultAsync(x => x.AttendanceSessionId == sessionId, cancellationToken);
+        if (session is null) return null;
+        var rows = await context.Enrollments.AsNoTracking().Where(x => x.CourseOfferingID == session.CourseOfferingId)
+            .Select(x => new { x.StudentID, x.Student.StudentCode, StudentName = x.Student.User!.FullName,
+                RecordedAt = context.AttendanceRecords.Where(r => r.AttendanceSessionId == sessionId && r.StudentId == x.StudentID).Select(r => (DateTime?)r.RecordedAt).SingleOrDefault() })
+            .OrderBy(x => x.StudentCode).ToListAsync(cancellationToken);
+        return new AttendanceReportDto(session.AttendanceSessionId, session.CourseOfferingId, session.StartedAt, session.ExpiresAt, session.EndedAt, session.Status.ToString(),
+            rows.Select(x => new AttendanceReportRowDto(x.StudentID, x.StudentCode, x.StudentName, x.RecordedAt.HasValue ? "Present" : "Absent", x.RecordedAt)).ToList());
+    }
+
+    private static AttendanceSessionDto ToDto(AttendanceSession x, int count) => new(x.AttendanceSessionId, x.CourseOfferingId, x.StartedAt, x.ExpiresAt, x.EndedAt, x.Status.ToString(), count);
+    private static void ExpireIfNeeded(AttendanceSession x, DateTime now) { if (x.Status == AttendanceSessionStatus.Active && x.ExpiresAt <= now) { x.Status = AttendanceSessionStatus.Expired; x.EndedAt ??= x.ExpiresAt; } }
+    private static string BuildToken(AttendanceSession session, long slot) => $"{session.AttendanceSessionId:N}.{slot}.{Sign(session, slot)}";
+    private static string Sign(AttendanceSession session, long slot) { using var hmac = new HMACSHA256(Convert.FromBase64String(session.SigningKey)); return Convert.ToHexString(hmac.ComputeHash(Encoding.UTF8.GetBytes($"{session.AttendanceSessionId:N}.{slot}"))); }
+    private static (Guid SessionId, long Slot, string Signature)? ParseToken(string token) { var parts = token?.Split('.') ?? []; return parts.Length == 3 && Guid.TryParseExact(parts[0], "N", out var id) && long.TryParse(parts[1], out var slot) && parts[2].Length == 64 ? (id, slot, parts[2]) : null; }
+}
+
+public sealed class AttendanceValidationException(string message) : Exception(message);
+public sealed class AttendanceConflictException(string message) : Exception(message);

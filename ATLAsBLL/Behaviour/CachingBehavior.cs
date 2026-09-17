@@ -17,7 +17,7 @@ namespace ATLAsBLL.Behaviors.Caching
         {
             _cache = cache;
             _logger = logger;
-        }
+            }
 
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {

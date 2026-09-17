@@ -121,7 +121,9 @@ public class RequestController : ControllerBase
 
 
 
-    private async Task<ActionResult<GradeAppealRequestDto>> GetById(
+    [HttpGet("{requestId:int}")]
+    [Authorize(Roles = "Student")]
+    public async Task<ActionResult<GradeAppealRequestDto>> GetById(
     int requestId,
     CancellationToken cancellationToken)
     {

@@ -1,7 +1,12 @@
 {
   "Version": 1,
   "WorkspaceRootPath": "C:\\vs-communtiy2026\\ATLAS\\",
-  "Documents": [],
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|c:\\vs-communtiy2026\\atlas\\atlas\\controllers\\student\\studentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{8F2B9A5A-A590-9822-22A6-2FB67671AB62}|ATLAS\\ATLAS.csproj|solutionrelative:atlas\\controllers\\student\\studentcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
   "DocumentGroupContainers": [
     {
       "Orientation": 0,
@@ -9,7 +14,7 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": -1,
+          "SelectedChildIndex": 6,
           "Children": [
             {
               "$type": "Bookmark",
@@ -34,6 +39,19 @@
             {
               "$type": "Bookmark",
               "Name": "ST:0:0:{0ad07096-bba9-4900-a651-0598d26f6d24}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "StudentController.cs",
+              "DocumentMoniker": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\Student\\StudentController.cs",
+              "RelativeDocumentMoniker": "ATLAS\\Controllers\\Student\\StudentController.cs",
+              "ToolTip": "C:\\vs-communtiy2026\\ATLAS\\ATLAS\\Controllers\\Student\\StudentController.cs",
+              "RelativeToolTip": "ATLAS\\Controllers\\Student\\StudentController.cs",
+              "ViewState": "AgIAAC4AAADA1MzMzAwvwAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-09-16T20:39:27.272Z",
+              "EditorCaption": ""
             }
           ]
         }

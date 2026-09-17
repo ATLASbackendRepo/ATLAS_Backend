@@ -5,7 +5,7 @@ using System.Collections.Generic;
 namespace ATLAsBLL.Features.CourseGrades.Commands.CreateCourseGradesRange
 {
     public record AssignCourseGradesRangeCommand(
-      List<InsertGradeDTO> GradeDTO
+     string  FilePath , int CourseOfferingID , int ModelID ,int UserID
     ) : ICommand<bool>;
 
    

@@ -4,6 +4,7 @@ using ATLASDomain.Entities;
 using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Security.Cryptography;
 
 namespace ATLAsBLL.Features.Users.Commands.CreateUser
 {
@@ -31,6 +32,7 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUser
                 ,DepartmentId = request.create_StaffDto.DepartmentId
                 ,InstitutionID = request.create_StaffDto.InstituteId       
                 ,IsActive = true
+                ,MustChangePassword = true
             };
 
                 user.Password = BCrypt.Net.BCrypt.HashPassword("12345678");

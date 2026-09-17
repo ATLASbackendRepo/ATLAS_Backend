@@ -3,3 +3,4 @@
 **/obj/
 Uploads/
 sql-backups/*.bak
+/.env

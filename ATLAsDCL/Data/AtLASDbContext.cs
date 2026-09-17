@@ -36,6 +36,8 @@ namespace ATLAsDCL.Data
         public DbSet<Enrollment> Enrollments { get; set; }
 
         public DbSet<CourseGrade> CourseGrades { get; set; }
+        public DbSet<AttendanceSession> AttendanceSessions { get; set; } = null!;
+        public DbSet<AttendanceRecord> AttendanceRecords { get; set; } = null!;
         public DbSet<SemesterStudentRankingView> SemesterStudentRankings { get; set; } = null!;
         public DbSet<StudentGradeModelView> StudentGradeModels { get; set; } = null!;
         public DbSet<CourseDetailsView> CourseDetails { get; set; } = null!;

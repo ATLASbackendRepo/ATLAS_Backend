@@ -9,6 +9,8 @@ namespace ATLAsBLL.Features.Department.Comand.CreateDepartment
             RuleFor(d => d.DepartmentName)
                 .NotEmpty().WithMessage("Department name is required.")
                 .MaximumLength(100).WithMessage("Department name cannot exceed 100 characters.");
+            RuleFor(d => d.InstitutionId)
+                .GreaterThan(0).WithMessage("Institution ID must be greater than 0.");
         }
     }
 }

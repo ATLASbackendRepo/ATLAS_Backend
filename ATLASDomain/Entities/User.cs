@@ -19,6 +19,7 @@ public class User
 
 
     public bool IsActive { get; set; }
+    public bool MustChangePassword { get; set; }
 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public enUserRole Role { get; set; }
@@ -54,6 +55,7 @@ public class User
     /// </summary>
 
     public string? RefreshTokenHash { get; set; }
+    public string? PreviousRefreshTokenHash { get; set; }
     public DateTime? RefreshTokenExpiresAt { get; set; }
     public DateTime? RefreshTokenRevokedAt { get; set; }
 }

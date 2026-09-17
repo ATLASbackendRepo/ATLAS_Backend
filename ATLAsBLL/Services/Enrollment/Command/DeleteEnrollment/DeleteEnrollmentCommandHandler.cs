@@ -16,14 +16,8 @@ namespace ATLAsBLL.Features.Enrollments.Commands.DeleteEnrollment
 
         public async Task<bool> Handle(DeleteEnrollmentCommand request, CancellationToken cancellationToken)
         {
-            var enrollment = await _unitOfWork.Enrollments.GetByIdAsync(request.EnrollmentID);
-
-            if (enrollment == null)
-                throw new System.Collections.Generic.KeyNotFoundException($"Enrollment record with ID {request.EnrollmentID} does not exist.");
-
-            _unitOfWork.Enrollments.Delete(enrollment);
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
-            return true;
+            var ISDeleted = await _unitOfWork.Enrollments.DeleteEnrollmentByIdAsync(request.EnrollmentID);
+            return ISDeleted;
         }
     }
 }

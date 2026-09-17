@@ -9,6 +9,7 @@ namespace ATLAsDCL.Configuration
         public void Configure(EntityTypeBuilder<CourseOfferingDoctor> builder)
         {
             builder.HasKey(cod => cod.CourseOfferingDoctorID);
+            builder.HasIndex(cod => new { cod.CourseOfferingID, cod.DoctorID }).IsUnique();
             
         
         builder.HasOne(cod => cod.CourseOffering)

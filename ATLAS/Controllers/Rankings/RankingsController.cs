@@ -74,8 +74,8 @@ public class RankingsController : ControllerBase
         if (AcademicLevel < 1)
             return BadRequest("AcademicLevel must be greater than zero.");
 
-        if (count <= 0)
-            return BadRequest("Count must be greater than zero.");
+        if (count is < 1 or > 50)
+            return BadRequest("Count must be between 1 and 50.");
 
         var result = await _mediator.Send(
             new GetTopRankedStudentsInSemesterQuery(semesterId, AcademicLevel, count), cancellationToken);

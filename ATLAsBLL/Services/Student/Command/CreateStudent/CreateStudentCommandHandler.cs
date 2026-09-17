@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using ATLASDomain.Entities;
 using ATLAsDCL.UnitOfWork;
 using ATLAsBLL.Events;
+using System.Security.Cryptography;
 
 namespace ATLAsBLL.Features.Students.Commands.CreateStudent
 {
@@ -28,7 +29,8 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
                 ,
                 AcademicId = request.CreateStudentDTO.AcademicId 
                 , Role = enUserRole.Student,
-                IsActive =true
+                IsActive =true,
+                MustChangePassword = true
 
             };
 

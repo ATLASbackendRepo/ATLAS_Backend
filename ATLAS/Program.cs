@@ -31,8 +31,7 @@ builder.Host.UseSerilog((context, configuration) =>
         .ReadFrom.Configuration(context.Configuration)
         .Enrich.FromLogContext()
         .Enrich.WithProperty("Application", "ATLAS")
-        .WriteTo.Console()
-        .WriteTo.Seq("http://localhost:5341");
+        .WriteTo.Console();
 });
 
 // ======================================================
@@ -45,6 +44,8 @@ builder.Services.AddProblemDetails();
 builder.Services.AddScoped
    <ICourseOfferingAuthorizationService,
     CourseOfferingAuthorizationService>();
+builder.Services.AddSingleton(TimeProvider.System);
+builder.Services.AddScoped<ATLAS.Attendance.IAttendanceService, ATLAS.Attendance.AttendanceService>();
 
 // ======================================================
 // JWT Options
@@ -53,8 +54,9 @@ builder.Services.AddScoped
 builder.Services.AddOptions<JwtOptions>()
     .Bind(builder.Configuration.GetSection(JwtOptions.SectionName))
     .Validate(
-        o => !string.IsNullOrWhiteSpace(o.Key) && o.Key.Length >= 32,
-        "Jwt:Key must be supplied through a secure configuration provider and be at least 32 characters long.")
+        o => !string.IsNullOrWhiteSpace(o.Key) && o.Key.Length >= 64 &&
+             !string.Equals(o.Key, "YOUR_SUPER_SECRET_KEY_THAT_IS_AT_LEAST_32_CHARACTERS_LONG!", StringComparison.Ordinal),
+        "Jwt:Key must be supplied through a secure configuration provider, must not be the sample value, and must be at least 64 characters long.")
     .Validate(
         o => !string.IsNullOrWhiteSpace(o.Issuer),
         "Jwt:Issuer is required.")
@@ -130,9 +132,7 @@ builder.Services.AddCors(options =>
     options.AddPolicy("StudentApiCorsPolicy", policy =>
     {
         policy
-            .WithOrigins(
-                "https://localhost:7133",
-                "http://localhost:5056")
+            .WithOrigins(builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? Array.Empty<string>())
             .AllowAnyHeader()
             .AllowAnyMethod();
     });
@@ -741,13 +741,13 @@ builder.Services.AddScoped<ICorrelationIdAccessor, CorrelationIdAccessor>();
 //builder.Services.AddScoped<IAuditService, AuditService>();
 //builder.Services.AddScoped<ISecurityEventService, SecurityEventService>(); // ← كانت ناقصة، ده اللي كان بيكسر أي Login فاشل
 builder.Services.AddAuthorization();
+builder.Services.AddHealthChecks();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, SecurityAuditAuthorizationHandler>();
 
 
 builder.Services.AddDbContextFactory<AtLASDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
     , ServiceLifetime.Scoped);
-
 
 // ======================================================
 // Discord & Email Alerts
@@ -770,6 +770,33 @@ builder.Services.AddHostedService<AlertBackgroundService>();
 // ======================================================
 
 var app = builder.Build();
+
+await using (var scope = app.Services.CreateAsyncScope())
+{
+    var database = scope.ServiceProvider.GetRequiredService<AtLASDbContext>();
+    await database.Database.MigrateAsync();
+
+    var adminAcademicId = app.Configuration["Seed:FirstAdmin:AcademicId"];
+    var adminPassword = app.Configuration["Seed:FirstAdmin:Password"];
+    var hasInstitutionId = int.TryParse(app.Configuration["Seed:FirstAdmin:InstitutionId"], out var institutionId);
+    var hasDepartmentId = int.TryParse(app.Configuration["Seed:FirstAdmin:DepartmentId"], out var departmentId);
+    if (!string.IsNullOrWhiteSpace(adminAcademicId) && !string.IsNullOrWhiteSpace(adminPassword) && hasInstitutionId && hasDepartmentId &&
+        !await database.Users.AnyAsync(user => user.Role == ATLASDomain.Entities.enUserRole.SAdmin))
+    {
+        database.Users.Add(new ATLASDomain.Entities.User
+        {
+            AcademicId = adminAcademicId,
+            FullName = app.Configuration["Seed:FirstAdmin:FullName"] ?? "ATLAS Administrator",
+            Password = BCrypt.Net.BCrypt.HashPassword(adminPassword),
+            Role = ATLASDomain.Entities.enUserRole.SAdmin,
+            IsActive = true,
+            MustChangePassword = false,
+            InstitutionID = institutionId,
+            DepartmentId = departmentId
+        });
+        await database.SaveChangesAsync();
+    }
+}
 
 // ======================================================
 // Swagger
@@ -799,6 +826,11 @@ app.UseRateLimiter();
 
 app.UseAuthorization();
 
+app.MapHealthChecks("/healthz");
+app.MapGet("/readyz", async (AtLASDbContext database, CancellationToken cancellationToken) =>
+    await database.Database.CanConnectAsync(cancellationToken)
+        ? Results.Ok(new { status = "ready" })
+        : Results.StatusCode(StatusCodes.Status503ServiceUnavailable));
 app.MapControllers();
 
 // ======================================================

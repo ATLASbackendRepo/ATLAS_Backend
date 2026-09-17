@@ -112,7 +112,47 @@ public class CourseGradeRepository
             TotalCount = totalCount
         };
     }
+    public async Task<List<CourseGradesExportDto>>
+    GetCourseGradesForExportAsync(int courseOfferingId)
+    {
+        var students = await _context.Enrollments
+            .AsNoTracking()
+            .Where(e => e.CourseOfferingID == courseOfferingId)
+            .OrderBy(e => e.Student!.User!.FullName)
+            .Select(e => new CourseGradesExportDto
+            {
+                StudentId = e.StudentID,
 
+                StudentName = e.Student!.User!.FullName ?? string.Empty,
+
+                StudentCode = e.Student!.StudentCode ?? string.Empty,
+
+                AcademicId = e.Student!.AcademicId ?? string.Empty,
+
+                EnrollmentId = e.EnrollmentID,
+
+                Grades = _context.AssessmentModules
+                    .Where(m => m.CourseOfferingID == courseOfferingId)
+                    .OrderBy(m => m.ModuleID)
+                    .Select(m => new EXportStudentModuleGradeDto
+                    {
+                        ModuleName = m.ModuleName,
+
+                        MaxDegree = (double)m.MaxDegree,
+
+                        StudentDegree = _context.CourseGrades
+                            .Where(g =>
+                                g.EnrollmentID == e.EnrollmentID &&
+                                g.ModuleID == m.ModuleID)
+                            .Select(g => (double?)g.StudentDegree)
+                            .FirstOrDefault()
+                    })
+                    .ToList()
+            })
+            .ToListAsync();
+
+        return students;
+    }
 
     public async Task<List<CourseGrade>> GetByEnrollmentAndModulesAsync(
     List<int> enrollmentIds,

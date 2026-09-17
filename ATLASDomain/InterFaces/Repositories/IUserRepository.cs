@@ -13,4 +13,6 @@ public interface IUserRepository : IGenericRepository<User>
     Task<User?> GetUserByAcademicIDAsync(string academicID);
     Task<bool> UserNameExistsAsync(string userName);
 
+    Task<int?>  GetUserIdByAcdimicId(string AcdimicID, CancellationToken cancellationToken);
+
 }

@@ -203,9 +203,10 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                             FullName = fullName,
                             DepartmentId = departmentId,
                             InstitutionID = institutionId,
-                            Password = BCrypt.Net.BCrypt.HashPassword(GenerateInitialPassword()),
+                            Password = BCrypt.Net.BCrypt.HashPassword("12345678"),
                             Role = enUserRole.Student,
-                            IsActive = true
+                            IsActive = true,
+                            MustChangePassword = true
                         }
                     };
 
@@ -226,12 +227,6 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                 .Trim() ?? string.Empty;
         }
 
-        private static string GenerateInitialPassword()
-        {
-            var bytes = new byte[24];
-            System.Security.Cryptography.RandomNumberGenerator.Fill(bytes);
-            return Convert.ToBase64String(bytes);
-        }
 
         private static void ValidateRequiredData(
             string institutionName,

@@ -20,6 +20,8 @@ namespace ATLAsBLL.Features.Department.Comand.CreateDepartment
             var department = new ATLASDomain.Entities.Department
             {
                 D_Name = request.DepartmentName
+                ,
+                InstitutionID = request.InstitutionId
             };
 
             await _unitOfWork.Departments.AddAsync(department);

@@ -19,7 +19,7 @@ namespace ATLAsBLL.Services.profile.Staff
 
         public async Task Handle(UserCreatedEvent User, CancellationToken cancellationToken)
         {
-            if (User.Role != enUserRole.TeachingAssistant || User.Role != enUserRole.Doctor)
+            if (User.Role != enUserRole.TeachingAssistant && User.Role != enUserRole.Doctor)
                 return;
 
             var staffProfile = new StaffProfile

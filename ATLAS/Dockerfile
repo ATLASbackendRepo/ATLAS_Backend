@@ -2,7 +2,6 @@
 
 # This stage is used when running from VS in fast mode (Default for Debug configuration)
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
-USER $APP_UID
 WORKDIR /app
 EXPOSE 8080
 EXPOSE 8081
@@ -28,6 +27,16 @@ RUN dotnet publish "./ATLAS.csproj" -c $BUILD_CONFIGURATION -o /app/publish /p:U
 
 # This stage is used in production or when running from VS in regular mode (Default when not using the Debug configuration)
 FROM base AS final
+
+# curl is required by the docker-compose healthcheck against /readyz.
+USER root
+RUN apt-get update && apt-get install -y --no-install-recommends curl && rm -rf /var/lib/apt/lists/*
+
+# Run as a non-root user. APP_UID is provided as a build arg by the
+# Visual Studio Docker tooling; the explicit default keeps bare `docker build` working.
+ARG APP_UID=1654
+USER ${APP_UID}
+
 WORKDIR /app
 COPY --from=publish /app/publish .
 ENTRYPOINT ["dotnet", "ATLAS.dll"]

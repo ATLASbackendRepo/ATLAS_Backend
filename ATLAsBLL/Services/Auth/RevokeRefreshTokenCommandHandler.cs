@@ -10,6 +10,8 @@ public sealed class RevokeRefreshTokenCommandHandler(IUnitOfWork unitOfWork) : I
         var user = await unitOfWork.Users.GetByIdAsync(request.UserId)
             ?? throw new KeyNotFoundException("User not found.");
         user.RefreshTokenRevokedAt = DateTime.UtcNow;
+        user.RefreshTokenHash = null;
+        user.PreviousRefreshTokenHash = null;
         await unitOfWork.SaveChangesAsync(cancellationToken);
     }
 }
