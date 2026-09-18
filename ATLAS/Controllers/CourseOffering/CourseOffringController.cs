@@ -190,6 +190,10 @@ namespace ATLAS.Controllers.CourseOffering
             }
             return Ok(courses);
         }
+    
+
+
+
 
         [HttpGet("DoctorIDs", Name = "GetDoctorIDs")]
         [ProducesResponseType(StatusCodes.Status200OK)]

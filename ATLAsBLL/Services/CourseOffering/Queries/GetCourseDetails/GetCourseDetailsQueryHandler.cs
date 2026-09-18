@@ -19,12 +19,20 @@ namespace ATLAsBLL.Services.CourseOffering.Queries.GetCourseDetails
 
         public async Task<IEnumerable<CourseofferingDetailsDTO>> Handle(GetCourseDetailsQuery request, CancellationToken cancellationToken)
         {
-            var courseDetails = await _unitOfWork.CourseOfferings.GetMyCourseDetailsAsync(request.CourseOfferingId, request.userId);
+           
+               var user = await _unitOfWork.Users.GetByIdAsync(request.userId);
+            if (user == null) throw new Exception();
+            IEnumerable<CourseofferingDetailsDTO> courseDetails;
 
-            if (courseDetails == null)
-            {
+            if (user.Role == ATLASDomain.Entities.enUserRole.Admin || user.Role == ATLASDomain.Entities.enUserRole.SAdmin)
+                 courseDetails = await _unitOfWork.CourseOfferings.GetDetailsCourseAsync(request.CourseOfferingId);
+            else
+                courseDetails = await _unitOfWork.CourseOfferings.GetMyCourseDetailsAsync(request.CourseOfferingId, request.userId);
+
+                
+                if (courseDetails == null)
                 return Enumerable.Empty<CourseofferingDetailsDTO>();
-            }
+         
 
             return courseDetails;
         }

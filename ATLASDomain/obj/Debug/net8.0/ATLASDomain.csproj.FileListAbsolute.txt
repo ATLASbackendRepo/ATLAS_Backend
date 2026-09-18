@@ -10,3 +10,4 @@ C:\vs-communtiy2026\ATLAS\ATLASDomain\obj\Debug\net8.0\ATLASDomain.dll
 C:\vs-communtiy2026\ATLAS\ATLASDomain\obj\Debug\net8.0\refint\ATLASDomain.dll
 C:\vs-communtiy2026\ATLAS\ATLASDomain\obj\Debug\net8.0\ATLASDomain.pdb
 C:\vs-communtiy2026\ATLAS\ATLASDomain\obj\Debug\net8.0\ref\ATLASDomain.dll
+C:\vs-communtiy2026\ATLAS\ATLASDomain\obj\Debug\net8.0\ATLASDom.EC789419.Up2Date

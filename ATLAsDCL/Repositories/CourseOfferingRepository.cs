@@ -88,6 +88,23 @@ public class CourseOfferingRepository
             })
             .ToListAsync();
     }
+    public async Task<IEnumerable< CourseofferingDetailsDTO>> GetDetailsCourseAsync(
+        int courseOfferingId)
+    {
+        return await _context.CourseDetails
+            .AsNoTracking()
+            .Where(cd => cd.CourseOfferingID == courseOfferingId )
+            .Select(cd => new CourseofferingDetailsDTO
+            {
+                C_Name = cd.C_Name,
+                Credit_Hours = Convert.ToInt16(cd.Credit_Hours),
+                ModuleId = cd.ModuleId,
+                ModuleName = cd.ModuleName,
+                maxDegree = cd.maxDegree,
+                studentdegree = cd.studentdegree
+            })
+            .ToListAsync();
+    }
     public async Task<IEnumerable<DoctorCourseOfferingDTO>> GetStaffMyCourseAsync(int staffId)
     {
         return await _context.CourseOfferings

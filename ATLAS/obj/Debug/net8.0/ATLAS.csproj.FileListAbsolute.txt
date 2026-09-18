@@ -207,3 +207,4 @@ C:\vs-communtiy2026\ATLAS\ATLAS\bin\Debug\net8.0\ExcelNumberFormat.dll
 C:\vs-communtiy2026\ATLAS\ATLAS\bin\Debug\net8.0\RBush.dll
 C:\vs-communtiy2026\ATLAS\ATLAS\bin\Debug\net8.0\SixLabors.Fonts.dll
 C:\vs-communtiy2026\ATLAS\ATLAS\bin\Debug\net8.0\System.IO.Packaging.dll
+C:\vs-communtiy2026\ATLAS\ATLAS\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt
