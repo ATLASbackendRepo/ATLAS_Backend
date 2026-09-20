@@ -12,11 +12,20 @@ namespace ATLAsDCL.DependencyInjection;
 
 public static class ServiceCollectionExtensions
 {
-  public static IServiceCollection AddDAL(this IServiceCollection services, IConfiguration configuration)
-  {
-      services.AddDbContext<AtLASDbContext>(options =>
-          options.UseSqlServer(
-              configuration.GetConnectionString("DefaultConnection")));
+    public static IServiceCollection AddDAL(
+        this IServiceCollection services,
+        IConfiguration configuration)
+    {
+        var connectionString =
+            configuration.GetConnectionString("DefaultConnection");
+
+        // DbContext used by repositories/services
+        services.AddDbContext<AtLASDbContext>(options =>
+            options.UseSqlServer(connectionString));
+
+        // DbContextFactory used by Audit/Security services
+        services.AddDbContextFactory<AtLASDbContext>(options =>
+            options.UseSqlServer(connectionString));
 
         services.AddScoped<IAssessmentModuleRepository, AssessmentModuleRepository>();
         services.AddScoped<ICourseGradeRepository, CourseGradeRepository>();
@@ -25,7 +34,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ICourseOfferingTARepository, CourseOfferingTARepository>();
         services.AddScoped<ICourseRepository, CourseRepository>();
         services.AddScoped<IDepartmentRepository, DepartmentRepository>();
-      
+
         services.AddScoped<IEnrollmentRepository, EnrollmentRepository>();
         services.AddScoped<ISemesterRepository, SemesterRepository>();
         services.AddScoped<IStudentRepository, StudentRepository>();
@@ -35,13 +44,24 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IinstitutionRepository, institutionRepository>();
 
         services.AddScoped<IGradeAppealRequestRepository,
-                                  GradeAppealRequestRepository>();
-        services.AddScoped<ICourseGroupMessageRepository, CourseGroupMessageRepository>();
-        services.AddScoped<ICourseGroupMessageReadRepository, CourseGroupMessageReadRepository>();
-        services.AddScoped<INotificationRepository, NotificationRepository>();
-        // Course access service (authorization central point)
-        services.AddScoped<ATLASDomain.Services.ICourseAccessService, ATLAsDCL.Services.CourseAccessService>();
-        services.AddScoped<IUnitOfWork, ATLAsDCL.UnitOfWork.UnitOfWork>();
-      return services;
-  }
+            GradeAppealRequestRepository>();
+
+        services.AddScoped<ICourseGroupMessageRepository,
+            CourseGroupMessageRepository>();
+
+        services.AddScoped<ICourseGroupMessageReadRepository,
+            CourseGroupMessageReadRepository>();
+
+        services.AddScoped<INotificationRepository,
+            NotificationRepository>();
+
+        services.AddScoped<
+            ATLASDomain.Services.ICourseAccessService,
+            ATLAsDCL.Services.CourseAccessService>();
+
+        services.AddScoped<IUnitOfWork,
+            ATLAsDCL.UnitOfWork.UnitOfWork>();
+
+        return services;
+    }
 }

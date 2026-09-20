@@ -1,3 +1,4 @@
+C:\vs-communtiy2026\ATLAS\ATLAsBLL\bin\Debug\net8.0\QuestPDF.Fonts.Lato.br
 C:\vs-communtiy2026\ATLAS\ATLAsBLL\bin\Debug\net8.0\ATLAsBLL.deps.json
 C:\vs-communtiy2026\ATLAS\ATLAsBLL\bin\Debug\net8.0\ATLAsBLL.dll
 C:\vs-communtiy2026\ATLAS\ATLAsBLL\bin\Debug\net8.0\ATLAsBLL.pdb
@@ -16,4 +17,3 @@ C:\vs-communtiy2026\ATLAS\ATLAsBLL\obj\Debug\net8.0\ATLAsBLL.dll
 C:\vs-communtiy2026\ATLAS\ATLAsBLL\obj\Debug\net8.0\refint\ATLAsBLL.dll
 C:\vs-communtiy2026\ATLAS\ATLAsBLL\obj\Debug\net8.0\ATLAsBLL.pdb
 C:\vs-communtiy2026\ATLAS\ATLAsBLL\obj\Debug\net8.0\ref\ATLAsBLL.dll
-C:\vs-communtiy2026\ATLAS\ATLAsBLL\bin\Debug\net8.0\QuestPDF.Fonts.Lato.br

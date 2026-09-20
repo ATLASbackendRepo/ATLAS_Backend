@@ -18,6 +18,14 @@ namespace ATLASDCL.Configuration
                 .HasColumnType("decimal(5,2)")
                 .IsRequired();
 
+
+            builder.ToTable("AssessmentModules", table =>
+            {
+                table.HasCheckConstraint(
+                    "CK_AssessmentModules_MaxDegree_Range",
+                    "[MaxDegree] >= 1 AND [MaxDegree] <= 40");
+            });
+
             builder.HasOne(am => am.CourseOffering)
           .WithMany(co => co.AssessmentModules)
           .HasForeignKey(am => am.CourseOfferingID)

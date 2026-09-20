@@ -26,9 +26,14 @@ namespace ATLAsDCL.Configuration
             builder.HasOne(cg => cg.Enrollment)
                 .WithMany()
                 .HasForeignKey(cg => cg.EnrollmentID)
-                .OnDelete(DeleteBehavior.Restrict); 
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.ToTable("CourseGrades", table =>
+            {
+                table.HasCheckConstraint(
+                    "CK_CourseGrades_StudentDegree_NonNegative",
+                    "[StudentDegree] >= 0");
+            });
 
-          
             builder.HasOne(cg => cg.AssessmentModule)
                 .WithMany(am => am.CourseGrades)
                 .HasForeignKey(cg => cg.ModuleID)

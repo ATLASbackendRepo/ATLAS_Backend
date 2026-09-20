@@ -1,8 +1,10 @@
 ﻿using ATLAsBLL.Behaviors;
 using ATLAsBLL.Behaviors.Caching;
 using ATLAsBLL.Behaviour;
+using ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade;
 using ATLAsBLL.Services;
 using ATLASDomain.InterFaces;
+using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -15,14 +17,18 @@ namespace ATLAsBLL // أو اسم الـ Namespace الحقيقي عندك
         {
             var assembly = Assembly.GetExecutingAssembly();
 
-            // إضافة دعم الـ Memory Cache المطلوب للـ Caching Behavior
+          
             services.AddMemoryCache();
-
+            services.AddValidatorsFromAssembly(
+                 assembly,
+                 includeInternalTypes: true);
+            services.AddValidatorsFromAssemblyContaining<
+                 AssignCourseGradeCommandValidator>();
             services.AddMediatR(cfg =>
             {
                 cfg.RegisterServicesFromAssembly(assembly);
 
-                // الترتيب الأبدي والأكثر كفاءة للـ Pipeline لـ Enterprise Applications:
+                
                 cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(LoggingBehavior<,>));
                 cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(UnhandledExceptionBehavior<,>));
                 cfg.AddBehavior(typeof(IPipelineBehavior<,>), typeof(CachingBehavior<,>)); // الكاش يفرمل قبل الـ Validation والـ DB

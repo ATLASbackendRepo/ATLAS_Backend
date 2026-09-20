@@ -24,7 +24,7 @@ namespace ATLAS.Controllers.Authtenication
 {
     [ApiController]
     [Route("api/Auth")]
-    [AllowAnonymous]
+ 
     public class AuthController : ControllerBase
     {
         private readonly IMediator _mediator;
@@ -52,6 +52,7 @@ namespace ATLAS.Controllers.Authtenication
 
         [HttpPost("Login")]
         [EnableRateLimiting("AuthLimiter")]
+        [AllowAnonymous]
         public async Task<IActionResult> Login([FromBody]  LoginDTO request)
         {
             if (request is null ||
@@ -142,6 +143,7 @@ namespace ATLAS.Controllers.Authtenication
 
 
         [HttpPost("refresh")]
+   
         [EnableRateLimiting("AuthLimiter")]
         public async Task<IActionResult> Refresh([FromBody] ATLASDomain.DTO.Login.RefreshRequest request)
         {
@@ -251,6 +253,7 @@ namespace ATLAS.Controllers.Authtenication
 
 
         [HttpPost("ChangePassword")]
+        [Authorize]
         [EnableRateLimiting("AuthLimiter")]
         public async Task<IActionResult> ChangePassword([FromBody] ChangePassword model)
         {
@@ -265,11 +268,13 @@ namespace ATLAS.Controllers.Authtenication
                 return BadRequest(new { message = "New password must be different from the old password." });
             }
 
+            var AcademicId = GetCurrentACdimicId();
+
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = !string.IsNullOrEmpty(userId) && int.TryParse(userId, out var parsedUserId)
                 ? await _mediator.Send(new GetUserByIdQuery(parsedUserId))
-                : !string.IsNullOrWhiteSpace(model.AcademicId)
-                    ? await _mediator.Send(new GetUserByAcademicIdQuery(model.AcademicId))
+                : !string.IsNullOrWhiteSpace(AcademicId)
+                    ? await _mediator.Send(new GetUserByAcademicIdQuery(AcademicId))
                     : null;
             if (user == null)
             {
@@ -300,6 +305,17 @@ namespace ATLAS.Controllers.Authtenication
             return Ok(new { message = "Password changed successfully." });
         }
 
+        private string GetCurrentACdimicId()
+        {
+            var userIdClaim = User.FindFirst("AcademicId");
+
+            if (userIdClaim == null || string.IsNullOrEmpty(userIdClaim.Value))
+            {
+                throw new UnauthorizedAccessException("User ID not found in token.");
+            }
+
+            return userIdClaim.Value;
+        }
 
 
 
@@ -314,66 +330,6 @@ namespace ATLAS.Controllers.Authtenication
 
 
 
-        //[HttpPost("StaffLogin")]
-        //[ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //public async Task<IActionResult> StaffLogin([FromBody] StaffLoginDTO request)
-        //{
-        //    if (request is null ||
-        //       request.StaffID <= 0 ||
-        //        string.IsNullOrWhiteSpace(request.Password))
-        //    {
-        //        return BadRequest("Staff ID and password are required.");
-        //    }
-
-        //    var staff = await _mediator.Send(new GetUserByIdQuery(request.StaffID));
-
-
-
-        //    if (staff == null || !staff.IsActive || staff.Role is enUserRole.Student)
-        //        return Unauthorized("Invalid credentials");
-
-
-        //    bool isValidPassword =
-        //        BCrypt.Net.BCrypt.Verify(request.Password, staff.Password);
-
-
-
-        //    if (!isValidPassword)
-        //        return Unauthorized("Invalid credentials");
-
-
-        //    var claims = new[]
-        //             {
-        //                new Claim(ClaimTypes.NameIdentifier, staff.UserId.ToString()),
-        //                new Claim(ClaimTypes.Name, staff.FullName),
-        //                new Claim(ClaimTypes.Role, staff.Role.ToString()),
-        //                new Claim("StaffId", staff.UserId.ToString())
-        //            };
-
-
-        //    var key1 = new SymmetricSecurityKey(
-        //        Encoding.UTF8.GetBytes(_jwtOptions.Key));
-
-        //    var creds1 = new SigningCredentials(
-        //        key1,
-        //        SecurityAlgorithms.HmacSha256);
-
-        //    var token = new JwtSecurityToken(
-        //        issuer: _jwtOptions.Issuer,
-        //        audience: _jwtOptions.Audience,
-        //        claims: claims,
-        //        expires: DateTime.UtcNow.AddMinutes(
-        //            _jwtOptions.ExpiryMinutes),
-        //        signingCredentials: creds1
-        //    );
-
-        //    return Ok(new
-        //    {
-        //        token = new JwtSecurityTokenHandler().WriteToken(token)
-        //    });
-        //}
 
 
 

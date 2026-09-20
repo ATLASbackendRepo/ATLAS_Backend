@@ -29,7 +29,7 @@ namespace ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade
             if (enrollment.CourseOfferingID != module.CourseOfferingID)
                 throw new InvalidOperationException("The assessment module does not belong to the enrollment's course offering.");
 
-            if (request.StudentDegree > module.MaxDegree)
+            if (request.StudentDegree < 0 || request.StudentDegree > module.MaxDegree)
                 throw new InvalidOperationException("Student degree cannot exceed the assessment module's maximum degree.");
 
             var grade = await _unitOfWork.CourseGrades.GetGradeByEnrollmentAndModuleAsync(request.EnrollmentId, request.ModuleId);

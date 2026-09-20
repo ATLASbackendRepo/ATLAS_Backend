@@ -2,7 +2,7 @@
 {
     public  class ChangePassword
     {
-        public string? AcademicId { get; set; }
+        
         public string OldPassword { get; set; }
         public string NewPassword { get; set; }
 

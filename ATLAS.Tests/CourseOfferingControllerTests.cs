@@ -10,16 +10,19 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using ATLAsBLL.Services.CourseGrade.Queries;
 using System.Threading;
+using Microsoft.Extensions.Logging;
 
 namespace ATLAS.Tests
 {
     public class CourseOfferingControllerTests
     {
+        private readonly ILogger<CourseOffringController> _logger;
+
         private CourseOffringController CreateControllerWithStudent(
           Mock<IMediator> mediatorMock,
           int studentId)
         {
-            var controller = new CourseOffringController(mediatorMock.Object);
+            var controller = new CourseOffringController(mediatorMock.Object, _logger);
 
             var user = new ClaimsPrincipal(
                 new ClaimsIdentity(
@@ -44,7 +47,7 @@ namespace ATLAS.Tests
         {
             var mediatorMock = new Mock<IMediator>();
 
-            var controller = new CourseOffringController(mediatorMock.Object);
+            var controller = new CourseOffringController(mediatorMock.Object, _logger);
 
             controller.ControllerContext = new ControllerContext
             {

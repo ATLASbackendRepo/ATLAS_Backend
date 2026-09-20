@@ -1,6 +1,8 @@
 .vs/
+bin/
+obj/
 **/bin/
 **/obj/
-Uploads/
-sql-backups/*.bak
-/.env
+
+.env
+*.env

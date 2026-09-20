@@ -13,6 +13,7 @@ namespace ATLAsBLL.Services.Notifications
     public class CreateNotificationsOnMessageSent : INotificationHandler<CourseGroupMessageSentEvent>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private const int BodyPreviewLength = 500;
 
         public CreateNotificationsOnMessageSent(IUnitOfWork unitOfWork)
         {
@@ -21,7 +22,15 @@ namespace ATLAsBLL.Services.Notifications
 
         public async Task Handle(CourseGroupMessageSentEvent notification, CancellationToken cancellationToken)
         {
-      var studentUserIds = await _unitOfWork.Enrollments
+            var preview = notification.Content.Length <= BodyPreviewLength
+        ? notification.Content
+        : notification.Content[
+            ..(BodyPreviewLength - 1)] + "…";
+
+
+
+
+            var studentUserIds = await _unitOfWork.Enrollments
                              .GetStudentUserIdsByCourseOfferingAsync(notification.CourseOfferingId);
             var offering = (await _unitOfWork.CourseOfferings
                           .GetCourseOFferingByID( notification.CourseOfferingId));
@@ -33,6 +42,11 @@ namespace ATLAsBLL.Services.Notifications
             }
             var title = offering.Course.C_Name;
 
+
+
+
+
+
             var notifications = new List<Notification>();
             foreach (var uid in studentUserIds)
             {
@@ -43,7 +57,7 @@ namespace ATLAsBLL.Services.Notifications
                     RecipientUserID = (int) uid,
                     Type = "CourseGroupMessage",
                     Title = title,
-                    Body = notification.Content,
+                    Body = preview,
                     RelatedMessageID = notification.MessageId,
                     IsRead = false
                 });

@@ -745,9 +745,9 @@ builder.Services.AddHealthChecks();
 builder.Services.AddSingleton<IAuthorizationMiddlewareResultHandler, SecurityAuditAuthorizationHandler>();
 
 
-builder.Services.AddDbContextFactory<AtLASDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
-    , ServiceLifetime.Scoped);
+//builder.Services.AddDbContextFactory<AtLASDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
+//    , ServiceLifetime.Scoped);
 
 // ======================================================
 // Discord & Email Alerts

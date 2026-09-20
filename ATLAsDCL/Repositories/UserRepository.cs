@@ -25,7 +25,6 @@ public class UserRepository
     public async Task<User?> GetUserByAcademicIDAsync(string academicID)
     {
         return await _context.Users
-            .AsNoTracking()
             .FirstOrDefaultAsync(u=> u.AcademicId  == academicID);
     }
 
