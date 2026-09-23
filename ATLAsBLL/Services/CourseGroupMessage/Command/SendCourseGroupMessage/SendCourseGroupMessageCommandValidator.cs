@@ -3,6 +3,9 @@ using ATLAsBLL.Services.CourseGroupMessage.Command.SendCourseGroupMessage;
 
 namespace ATLAsBLL.Services.CourseGroupMessage.Command.SendCourseGroupMessage;
 
+/// <summary>
+/// Send Course Group Message Command Validator.
+/// </summary>
 public class SendCourseGroupMessageCommandValidator : AbstractValidator<SendCourseGroupMessageCommand>
 {
     public SendCourseGroupMessageCommandValidator()

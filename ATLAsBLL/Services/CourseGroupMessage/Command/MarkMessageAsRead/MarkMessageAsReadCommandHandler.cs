@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.CourseGroupMessage.Command.MarkMessageAsRead;
 
+/// <summary>
+/// Mark Message As Read Command Handler.
+/// </summary>
 public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsReadCommand, int>
 {
+    /// <summary>
+    /// _unit Of Work.
+    /// </summary>
     private readonly IUnitOfWork _unitOfWork;
 
     public MarkMessageAsReadCommandHandler(IUnitOfWork unitOfWork)
@@ -16,6 +22,9 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
         _unitOfWork = unitOfWork;
     }
 
+    /// <summary>
+    /// Handle.
+    /// </summary>
     public async Task<int> Handle(MarkMessageAsReadCommand request, CancellationToken cancellationToken)
     {
         var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId);

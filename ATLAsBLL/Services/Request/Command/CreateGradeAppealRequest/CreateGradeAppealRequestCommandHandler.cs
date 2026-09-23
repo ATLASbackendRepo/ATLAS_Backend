@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Exceptions;
+using ATLAsBLL.Exceptions;
 using ATLAsDCL.UnitOfWork;
 using ATLASDomain.Entities;
 using MediatR;
@@ -10,9 +10,15 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
 {
+    /// <summary>
+    /// Create Grade Appeal Request Command Handler.
+    /// </summary>
     public class CreateGradeAppealRequestCommandHandler
         : IRequestHandler<CreateGradeAppealRequestCommand, int>
     {
+        /// <summary>
+        /// _Unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _UnitOfWork;
 
         public CreateGradeAppealRequestCommandHandler(
@@ -21,6 +27,9 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
             _UnitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<int> Handle(
             CreateGradeAppealRequestCommand command,
             CancellationToken cancellationToken)

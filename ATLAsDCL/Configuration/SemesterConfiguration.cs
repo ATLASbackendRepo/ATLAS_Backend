@@ -1,11 +1,17 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ATLAsDCL.Configuration
 {
+    /// <summary>
+    /// Semester Configuration.
+    /// </summary>
     internal class SemesterConfiguration : IEntityTypeConfiguration<Semester>
     {
+        /// <summary>
+        /// Configure.
+        /// </summary>
         public void Configure(EntityTypeBuilder<Semester> builder)
         {
             builder.ToTable("Semesters");

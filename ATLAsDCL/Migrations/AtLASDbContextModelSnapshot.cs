@@ -238,7 +238,10 @@ namespace ATLAsDCL.Migrations
 
                     b.HasIndex("CourseOfferingID");
 
-                    b.ToTable("AssessmentModules");
+                    b.ToTable("AssessmentModules", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AssessmentModules_MaxDegree_Range", "[MaxDegree] >= 1 AND [MaxDegree] <= 40");
+                        });
                 });
 
             modelBuilder.Entity("ATLASDomain.Entities.AttendanceRecord", b =>
@@ -369,7 +372,10 @@ namespace ATLAsDCL.Migrations
                         .IsUnique()
                         .HasDatabaseName("UX_CourseGrades_EnrollmentID_ModuleID");
 
-                    b.ToTable("CourseGrades", (string)null);
+                    b.ToTable("CourseGrades", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_CourseGrades_StudentDegree_NonNegative", "[StudentDegree] >= 0");
+                        });
                 });
 
             modelBuilder.Entity("ATLASDomain.Entities.CourseOffering", b =>
@@ -412,9 +418,10 @@ namespace ATLAsDCL.Migrations
 
                     b.HasKey("CourseOfferingDoctorID");
 
-                    b.HasIndex("CourseOfferingID");
-
                     b.HasIndex("DoctorID");
+
+                    b.HasIndex("CourseOfferingID", "DoctorID")
+                        .IsUnique();
 
                     b.ToTable("CourseOfferingDoctors");
                 });
@@ -435,9 +442,10 @@ namespace ATLAsDCL.Migrations
 
                     b.HasKey("CourseOfferingTAID");
 
-                    b.HasIndex("CourseOfferingID");
-
                     b.HasIndex("TeacherAssistID");
+
+                    b.HasIndex("CourseOfferingID", "TeacherAssistID")
+                        .IsUnique();
 
                     b.ToTable("CourseOfferingTAs");
                 });
@@ -695,9 +703,11 @@ namespace ATLAsDCL.Migrations
 
                     b.Property<string>("StudentCode")
                         .IsRequired()
+                        .ValueGeneratedOnAdd()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)")
-                        .HasColumnName("StudentCode");
+                        .HasColumnName("StudentCode")
+                        .HasDefaultValueSql("('S' + RIGHT('00000000' + CAST(NEXT VALUE FOR dbo.Seq_StudentCode AS nvarchar(10)), 8))");
 
                     b.Property<int?>("UserId")
                         .IsRequired()
@@ -757,10 +767,18 @@ namespace ATLAsDCL.Migrations
                         .HasColumnType("bit")
                         .HasDefaultValue(true);
 
+                    b.Property<bool>("MustChangePassword")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasMaxLength(255)
                         .HasColumnType("nvarchar(255)");
+
+                    b.Property<string>("PreviousRefreshTokenHash")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime?>("RefreshTokenExpiresAt")
                         .HasColumnType("datetime2");
@@ -784,7 +802,7 @@ namespace ATLAsDCL.Migrations
 
                     b.ToTable("Users", t =>
                         {
-                            t.HasCheckConstraint("CK__Users__Role", "[Role] IN ('Student', 'Admin', 'SuperAdmin', 'Doctor', 'TeachingAssistant')");
+                            t.HasCheckConstraint("CK__Users__Role", "[Role] IN ('Student', 'Admin', 'SAdmin', 'Doctor', 'TeachingAssistant')");
                         });
                 });
 
@@ -1250,14 +1268,14 @@ namespace ATLAsDCL.Migrations
                     b.HasOne("ATLASDomain.Entities.Department", "Department")
                         .WithMany("Users")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_Users_Departments");
 
                     b.HasOne("ATLASDomain.Entities.Institution", "Institution")
                         .WithMany("Users")
                         .HasForeignKey("InstitutionID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_User_Insutition");
 

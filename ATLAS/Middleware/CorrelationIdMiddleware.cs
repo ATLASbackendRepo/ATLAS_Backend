@@ -1,11 +1,20 @@
-﻿using System.Diagnostics;
+using System.Diagnostics;
 
 namespace ATLAs.API.Middleware
 {
+    /// <summary>
+    /// Correlation Id Middleware.
+    /// </summary>
     public class CorrelationIdMiddleware
     {
+        /// <summary>
+        /// Header Name.
+        /// </summary>
         private const string HeaderName = "X-Correlation-ID";
 
+        /// <summary>
+        /// _next.
+        /// </summary>
         private readonly RequestDelegate _next;
 
         public CorrelationIdMiddleware(RequestDelegate next)
@@ -13,6 +22,9 @@ namespace ATLAs.API.Middleware
             _next = next;
         }
 
+        /// <summary>
+        /// Invoke Async.
+        /// </summary>
         public async Task InvokeAsync(HttpContext context)
         {
             var correlationId =

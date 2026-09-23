@@ -4,12 +4,21 @@ using MediatR;
 
 namespace ATLAsBLL.Services.CourseGroupMessage.Queries.GetCourseGroupMessages;
 
+/// <summary>
+/// Get Course Group Messages Query Handler.
+/// </summary>
 public class GetCourseGroupMessagesQueryHandler
     : IRequestHandler<
         GetCourseGroupMessagesQuery,
         List<CourseGroupMessageDto>>
 {
+    /// <summary>
+    /// _unit Of Work.
+    /// </summary>
     private readonly IUnitOfWork _unitOfWork;
+    /// <summary>
+    /// _course Access Service.
+    /// </summary>
     private readonly ATLASDomain.Services.ICourseAccessService _courseAccessService;
 
     public GetCourseGroupMessagesQueryHandler(
@@ -20,6 +29,9 @@ public class GetCourseGroupMessagesQueryHandler
         _courseAccessService = courseAccessService;
     }
 
+    /// <summary>
+    /// Handle.
+    /// </summary>
     public async Task<List<CourseGroupMessageDto>> Handle(
         GetCourseGroupMessagesQuery request,
         CancellationToken cancellationToken)

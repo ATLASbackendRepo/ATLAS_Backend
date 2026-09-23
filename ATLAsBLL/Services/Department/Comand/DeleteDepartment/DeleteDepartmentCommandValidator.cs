@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Features.Department.Comand.DeleteDepartment
 {
+    /// <summary>
+    /// Delete Department Command Validator.
+    /// </summary>
     public class DeleteDepartmentCommandValidator : AbstractValidator<DeleteDepartmentCommand>
     {
         public DeleteDepartmentCommandValidator()

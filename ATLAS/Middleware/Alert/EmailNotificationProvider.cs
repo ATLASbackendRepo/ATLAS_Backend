@@ -1,4 +1,4 @@
-﻿    using ATLASDomain.Entities;
+    using ATLASDomain.Entities;
     using ATLASDomain.InterFaces;
     using Microsoft.Extensions.Options;
     using System.Net;
@@ -6,11 +6,23 @@
 namespace ATLAS.Middleware.Alert
 {
 
+    /// <summary>
+    /// Email Notification Provider.
+    /// </summary>
     public class EmailNotificationProvider : INotificationProvider
     {
+        /// <summary>
+        /// _options.
+        /// </summary>
         private readonly EmailOptions _options;
+        /// <summary>
+        /// _logger.
+        /// </summary>
         private readonly ILogger<EmailNotificationProvider> _logger;
 
+        /// <summary>
+        /// Name.
+        /// </summary>
         public string Name => "Email";
 
         public EmailNotificationProvider(IOptions<EmailOptions> options, ILogger<EmailNotificationProvider> logger)
@@ -19,6 +31,9 @@ namespace ATLAS.Middleware.Alert
             _logger = logger;
         }
 
+        /// <summary>
+        /// Send Async.
+        /// </summary>
         public async Task SendAsync(SecurityEvent securityEvent, CancellationToken cancellationToken)
         {
             if (string.IsNullOrWhiteSpace(_options.RecipientEmail))

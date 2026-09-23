@@ -1,9 +1,12 @@
-﻿using ATLASDomain.DTO.Staff;
+using ATLASDomain.DTO.Staff;
 using ATLASDomain.Entities;
 using ATLASDomain.InterFaces.Repositories;
 
 namespace ATLASDomain.Interfaces.Repositories;
 
+/// <summary>
+/// IUser Repository.
+/// </summary>
 public interface IUserRepository : IGenericRepository<User>
 {
     Task<User?> GetByUserNameAsync(string userName);

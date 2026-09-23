@@ -1,6 +1,9 @@
-﻿using ATLASDomain.DTO.Request;
+using ATLASDomain.DTO.Request;
 using ATLASDomain.Entities;
 
+/// <summary>
+/// IGrade Appeal Request Repository.
+/// </summary>
 public interface IGradeAppealRequestRepository
 {
     Task<GradeAppealRequestDto?> GetByIdAsync(int requestId);

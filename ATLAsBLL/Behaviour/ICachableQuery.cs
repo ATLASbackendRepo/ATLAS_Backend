@@ -1,5 +1,8 @@
-﻿namespace ATLAsBLL.Behaviors.Caching
+namespace ATLAsBLL.Behaviors.Caching
 {
+    /// <summary>
+    /// ICachable Query.
+    /// </summary>
     public interface ICachableQuery
     {
         string CacheKey { get; }

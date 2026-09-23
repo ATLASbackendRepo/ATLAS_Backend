@@ -9,8 +9,14 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.Notifications.Queries.GetMyNotifications;
 
+/// <summary>
+/// Get My Notifications Query Handler.
+/// </summary>
 public class GetMyNotificationsQueryHandler : IRequestHandler<GetMyNotificationsQuery, List<NotificationDto>>
 {
+    /// <summary>
+    /// _unit Of Work.
+    /// </summary>
     private readonly IUnitOfWork _unitOfWork;
 
     public GetMyNotificationsQueryHandler(IUnitOfWork unitOfWork)
@@ -18,6 +24,9 @@ public class GetMyNotificationsQueryHandler : IRequestHandler<GetMyNotifications
         _unitOfWork = unitOfWork;
     }
 
+    /// <summary>
+    /// Handle.
+    /// </summary>
     public async Task<List<NotificationDto>> Handle(GetMyNotificationsQuery request, CancellationToken cancellationToken)
     {
         IEnumerable<ATLAS.Domain.Entities.Notification> notifications;

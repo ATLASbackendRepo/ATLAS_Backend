@@ -1,4 +1,4 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using System.Reflection.Emit;
@@ -6,8 +6,14 @@ using System.Reflection.Emit;
 
 namespace ATLAsDCL.Configuration
 {
+    /// <summary>
+    /// Enrollment Configuration.
+    /// </summary>
     internal class EnrollmentConfiguration : IEntityTypeConfiguration<Enrollment>
     {
+        /// <summary>
+        /// Configure.
+        /// </summary>
         public void Configure(EntityTypeBuilder<Enrollment> builder)
         {
             builder.HasKey(e => e.EnrollmentID);

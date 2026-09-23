@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Features.Users.Commands.UpdateUser
 {
+    /// <summary>
+    /// Update User Command Validator.
+    /// </summary>
     public class UpdateUserCommandValidator : AbstractValidator<UpdateUserCommand>
     {
         public UpdateUserCommandValidator()

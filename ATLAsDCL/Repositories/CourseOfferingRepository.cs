@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.DTO.Analysis;
 using ATLASDomain.DTO.CourseOffring;
 using ATLASDomain.Entities;
@@ -8,6 +8,9 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage;
 using System.Data;
 
+/// <summary>
+/// Course Offering Repository.
+/// </summary>
 public class CourseOfferingRepository
     : GenericRepository<CourseOffering>, ICourseOfferingRepository
 {
@@ -16,6 +19,9 @@ public class CourseOfferingRepository
     {
     }
 
+    /// <summary>
+    /// Get Details Async.
+    /// </summary>
     private async Task<CourseOffering?> GetDetailsAsync(int id)
     {
         return await _context.CourseOfferings
@@ -32,6 +38,9 @@ public class CourseOfferingRepository
 
 
 
+    /// <summary>
+    /// Get Course OFfering By ID.
+    /// </summary>
     public async Task<CourseOffering?> GetCourseOFferingByID(int id)
     {
         return await _context.CourseOfferings
@@ -40,12 +49,18 @@ public class CourseOfferingRepository
             .FirstOrDefaultAsync(c => c.CourseOfferingID == id);
     }
 
+    /// <summary>
+    /// Get Offering Details Async.
+    /// </summary>
     public async Task<CourseOffering?> GetOfferingDetailsAsync(int offeringId)
     {
 
         return await GetDetailsAsync(offeringId);
     }
 
+    /// <summary>
+    /// Get By Semester Async.
+    /// </summary>
     public async Task<IEnumerable<CourseOffering>> GetBySemesterAsync(int semesterId)
     {
         return await _context.CourseOfferings
@@ -54,6 +69,9 @@ public class CourseOfferingRepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Get By Course Async.
+    /// </summary>
     public async Task<IEnumerable<CourseOffering>> GetByCourseAsync(int courseId)
     {
         return await _context.CourseOfferings
@@ -63,6 +81,9 @@ public class CourseOfferingRepository
     }
 
 
+    /// <summary>
+    /// Get My Course Async.
+    /// </summary>
     public async Task<IEnumerable<CourseOfferingDTO>> GetMyCourseAsync(int userId)
     {
         return await _context.CourseOfferings
@@ -88,6 +109,9 @@ public class CourseOfferingRepository
             })
             .ToListAsync();
     }
+    /// <summary>
+    /// Get Details Course Async.
+    /// </summary>
     public async Task<IEnumerable< CourseofferingDetailsDTO>> GetDetailsCourseAsync(
         int courseOfferingId)
     {
@@ -105,6 +129,9 @@ public class CourseOfferingRepository
             })
             .ToListAsync();
     }
+    /// <summary>
+    /// Get Staff My Course Async.
+    /// </summary>
     public async Task<IEnumerable<DoctorCourseOfferingDTO>> GetStaffMyCourseAsync(int staffId)
     {
         return await _context.CourseOfferings
@@ -124,6 +151,9 @@ public class CourseOfferingRepository
 
 
 
+    /// <summary>
+    /// Get My Course Details Async.
+    /// </summary>
     public  async Task<IEnumerable<CourseofferingDetailsDTO>> GetMyCourseDetailsAsync(int courseofferingId, int userId)
     {
         var StudentID = await _context.Students
@@ -158,6 +188,9 @@ public class CourseOfferingRepository
 
 
 
+    /// <summary>
+    /// Get Course Analysis Async.
+    /// </summary>
     public async Task<CourseAnalysisResponseDto> GetCourseAnalysisAsync(int courseOfferingId)
     {
         

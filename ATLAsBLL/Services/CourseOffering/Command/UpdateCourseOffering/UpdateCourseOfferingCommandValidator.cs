@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Features.CourseOfferings.Commands.UpdateCourseOffering
 {
+    /// <summary>
+    /// Update Course Offering Command Validator.
+    /// </summary>
     public class UpdateCourseOfferingCommandValidator : AbstractValidator<UpdateCourseOfferingCommand>
     {
         public UpdateCourseOfferingCommandValidator()

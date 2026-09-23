@@ -1,11 +1,17 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ATLASDCL.Configuration
 {
+    /// <summary>
+    /// Assessment Module Configuration.
+    /// </summary>
     public class AssessmentModuleConfiguration : IEntityTypeConfiguration<AssessmentModule>
     {
+        /// <summary>
+        /// Configure.
+        /// </summary>
         public void Configure(EntityTypeBuilder<AssessmentModule> builder)
         {
             builder.HasKey(am => am.ModuleID);

@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.Entities;
 using ATLASDomain.InterFaces;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +11,18 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services
 {
+    /// <summary>
+    /// Security Event Service.
+    /// </summary>
     public class SecurityEventService : ISecurityEventService
     {
+        /// <summary>
+        /// _context Factory.
+        /// </summary>
         private readonly IDbContextFactory<AtLASDbContext> _contextFactory;
+        /// <summary>
+        /// _logger.
+        /// </summary>
         private readonly ILogger<SecurityEventService> _logger;
 
         public SecurityEventService(IDbContextFactory<AtLASDbContext> contextFactory, ILogger<SecurityEventService> logger)
@@ -22,6 +31,9 @@ namespace ATLAsBLL.Services
             _logger = logger;
         }
 
+        /// <summary>
+        /// Log Async.
+        /// </summary>
         public async Task LogAsync(SecurityEventEntry entry, CancellationToken cancellationToken = default)
         {
             try
@@ -48,6 +60,9 @@ namespace ATLAsBLL.Services
                 _logger.LogError(ex, "Failed to write security event: {EventType}", entry.EventType);
             }
         }
+        /// <summary>
+        /// Count Recent Failed Logins Async.
+        /// </summary>
         public async Task<int> CountRecentFailedLoginsAsync(string academicId, TimeSpan window, CancellationToken cancellationToken = default)
         {
             await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);

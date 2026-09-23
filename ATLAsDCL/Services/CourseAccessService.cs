@@ -7,11 +7,20 @@ using System.Threading.Tasks;
 
 namespace ATLAsDCL.Services
 {
+    /// <summary>
+    /// Course Access Service.
+    /// </summary>
     public class CourseAccessService : ICourseAccessService
     {
+        /// <summary>
+        /// _context.
+        /// </summary>
         private readonly AtLASDbContext _context;
         public CourseAccessService(AtLASDbContext context) => _context = context;
 
+        /// <summary>
+        /// Can Send Async.
+        /// </summary>
         public async Task<bool> CanSendAsync(int userId, int courseOfferingId)
         {
             // Doctor?
@@ -25,6 +34,9 @@ namespace ATLAsDCL.Services
             return false;
         }
 
+        /// <summary>
+        /// Can Read Async.
+        /// </summary>
         public async Task<bool> CanReadAsync(int userId, int courseOfferingId)
         {
             // Doctor or TA

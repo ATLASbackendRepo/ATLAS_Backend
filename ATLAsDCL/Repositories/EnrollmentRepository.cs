@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLAsDCL.Repositories;
 using ATLASDomain.DTO.CourseGrade;
 using ATLASDomain.DTO.Enrollment;
@@ -8,6 +8,9 @@ using ATLASDomain.Views;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+/// <summary>
+/// Enrollment Repository.
+/// </summary>
 public class EnrollmentRepository
     : GenericRepository<Enrollment>, IEnrollmentRepository
 {
@@ -16,6 +19,9 @@ public class EnrollmentRepository
     {
     }
 
+    /// <summary>
+    /// Get Enrollment Details Async.
+    /// </summary>
     public async Task<Enrollment?> GetEnrollmentDetailsAsync(int id)
     {
         return await _context.Enrollments
@@ -24,6 +30,9 @@ public class EnrollmentRepository
             .Include(e => e.CourseOffering)
             .FirstOrDefaultAsync(e => e.EnrollmentID == id);
     }
+    /// <summary>
+    /// Get Enrollment Id Async.
+    /// </summary>
     public async Task<int?> GetEnrollmentIdAsync(string academicId, int courseOfferingId, CancellationToken cancellationToken = default)
     {
         return await _context.Enrollments
@@ -33,6 +42,47 @@ public class EnrollmentRepository
             .FirstOrDefaultAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Get Enrollment Ids By Academic Numbers Async.
+    /// Resolves many academic numbers with a single batched query so that
+    /// bulk imports do not perform one database round-trip per row.
+    /// </summary>
+    /// <param name="academicNumbers">academic Numbers.</param>
+    /// <param name="courseOfferingId">course Offering Id.</param>
+    /// <param name="cancellationToken">cancellation Token.</param>
+    public async Task<Dictionary<string, int>> GetEnrollmentIdsByAcademicNumbersAsync(
+        List<string> academicNumbers,
+        int courseOfferingId,
+        CancellationToken cancellationToken = default)
+    {
+        var result = new Dictionary<string, int>(
+            StringComparer.OrdinalIgnoreCase);
+
+        if (academicNumbers == null || academicNumbers.Count == 0)
+            return result;
+
+        var enrollments = await _context.Enrollments
+            .AsNoTracking()
+            .Include(e => e.Student)
+            .Where(e =>
+                e.CourseOfferingID == courseOfferingId &&
+                academicNumbers.Contains(e.Student!.AcademicId!))
+            .ToListAsync();
+
+        foreach (var enrollment in enrollments)
+        {
+            var academicId = enrollment.Student?.AcademicId;
+
+            if (academicId != null)
+                result[academicId] = enrollment.EnrollmentID;
+        }
+
+        return result;
+    }
+
+    /// <summary>
+    /// Is Student Enrolled Async.
+    /// </summary>
     public async Task<bool> IsStudentEnrolledAsync(int studentId, int courseOfferingId, DateTime semester)
     {
         return await _context.Enrollments
@@ -43,6 +93,9 @@ public class EnrollmentRepository
         e.CourseOffering.Semester.AcademicYear == semester.Date.Year.ToString());
     }
 
+    /// <summary>
+    /// Get Student Enrollments Async.
+    /// </summary>
     public async Task<IEnumerable<Enrollment>> GetStudentEnrollmentsAsync(int studentId)
     {
         return await _context.Enrollments
@@ -53,6 +106,9 @@ public class EnrollmentRepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Get Course Enrollments Async.
+    /// </summary>
     public async Task<IEnumerable<Enrollment>> GetCourseEnrollmentsAsync(int courseOfferingId)
     {
         return await _context.Enrollments
@@ -62,6 +118,9 @@ public class EnrollmentRepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Get Student Semester Rank Async.
+    /// </summary>
     public async Task<SemesterStudentRankingView?> GetStudentSemesterRankAsync(
       int studentId, int semesterId, CancellationToken cancellationToken)
     {
@@ -71,6 +130,9 @@ public class EnrollmentRepository
             .FirstOrDefaultAsync();
     }
 
+    /// <summary>
+    /// Get Top Ranked Students In Semester Async.
+    /// </summary>
     public async Task<List<SemesterStudentRankingView>> GetTopRankedStudentsInSemesterAsync(
         int semesterId,int AcademicLevel ,int topCount, CancellationToken cancellationToken)
     {
@@ -81,6 +143,9 @@ public class EnrollmentRepository
             .ToListAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Get Student User Ids By Course Offering Async.
+    /// </summary>
     public async Task<List<int?>> GetStudentUserIdsByCourseOfferingAsync(int courseOfferingId)
     {
         return await _context.Enrollments
@@ -94,6 +159,9 @@ public class EnrollmentRepository
 
 
 
+    /// <summary>
+    /// Bulk Enroll Students Fast Async.
+    /// </summary>
     public async Task<int> BulkEnrollStudentsFastAsync(BulkCreateEnrollmentDTO dto)
     {
         var semester = await _context.Semesters
@@ -157,6 +225,9 @@ public class EnrollmentRepository
 
         return rowsAffected; 
     }
+    /// <summary>
+    /// Add Single Student To Enrollment Async.
+    /// </summary>
     public async Task<bool> AddSingleStudentToEnrollmentAsync(string AcdimicID, BulkCreateEnrollmentDTO dto)
     {
 
@@ -208,6 +279,9 @@ public class EnrollmentRepository
         return true;
     }
 
+    /// <summary>
+    /// Delete Enrollment By Id Async.
+    /// </summary>
     public async Task<bool> DeleteEnrollmentByIdAsync(int enrollmentId)
     {
         var deletedRows = await _context.Enrollments
@@ -217,6 +291,9 @@ public class EnrollmentRepository
         return deletedRows > 0;
     }
 
+  /// <summary>
+  /// Get Enrollments Overview Async.
+  /// </summary>
   public async Task<PagedResultDto<CourseEnrollmentSummaryDto>> GetEnrollmentsOverviewAsync(
       string? searchKeyword = null,
       int? doctorId = null,

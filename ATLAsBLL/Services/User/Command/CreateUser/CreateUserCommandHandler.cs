@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Events;
+using ATLAsBLL.Events;
 using ATLAsDCL.UnitOfWork;
 using ATLASDomain.Entities;
 using MediatR;
@@ -8,10 +8,19 @@ using System.Security.Cryptography;
 
 namespace ATLAsBLL.Features.Users.Commands.CreateUser
 {
+    /// <summary>
+    /// Create User Command Handler.
+    /// </summary>
     public class CreateUserCommandHandler : IRequestHandler<CreateUserCommand, int>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
+        /// <summary>
+        /// _publisher.
+        /// </summary>
         private readonly IPublisher _publisher;
         public CreateUserCommandHandler(
            IUnitOfWork unitOfWork,
@@ -21,6 +30,9 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUser
             _publisher = publisher;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<int> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
             var user = new User

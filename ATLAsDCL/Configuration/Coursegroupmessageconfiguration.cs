@@ -1,11 +1,17 @@
-﻿using ATLAS.Domain.Entities;
+using ATLAS.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ATLAS.Infrastructure.Persistence.Configurations
 {
+    /// <summary>
+    /// Course Group Message Configuration.
+    /// </summary>
     public class CourseGroupMessageConfiguration : IEntityTypeConfiguration<CourseGroupMessage>
     {
+        /// <summary>
+        /// Configure.
+        /// </summary>
         public void Configure(EntityTypeBuilder<CourseGroupMessage> builder)
         {
             builder.ToTable("CourseGroupMessages");

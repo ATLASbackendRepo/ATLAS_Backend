@@ -1,12 +1,18 @@
-﻿using MediatR;
+using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Features.Users.Commands.UpdateUser
 {
+    /// <summary>
+    /// Update User Command Handler.
+    /// </summary>
     public class UpdateUserCommandHandler : IRequestHandler<UpdateUserCommand, bool>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public UpdateUserCommandHandler(IUnitOfWork unitOfWork)
@@ -14,6 +20,9 @@ namespace ATLAsBLL.Features.Users.Commands.UpdateUser
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<bool> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
             var user = await _unitOfWork.Users.GetUserByAcademicIDAsync(request.Update_StaffDto.AcademicId);

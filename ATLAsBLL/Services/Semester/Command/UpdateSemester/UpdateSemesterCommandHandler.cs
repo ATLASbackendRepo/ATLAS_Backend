@@ -1,12 +1,18 @@
-﻿using MediatR;
+using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Features.Semesters.Commands.UpdateSemester
 {
+    /// <summary>
+    /// Update Semester Command Handler.
+    /// </summary>
     public class UpdateSemesterCommandHandler : IRequestHandler<UpdateSemesterCommand, bool>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public UpdateSemesterCommandHandler(IUnitOfWork unitOfWork)
@@ -14,6 +20,9 @@ namespace ATLAsBLL.Features.Semesters.Commands.UpdateSemester
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<bool> Handle(UpdateSemesterCommand request, CancellationToken cancellationToken)
         {
             var semester = await _unitOfWork.Semesters.GetByIdAsync(request.SemesterID);

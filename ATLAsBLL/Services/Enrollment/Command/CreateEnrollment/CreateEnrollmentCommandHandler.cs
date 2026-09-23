@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
@@ -7,8 +7,14 @@ using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Features.Enrollments.Commands.CreateEnrollment
 {
+    /// <summary>
+    /// Create Enrollment Command Handler.
+    /// </summary>
     public class CreateEnrollmentCommandHandler : IRequestHandler<CreateEnrollmentCommand, bool>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public CreateEnrollmentCommandHandler(IUnitOfWork unitOfWork)
@@ -16,6 +22,9 @@ namespace ATLAsBLL.Features.Enrollments.Commands.CreateEnrollment
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<bool> Handle(CreateEnrollmentCommand request, CancellationToken cancellationToken)
         {
 

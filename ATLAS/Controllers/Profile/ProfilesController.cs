@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Services.profile.Staff.command;
+using ATLAsBLL.Services.profile.Staff.command;
 using ATLAsBLL.Services.profile.Staff.Query;
 using ATLAsBLL.Services.profile.Student.command;
 using ATLAsBLL.Services.profile.Student.Query;
@@ -14,8 +14,14 @@ namespace ATLAS.API.Controllers.Profile
 {
     [ApiController]
     [Route("api/[controller]")]
+    /// <summary>
+    /// Profiles Controller.
+    /// </summary>
     public class ProfilesController : ControllerBase
     {
+        /// <summary>
+        /// _mediator.
+        /// </summary>
         private readonly IMediator _mediator;
 
         public ProfilesController(IMediator mediator)
@@ -30,6 +36,9 @@ namespace ATLAS.API.Controllers.Profile
         [EnableRateLimiting("ProfileReadPolicy")]
 
 
+        /// <summary>
+        /// Get By User Id.
+        /// </summary>
         public async Task<ActionResult<StaffProfileResponseDto>> GetByUserId()
 
         {
@@ -52,6 +61,9 @@ namespace ATLAS.API.Controllers.Profile
             [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize(Roles = "Doctor,TeachingAssistant")]
         [EnableRateLimiting("ProfileUpdatePolicy")]
+        /// <summary>
+        /// Update Profile.
+        /// </summary>
         public async Task<IActionResult> UpdateProfile([FromBody] StaffProfileUpdateDTO dto)
             {
                 var userId = GetCurrentUserId();
@@ -72,6 +84,9 @@ namespace ATLAS.API.Controllers.Profile
         [Authorize(Roles = "Student")]
         [EnableRateLimiting("ProfileReadPolicy")]
 
+        /// <summary>
+        /// Get Student Profile By User Id.
+        /// </summary>
         public async Task<ActionResult<StaffProfileResponseDto>> GetStudentProfileByUserId()
 
         {
@@ -94,6 +109,9 @@ namespace ATLAS.API.Controllers.Profile
             [ProducesResponseType(StatusCodes.Status404NotFound)]
             [Authorize(Roles = "Student")]
            [EnableRateLimiting("ProfileUpdatePolicy")]
+        /// <summary>
+        /// Update Student Profile.
+        /// </summary>
         public async Task<IActionResult> UpdateStudentProfile([FromBody] StudentUpdateProfileInfoDTO dto)
             {
                 var userId = GetCurrentUserId();
@@ -112,6 +130,9 @@ namespace ATLAS.API.Controllers.Profile
 
 
 
+        /// <summary>
+        /// Get Current User Id.
+        /// </summary>
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);

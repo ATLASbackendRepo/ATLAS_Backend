@@ -1,12 +1,18 @@
-﻿using ATLAsDCL.UnitOfWork;
+using ATLAsDCL.UnitOfWork;
 using ATLASDomain.DTO.Request;
 using MediatR;
 namespace ATLAsBLL.Services.Request.Qeuries
 {
 
+    /// <summary>
+    /// Get Grade Appeal By Id Query Handler.
+    /// </summary>
     public class GetGradeAppealByIdQueryHandler
         : IRequestHandler<GetGradeAppealByIdQuery, GradeAppealRequestDto?>
     {
+        /// <summary>
+        /// _Unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _UnitOfWork;
 
         public GetGradeAppealByIdQueryHandler(
@@ -15,6 +21,9 @@ namespace ATLAsBLL.Services.Request.Qeuries
             _UnitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<GradeAppealRequestDto?> Handle(
             GetGradeAppealByIdQuery query,
             CancellationToken cancellationToken)

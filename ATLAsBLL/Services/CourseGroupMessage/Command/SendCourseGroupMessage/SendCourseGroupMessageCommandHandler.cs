@@ -9,10 +9,22 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.CourseGroupMessage.Command.SendCourseGroupMessage;
 
+/// <summary>
+/// Send Course Group Message Command Handler.
+/// </summary>
 public class SendCourseGroupMessageCommandHandler : IRequestHandler<SendCourseGroupMessageCommand, int>
 {
+    /// <summary>
+    /// _unit Of Work.
+    /// </summary>
     private readonly IUnitOfWork _unitOfWork;
+    /// <summary>
+    /// _course Access Service.
+    /// </summary>
     private readonly ICourseAccessService _courseAccessService;
+    /// <summary>
+    /// _publisher.
+    /// </summary>
     private readonly IPublisher _publisher;
 
     public SendCourseGroupMessageCommandHandler(IUnitOfWork unitOfWork, ICourseAccessService courseAccessService, IPublisher publisher)
@@ -22,6 +34,9 @@ public class SendCourseGroupMessageCommandHandler : IRequestHandler<SendCourseGr
         _publisher = publisher;
     }
 
+    /// <summary>
+    /// Handle.
+    /// </summary>
     public async Task<int> Handle(SendCourseGroupMessageCommand request, CancellationToken cancellationToken)
     {
         // Authorization: only Doctor/TA can send

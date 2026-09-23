@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLAsDCL.Repositories;
 using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
@@ -7,29 +7,89 @@ using Microsoft.EntityFrameworkCore.Storage;
 
 namespace ATLAsDCL.UnitOfWork;
 
+/// <summary>
+/// Unit Of Work.
+/// </summary>
 public sealed class UnitOfWork : IUnitOfWork
 {
+    /// <summary>
+    /// _context.
+    /// </summary>
     private readonly AtLASDbContext _context;
+    /// <summary>
+    /// _current Transaction.
+    /// </summary>
     private IDbContextTransaction? _currentTransaction;
 
+    /// <summary>
+    /// Assessment Modules.
+    /// </summary>
     public IAssessmentModuleRepository AssessmentModules { get; }
+    /// <summary>
+    /// Course Grades.
+    /// </summary>
     public ICourseGradeRepository CourseGrades { get; }
+    /// <summary>
+    /// Course Offering Doctors.
+    /// </summary>
     public ICourseOfferingDoctorRepository CourseOfferingDoctors { get; }
+    /// <summary>
+    /// Course Offerings.
+    /// </summary>
     public ICourseOfferingRepository CourseOfferings { get; }
+    /// <summary>
+    /// Course Offering TAs.
+    /// </summary>
     public ICourseOfferingTARepository CourseOfferingTAs { get; }
+    /// <summary>
+    /// Courses.
+    /// </summary>
     public ICourseRepository Courses { get; }
+    /// <summary>
+    /// Departments.
+    /// </summary>
     public IDepartmentRepository Departments { get; }
+    /// <summary>
+    /// Course Group Messages.
+    /// </summary>
     public ICourseGroupMessageRepository CourseGroupMessages { get; }
 
+    /// <summary>
+    /// Course Group Message Read.
+    /// </summary>
     public ICourseGroupMessageReadRepository CourseGroupMessageRead { get; }
+    /// <summary>
+    /// Notifications.
+    /// </summary>
     public INotificationRepository Notifications { get; }
+    /// <summary>
+    /// Enrollments.
+    /// </summary>
     public IEnrollmentRepository Enrollments { get; }
+    /// <summary>
+    /// Semesters.
+    /// </summary>
     public ISemesterRepository Semesters { get; }
+    /// <summary>
+    /// Students.
+    /// </summary>
     public IStudentRepository Students { get; }
+    /// <summary>
+    /// Staff Profile.
+    /// </summary>
     public IStaffProfileRepository StaffProfile { get; }
+    /// <summary>
+    /// Student Profile.
+    /// </summary>
     public IStudentProfileRepository StudentProfile { get; }
+    /// <summary>
+    /// Users.
+    /// </summary>
     public IUserRepository Users { get; }
 
+ /// <summary>
+ /// iinstitutions.
+ /// </summary>
  public IinstitutionRepository iinstitutions { get; }
 
     public UnitOfWork(
@@ -75,12 +135,18 @@ public sealed class UnitOfWork : IUnitOfWork
         iinstitutions = iinstitution;
     }
 
+    /// <summary>
+    /// Save Changes Async.
+    /// </summary>
     public async Task<int> SaveChangesAsync(
         CancellationToken cancellationToken = default)
     {
         return await _context.SaveChangesAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Begin Transaction Async.
+    /// </summary>
     public async Task BeginTransactionAsync(
         CancellationToken cancellationToken = default)
     {
@@ -91,6 +157,9 @@ public sealed class UnitOfWork : IUnitOfWork
             await _context.Database.BeginTransactionAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Commit Transaction Async.
+    /// </summary>
     public async Task CommitTransactionAsync(
         CancellationToken cancellationToken = default)
     {
@@ -116,6 +185,9 @@ public sealed class UnitOfWork : IUnitOfWork
         }
     }
 
+    /// <summary>
+    /// Rollback Transaction Async.
+    /// </summary>
     public async Task RollbackTransactionAsync(
         CancellationToken cancellationToken = default)
     {
@@ -136,13 +208,22 @@ public sealed class UnitOfWork : IUnitOfWork
         }
     }
 
+    /// <summary>
+    /// Dispose.
+    /// </summary>
     public void Dispose()
     {
         _currentTransaction?.Dispose();
         _context.Dispose();
     }
+    /// <summary>
+    /// staff Profile.
+    /// </summary>
     public IStaffProfileRepository staffProfile => StaffProfile;
 
+    /// <summary>
+    /// _course Group Messages Read.
+    /// </summary>
     private ICourseGroupMessageReadRepository? _courseGroupMessagesRead;
 
     public ICourseGroupMessageReadRepository CourseGroupMessagesRead
@@ -161,11 +242,17 @@ public sealed class UnitOfWork : IUnitOfWork
  
 
 
+    /// <summary>
+    /// Grade Appeal Request.
+    /// </summary>
     public IGradeAppealRequestRepository GradeAppealRequest { get; }
 
     public IGradeAppealRequestRepository GradeAppealRequests
         => GradeAppealRequest;
 
+    /// <summary>
+    /// _institution.
+    /// </summary>
     private IinstitutionRepository? _institution;
     public IinstitutionRepository Institutions
     {

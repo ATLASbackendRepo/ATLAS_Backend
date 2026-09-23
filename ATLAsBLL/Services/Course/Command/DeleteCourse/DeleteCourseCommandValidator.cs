@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Features.Courses.Commands.DeleteCourse
 {
+    /// <summary>
+    /// Delete Course Command Validator.
+    /// </summary>
     public class DeleteCourseCommandValidator : AbstractValidator<DeleteCourseCommand>
     {
         public DeleteCourseCommandValidator()

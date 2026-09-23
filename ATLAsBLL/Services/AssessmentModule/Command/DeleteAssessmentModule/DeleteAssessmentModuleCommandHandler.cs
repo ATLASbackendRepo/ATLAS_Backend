@@ -1,15 +1,24 @@
-﻿using MediatR;
+using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Features.AssessmentModules.Commands.DeleteAssessmentModule
 {
+    /// <summary>
+    /// Delete Assessment Module Command Handler.
+    /// </summary>
     public class DeleteAssessmentModuleCommandHandler : IRequestHandler<DeleteAssessmentModuleCommand, bool>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
         public DeleteAssessmentModuleCommandHandler(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<bool> Handle(DeleteAssessmentModuleCommand request, CancellationToken cancellationToken)
         {
             if(request.ModuleId <= 0) throw new System.ArgumentException("Invalid module ID.");

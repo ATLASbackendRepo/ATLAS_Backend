@@ -1,10 +1,16 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
+/// <summary>
+/// Grade Appeal Request Configuration.
+/// </summary>
 public class GradeAppealRequestConfiguration
     : IEntityTypeConfiguration<GradeAppealRequest>
 {
+    /// <summary>
+    /// Configure.
+    /// </summary>
     public void Configure(EntityTypeBuilder<GradeAppealRequest> builder)
     {
         builder.ToTable("GradeAppealRequests");

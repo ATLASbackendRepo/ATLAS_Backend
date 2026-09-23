@@ -1,11 +1,17 @@
-﻿using ATLAS.Domain.Entities;
+using ATLAS.Domain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ATLAS.Infrastructure.Persistence.Configurations
 {
+    /// <summary>
+    /// Notification Configuration.
+    /// </summary>
     public class NotificationConfiguration : IEntityTypeConfiguration<Notification>
     {
+        /// <summary>
+        /// Configure.
+        /// </summary>
         public void Configure(EntityTypeBuilder<Notification> builder)
         {
             builder.ToTable("Notifications");

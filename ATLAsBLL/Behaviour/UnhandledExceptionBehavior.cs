@@ -1,12 +1,18 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 
 namespace ATLAsBLL.Behaviors
 {
+    /// <summary>
+    /// Unhandled Exception Behavior.
+    /// </summary>
     public class UnhandledExceptionBehavior<TRequest, TResponse>
         : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
+        /// <summary>
+        /// _logger.
+        /// </summary>
         private readonly ILogger<UnhandledExceptionBehavior<TRequest, TResponse>> _logger;
 
         public UnhandledExceptionBehavior(
@@ -15,6 +21,9 @@ namespace ATLAsBLL.Behaviors
             _logger = logger;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<TResponse> Handle(
             TRequest request,
             RequestHandlerDelegate<TResponse> next,

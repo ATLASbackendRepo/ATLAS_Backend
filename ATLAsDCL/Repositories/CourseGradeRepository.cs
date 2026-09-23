@@ -1,9 +1,12 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.DTO.CourseGrade;
 using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
+/// <summary>
+/// Course Grade Repository.
+/// </summary>
 public class CourseGradeRepository
     : GenericRepository<CourseGrade>, ICourseGradeRepository
 {
@@ -12,6 +15,9 @@ public class CourseGradeRepository
     {
     }
 
+    /// <summary>
+    /// Get Grades By Enrollment Async.
+    /// </summary>
     public async Task<IEnumerable<CourseGrade>> GetGradesByEnrollmentAsync(int enrollmentId)
     {
         return await _context.CourseGrades
@@ -28,12 +34,18 @@ public class CourseGradeRepository
     }
 
 
+    /// <summary>
+    /// Get Grade By Enrollment And Module Async.
+    /// </summary>
     public async Task<CourseGrade?> GetGradeByEnrollmentAndModuleAsync(int enrollmentId, int moduleId)
     {
         return await _context.CourseGrades
             .FirstOrDefaultAsync(g => g.EnrollmentID == enrollmentId && g.ModuleID == moduleId);
     }
 
+    /// <summary>
+    /// Get Avg Grades By Module Enrollment Async.
+    /// </summary>
     public async Task<double> GetAvgGradesByModuleEnrollmentAsync(int moduleId, int enrollmentId)
     {
         return await _context.CourseGrades
@@ -45,6 +57,9 @@ public class CourseGradeRepository
 
 
 
+        /// <summary>
+        /// Get Course Students Paged Async.
+        /// </summary>
         public async Task<PagedResultDto<StudentCardDto>> GetCourseStudentsPagedAsync(GetStudentsPagedQueryModel param)
     {
         var pageNumber = Math.Max(1, param.PageNumber);
@@ -115,45 +130,86 @@ public class CourseGradeRepository
     public async Task<List<CourseGradesExportDto>>
     GetCourseGradesForExportAsync(int courseOfferingId)
     {
-        var students = await _context.Enrollments
+        // 1) Enrollments + student profile data via explicit projection.
+        var rows = await _context.Enrollments
             .AsNoTracking()
             .Where(e => e.CourseOfferingID == courseOfferingId)
             .OrderBy(e => e.Student!.User!.FullName)
             .Select(e => new CourseGradesExportDto
             {
                 StudentId = e.StudentID,
-
                 StudentName = e.Student!.User!.FullName ?? string.Empty,
-
                 StudentCode = e.Student!.StudentCode ?? string.Empty,
-
                 AcademicId = e.Student!.AcademicId ?? string.Empty,
-
-                EnrollmentId = e.EnrollmentID,
-
-                Grades = _context.AssessmentModules
-                    .Where(m => m.CourseOfferingID == courseOfferingId)
-                    .OrderBy(m => m.ModuleID)
-                    .Select(m => new EXportStudentModuleGradeDto
-                    {
-                        ModuleName = m.ModuleName,
-
-                        MaxDegree = (double)m.MaxDegree,
-
-                        StudentDegree = _context.CourseGrades
-                            .Where(g =>
-                                g.EnrollmentID == e.EnrollmentID &&
-                                g.ModuleID == m.ModuleID)
-                            .Select(g => (double?)g.StudentDegree)
-                            .FirstOrDefault()
-                    })
-                    .ToList()
+                EnrollmentId = e.EnrollmentID
             })
             .ToListAsync();
 
-        return students;
+        if (rows.Count == 0)
+            return rows;
+
+        // 2) Assessment modules once (header/ordering data).
+        var modules = await _context.AssessmentModules
+            .AsNoTracking()
+            .Where(m => m.CourseOfferingID == courseOfferingId)
+            .OrderBy(m => m.ModuleID)
+            .ToListAsync();
+
+        var enrollmentIds = rows.Select(x => x.EnrollmentId).ToList();
+        var moduleIds = modules.Select(m => m.ModuleID).ToList();
+
+        // 3) All grades for the offering in a single query.
+        var grades = await _context.CourseGrades
+            .AsNoTracking()
+            .Where(g =>
+                enrollmentIds.Contains(g.EnrollmentID) &&
+                moduleIds.Contains(g.ModuleID))
+            .ToListAsync();
+
+        var gradesByKey = grades.ToDictionary(
+            g => (g.EnrollmentID, g.ModuleID),
+            g => (double?)g.StudentDegree);
+
+        // 4) Compose the projection into the final DTOs in memory.
+        var result = new List<CourseGradesExportDto>(rows.Count);
+
+        foreach (var row in rows)
+        {
+            var student = new CourseGradesExportDto
+            {
+                StudentId = row.StudentId,
+                StudentName = row.StudentName,
+                StudentCode = row.StudentCode,
+                AcademicId = row.AcademicId,
+                EnrollmentId = row.EnrollmentId,
+                Grades = new List<EXportStudentModuleGradeDto>()
+            };
+
+            foreach (var module in modules)
+            {
+                double? degree = null;
+                gradesByKey.TryGetValue(
+                    (row.EnrollmentId, module.ModuleID),
+                    out degree);
+
+                student.Grades.Add(new EXportStudentModuleGradeDto
+                {
+                    ModuleId = module.ModuleID,
+                    ModuleName = module.ModuleName,
+                    MaxDegree = (double)module.MaxDegree,
+                    StudentDegree = degree
+                });
+            }
+
+            result.Add(student);
+        }
+
+        return result;
     }
 
+    /// <summary>
+    /// Get By Enrollment And Modules Async.
+    /// </summary>
     public async Task<List<CourseGrade>> GetByEnrollmentAndModulesAsync(
     List<int> enrollmentIds,
     List<int> moduleIds)
@@ -163,11 +219,17 @@ public class CourseGradeRepository
                      && moduleIds.Contains(x.ModuleID))
             .ToListAsync();
     }
+    /// <summary>
+    /// Add Range Async.
+    /// </summary>
     public async Task AddRangeAsync(List<CourseGrade> grades)
     {
         await _context.CourseGrades.AddRangeAsync(grades);
     }
 
+    /// <summary>
+    /// Update Range.
+    /// </summary>
     public void UpdateRange(List<CourseGrade> grades)
     {
         _context.CourseGrades.UpdateRange(grades);

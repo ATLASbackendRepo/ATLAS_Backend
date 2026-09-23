@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Events;
+using ATLAsBLL.Events;
 using ATLAsDCL.UnitOfWork;
 using ATLASDomain.Entities;
 using ExcelDataReader;
@@ -7,10 +7,19 @@ using System.Text;
 
 namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
 {
+    /// <summary>
+    /// Create Students Range Command Handler.
+    /// </summary>
     public class CreateStudentsRangeCommandHandler
         : IRequestHandler<CreateStudentsRangeCommand, bool>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
+        /// <summary>
+        /// _publisher.
+        /// </summary>
         private readonly IPublisher _publisher;
 
 
@@ -22,6 +31,9 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
             _publisher = publisher;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<bool> Handle(
             CreateStudentsRangeCommand request,
             CancellationToken cancellationToken)
@@ -61,6 +73,9 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
             }
         }
 
+        /// <summary>
+        /// Read Students From Excel Async.
+        /// </summary>
         private async Task<List<Student>> ReadStudentsFromExcelAsync(
             string filePath,
             CancellationToken cancellationToken)
@@ -218,6 +233,9 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
             return students;
         }
 
+        /// <summary>
+        /// Get Cell Value.
+        /// </summary>
         private static string GetCellValue(
             IExcelDataReader reader,
             int columnIndex)
@@ -228,6 +246,9 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
         }
 
 
+        /// <summary>
+        /// Validate Required Data.
+        /// </summary>
         private static void ValidateRequiredData(
             string institutionName,
             string departmentName,
@@ -256,6 +277,9 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                     $"Academic level is required for student '{fullName}'.");
         }
 
+        /// <summary>
+        /// Parse Academic Level.
+        /// </summary>
         private static int ParseAcademicLevel(string level)
         {
             return level.Trim().ToLowerInvariant() switch
@@ -270,6 +294,9 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
             };
         }
 
+        /// <summary>
+        /// Delete Excel File.
+        /// </summary>
         private static void DeleteExcelFile(string filePath)
         {
             if (!File.Exists(filePath))

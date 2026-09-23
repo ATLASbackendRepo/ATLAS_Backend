@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.UnitOfWork;
+using ATLAsDCL.UnitOfWork;
 using MediatR;
 using System.Collections.Generic;
 using System.Threading;
@@ -7,8 +7,14 @@ using ATLASDomain.DTO.CourseOffring;
 
 namespace ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Student
 {
+    /// <summary>
+    /// Get My Course Query Handler.
+    /// </summary>
     public class GetMyCourseQueryHandler : IRequestHandler<GetMyCourseQuery, IEnumerable<CourseOfferingDTO>>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public GetMyCourseQueryHandler(IUnitOfWork unitOfWork)
@@ -16,6 +22,9 @@ namespace ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Student
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<IEnumerable<CourseOfferingDTO>> Handle(GetMyCourseQuery request, CancellationToken cancellationToken)
         {
            

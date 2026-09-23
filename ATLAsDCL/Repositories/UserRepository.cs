@@ -1,9 +1,12 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.DTO.Staff;
 using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
+/// <summary>
+/// User Repository.
+/// </summary>
 public class UserRepository
     : GenericRepository<User>, IUserRepository
 {
@@ -12,16 +15,25 @@ public class UserRepository
     {
     }
 
+    /// <summary>
+    /// Get By User Name Async.
+    /// </summary>
     public async Task<User?> GetByUserNameAsync(string userName)
     {
         return await _dbSet.FirstOrDefaultAsync(u => u.FullName == userName);
     }
+    /// <summary>
+    /// Get By User Id Async.
+    /// </summary>
     public async Task<User?> GetByUserIdAsync(int userId)
     {
         return await _dbSet.FirstOrDefaultAsync(u => u.UserId == userId);
     }
 
 
+    /// <summary>
+    /// Get User By Academic IDAsync.
+    /// </summary>
     public async Task<User?> GetUserByAcademicIDAsync(string academicID)
     {
         return await _context.Users
@@ -29,11 +41,17 @@ public class UserRepository
     }
 
 
+    /// <summary>
+    /// User Name Exists Async.
+    /// </summary>
     public async Task<bool> UserNameExistsAsync(string userName)
     {
         return await _dbSet.AnyAsync(u => u.FullName == userName);
     }
 
+    /// <summary>
+    /// Get All Staff Async.
+    /// </summary>
     public async Task<IEnumerable<StaffDto>> GetAllStaffAsync(enUserRole role, StaffFilterDTO filter)
     {
         var query = _context.Users
@@ -78,6 +96,9 @@ public class UserRepository
     }
   
 
+    /// <summary>
+    /// Get User Id By Acdimic Id.
+    /// </summary>
     public async Task<int?> GetUserIdByAcdimicId(string AcdimicID, CancellationToken cancellationToken)
     {
         return await _context.Users

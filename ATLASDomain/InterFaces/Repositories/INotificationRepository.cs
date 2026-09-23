@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace ATLASDomain.Interfaces.Repositories
 {
+    /// <summary>
+    /// INotification Repository.
+    /// </summary>
     public interface INotificationRepository : IGenericRepository<Notification>
     {
         Task<IEnumerable<Notification>> GetUnreadForUserAsync(int userId);

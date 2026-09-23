@@ -1,4 +1,4 @@
-﻿using ATLASDomain.DTO.CourseGrade;
+using ATLASDomain.DTO.CourseGrade;
 using ATLASDomain.Interfaces.Repositories;
 using ATLAsBLL.Services.CourseGrade.Queries.GetMySemesterRank;
 using MediatR;
@@ -6,8 +6,14 @@ using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Services.CourseGrade.Queries;
 
+/// <summary>
+/// Get My Semester Rank Query Handler.
+/// </summary>
 public class GetMySemesterRankQueryHandler : IRequestHandler<GetMySemesterRankQuery, MyRankDto?>
 {
+    /// <summary>
+    /// _unit Of Work.
+    /// </summary>
     private readonly IUnitOfWork _unitOfWork;
 
     public GetMySemesterRankQueryHandler(IUnitOfWork unitOfWork)
@@ -15,6 +21,9 @@ public class GetMySemesterRankQueryHandler : IRequestHandler<GetMySemesterRankQu
         _unitOfWork = unitOfWork;
     }
 
+    /// <summary>
+    /// Handle.
+    /// </summary>
     public async Task<MyRankDto?> Handle(GetMySemesterRankQuery request, CancellationToken cancellationToken)
     {
         ATLASDomain.Entities.Student? student = await _unitOfWork.Students.GetStudentByUserIDAsync(request.UserId);

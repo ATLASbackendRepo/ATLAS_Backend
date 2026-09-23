@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLAsDCL.UnitOfWork;
 using MediatR;
 using System;
@@ -10,9 +10,15 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.Auth.Queries
 {
+    /// <summary>
+    /// Get User By Academic Id Query Handler.
+    /// </summary>
     public sealed class GetUserByAcademicIdQueryHandler
      : IRequestHandler<GetUserByAcademicIdQuery, ATLASDomain.Entities.User?>
     {
+        /// <summary>
+        /// _unitofwork.
+        /// </summary>
         private readonly IUnitOfWork _unitofwork;
 
         public GetUserByAcademicIdQueryHandler(IUnitOfWork unitofwork)
@@ -20,6 +26,9 @@ namespace ATLAsBLL.Services.Auth.Queries
             _unitofwork = unitofwork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<ATLASDomain.Entities.User?> Handle(
             GetUserByAcademicIdQuery request,
             CancellationToken cancellationToken)

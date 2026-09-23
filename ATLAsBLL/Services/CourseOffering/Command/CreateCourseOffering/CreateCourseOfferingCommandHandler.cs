@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 using ATLASDomain.Entities;
@@ -6,8 +6,14 @@ using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Features.CourseOfferings.Commands.CreateCourseOffering
 {
+    /// <summary>
+    /// Create Course Offering Command Handler.
+    /// </summary>
     public class CreateCourseOfferingCommandHandler : IRequestHandler<CreateCourseOfferingCommand, int>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public CreateCourseOfferingCommandHandler(IUnitOfWork unitOfWork)
@@ -15,6 +21,9 @@ namespace ATLAsBLL.Features.CourseOfferings.Commands.CreateCourseOffering
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<int> Handle(CreateCourseOfferingCommand request, CancellationToken cancellationToken)
         {
             // ممكن تشيك الأول لو المادة دي اتفتحت أصلاً في السمستر ده قبل كده عشان تمنع التكرار (قدام في الـ Business Rules)

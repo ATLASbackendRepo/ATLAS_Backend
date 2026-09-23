@@ -1,9 +1,12 @@
-﻿using ATLASDomain.Interfaces.Repositories;
+using ATLASDomain.Interfaces.Repositories;
 using ATLASDomain.InterFaces.Repositories;
 
 
 namespace ATLAsDCL.UnitOfWork;
 
+/// <summary>
+/// IUnit Of Work.
+/// </summary>
 public interface IUnitOfWork : IDisposable
 {
     IAssessmentModuleRepository AssessmentModules { get; }

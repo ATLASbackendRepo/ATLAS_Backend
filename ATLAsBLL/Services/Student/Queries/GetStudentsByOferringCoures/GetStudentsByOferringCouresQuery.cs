@@ -8,5 +8,8 @@ using ATLASDomain.DTO.Student;
 
 namespace ATLAsBLL.Services.Student.Queries.GetStudentsByOferringCoures
 {
+    /// <summary>
+    /// Get Students By Oferring Coures Query.
+    /// </summary>
     public record GetStudentsByOferringCouresQuery(int CourseOfferingID) : IQuery<IEnumerable<StudentDTO>>;
 }

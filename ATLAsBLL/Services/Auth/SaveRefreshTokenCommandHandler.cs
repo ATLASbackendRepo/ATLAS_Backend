@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.UnitOfWork;
+using ATLAsDCL.UnitOfWork;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,9 +8,15 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.Auth
 {
+    /// <summary>
+    /// Save Refresh Token Command Handler.
+    /// </summary>
     public class SaveRefreshTokenCommandHandler
     : IRequestHandler<SaveRefreshTokenCommand>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public SaveRefreshTokenCommandHandler(IUnitOfWork unitOfWork)
@@ -18,6 +24,9 @@ namespace ATLAsBLL.Services.Auth
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task Handle(
             SaveRefreshTokenCommand request,
             CancellationToken cancellationToken)

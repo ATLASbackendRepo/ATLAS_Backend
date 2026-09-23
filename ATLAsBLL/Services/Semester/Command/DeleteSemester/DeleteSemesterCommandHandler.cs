@@ -1,12 +1,18 @@
-﻿using MediatR;
+using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Features.Semesters.Commands.DeleteSemester
 {
+    /// <summary>
+    /// Delete Semester Command Handler.
+    /// </summary>
     public class DeleteSemesterCommandHandler : IRequestHandler<DeleteSemesterCommand, bool>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public DeleteSemesterCommandHandler(IUnitOfWork unitOfWork)
@@ -14,6 +20,9 @@ namespace ATLAsBLL.Features.Semesters.Commands.DeleteSemester
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<bool> Handle(DeleteSemesterCommand request, CancellationToken cancellationToken)
         {
             var semester = await _unitOfWork.Semesters.GetByIdAsync(request.SemesterID);

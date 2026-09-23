@@ -1,4 +1,4 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 
 namespace ATLAS.Domain.Entities
 {
@@ -8,15 +8,30 @@ namespace ATLAS.Domain.Entities
     /// </summary>
     public class CourseGroupMessageRead
     {
+        /// <summary>
+        /// Message ID.
+        /// </summary>
         public int MessageID { get; set; }
 
+        /// <summary>
+        /// User ID.
+        /// </summary>
         public int UserID { get; set; }
 
+        /// <summary>
+        /// Read At.
+        /// </summary>
         public DateTime ReadAt { get; set; } = DateTime.UtcNow;
 
         // Navigation properties
+        /// <summary>
+        /// Message.
+        /// </summary>
         public CourseGroupMessage Message { get; set; } = null!;
 
+        /// <summary>
+        /// user.
+        /// </summary>
         public User user { get; set; } = null!;
     }
 }

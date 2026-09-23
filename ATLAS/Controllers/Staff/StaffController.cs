@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Features.Students.Commands.CreateStudent;
+using ATLAsBLL.Features.Students.Commands.CreateStudent;
 using ATLAsBLL.Features.Students.Commands.CreateStudentsRange;
 using ATLAsBLL.Features.Students.Commands.DeleteStudent;
 using ATLAsBLL.Features.Students.Commands.UpdateStudent;
@@ -19,8 +19,14 @@ namespace ATLAS.Controllers.Staff
 {
     [Route("api/Staff")]
     [Authorize]
+    /// <summary>
+    /// Staff Controller.
+    /// </summary>
     public class StaffController : Controller
     {
+        /// <summary>
+        /// _mediator.
+        /// </summary>
         private readonly IMediator _mediator;
 
         public StaffController(IMediator mediator)
@@ -33,6 +39,9 @@ namespace ATLAS.Controllers.Staff
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [EnableRateLimiting("AdminGetAllPolicy")]
+        /// <summary>
+        /// Get All Student.
+        /// </summary>
         public async Task<ActionResult<IEnumerable<StaffDto>>> GetAllStudent(enUserRole role , [FromQuery] StaffFilterDTO staffFilter)
         {
 
@@ -49,6 +58,9 @@ namespace ATLAS.Controllers.Staff
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
+        /// <summary>
+        /// Create Staff.
+        /// </summary>
         public async Task<ActionResult> CreateStaff([FromBody] Create_Update_StaffDto createStaffDTO)
         {
             try
@@ -79,6 +91,9 @@ namespace ATLAS.Controllers.Staff
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
+        /// <summary>
+        /// update Staff.
+        /// </summary>
         public async Task<ActionResult> updateStaff([FromBody] Create_Update_StaffDto UpdateStaffDTO)
         {
             try
@@ -108,6 +123,9 @@ namespace ATLAS.Controllers.Staff
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminSoftDeletePolicy")]
+        /// <summary>
+        /// delete Staff.
+        /// </summary>
         public async Task<ActionResult> deleteStaff([FromQuery] string StaffCode)
         {
             try

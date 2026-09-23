@@ -1,12 +1,18 @@
-﻿// Persistence/Configurations/StudentProfileConfiguration.cs
+// Persistence/Configurations/StudentProfileConfiguration.cs
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ATLAS.Domain.Entities;
 
 namespace ATLAS.Persistence.Configurations
 {
+    /// <summary>
+    /// Student Profile Configuration.
+    /// </summary>
     public class StudentProfileConfiguration : IEntityTypeConfiguration<StudentProfile>
     {
+        /// <summary>
+        /// Configure.
+        /// </summary>
         public void Configure(EntityTypeBuilder<StudentProfile> builder)
         {
             builder.ToTable("StudentProfiles");

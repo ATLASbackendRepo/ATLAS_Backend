@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Features.Enrollments.Commands.DeleteEnrollment
 {
+    /// <summary>
+    /// Delete Enrollment Command Validator.
+    /// </summary>
     public class DeleteEnrollmentCommandValidator : AbstractValidator<DeleteEnrollmentCommand>
     {
         public DeleteEnrollmentCommandValidator()

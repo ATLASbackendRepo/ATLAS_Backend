@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Features.Semesters.Commands.DeleteSemester
 {
+    /// <summary>
+    /// Delete Semester Command Validator.
+    /// </summary>
     public class DeleteSemesterCommandValidator : AbstractValidator<DeleteSemesterCommand>
     {
         public DeleteSemesterCommandValidator()

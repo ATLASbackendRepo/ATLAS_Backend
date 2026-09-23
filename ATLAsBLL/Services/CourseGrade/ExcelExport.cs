@@ -1,4 +1,5 @@
-﻿using ATLAsDCL.UnitOfWork;
+using ATLASDomain.DTO.CourseGrade;
+using ATLAsDCL.UnitOfWork;
 using ClosedXML.Excel;
 using MediatR;
 using QuestPDF.Fluent;
@@ -7,9 +8,19 @@ using QuestPDF.Infrastructure;
 
 namespace ATLAsBLL.Features.CourseGrades.Queries.ExportCourseGrades;
 
+/// <summary>
+/// Exports the course grades of a course offering as an Excel or PDF file.
+/// Student profile data and per-module degrees are resolved through the
+/// course grade repository using an explicit EF Core projection with a fixed
+/// number of batched queries, so no lazy navigation loading is triggered on
+/// <see cref="ATLASDomain.Entities.Enrollment"/>.
+/// </summary>
 public class ExportCourseGradesQueryHandler
-    : IRequestHandler<ExportCourseGradesQuery , CourseGradesExportResult>
+    : IRequestHandler<ExportCourseGradesQuery, CourseGradesExportResult>
 {
+    /// <summary>
+    /// _unit Of Work.
+    /// </summary>
     private readonly IUnitOfWork _unitOfWork;
 
     public ExportCourseGradesQueryHandler(
@@ -18,6 +29,11 @@ public class ExportCourseGradesQueryHandler
         _unitOfWork = unitOfWork;
     }
 
+    /// <summary>
+    /// Handle.
+    /// </summary>
+    /// <param name="request">request.</param>
+    /// <param name="cancellationToken">cancellation Token.</param>
     public async Task<CourseGradesExportResult> Handle(
         ExportCourseGradesQuery request,
         CancellationToken cancellationToken)
@@ -42,23 +58,18 @@ public class ExportCourseGradesQueryHandler
                 $"Course offering with ID {request.CourseOfferingId} does not exist.");
         }
 
-        // Get students
-        var students = await _unitOfWork.Enrollments.FindAsync(
-            e => e.CourseOfferingID == request.CourseOfferingId);
+        // DB -> Projection -> DTO (student name, code, academic id, degrees).
+        var students = await _unitOfWork.CourseGrades
+            .GetCourseGradesForExportAsync(
+                request.CourseOfferingId);
 
-        var enrollmentList = students.ToList();
-
-        if (enrollmentList.Count == 0)
+        if (students.Count == 0)
         {
             throw new KeyNotFoundException(
                 "No students found for this course offering.");
         }
 
-        var enrollmentIds = enrollmentList
-            .Select(e => e.EnrollmentID)
-            .ToList();
-
-        // Get modules
+        // Assessment modules are still needed for the table headers.
         var modules = await _unitOfWork.AssessmentModules.FindAsync(
             m => m.CourseOfferingID == request.CourseOfferingId);
 
@@ -72,42 +83,26 @@ public class ExportCourseGradesQueryHandler
                 "No assessment modules found for this course offering.");
         }
 
-        var moduleIds = moduleList
-            .Select(m => m.ModuleID)
-            .ToList();
-
-        // Get all grades in one query
-        var grades = await _unitOfWork.CourseGrades.FindAsync(
-            g =>
-                enrollmentIds.Contains(g.EnrollmentID) &&
-                moduleIds.Contains(g.ModuleID));
-
-        var gradeDictionary = grades.ToDictionary(
-            g => (g.EnrollmentID, g.ModuleID),
-            g => g.StudentDegree);
-
         // Generate Excel
         if (format is "excel" or "xlsx")
         {
             return GenerateExcel(
-                enrollmentList,
-                moduleList,
-                gradeDictionary,
+                students,
                 request.CourseOfferingId);
         }
 
         // Generate PDF
         return GeneratePdf(
-            enrollmentList,
-            moduleList,
-            gradeDictionary,
+            students,
             request.CourseOfferingId);
     }
-
+    /// <summary>
+    /// Generate Excel.
+    /// </summary>
+    /// <param name="students">students.</param>
+    /// <param name="courseOfferingId">course Offering Id.</param>
     private static CourseGradesExportResult GenerateExcel(
-        List<ATLASDomain.Entities.Enrollment> enrollments,
-        List<ATLASDomain.Entities.AssessmentModule> modules,
-        Dictionary<(int EnrollmentId, int ModuleId), decimal> grades,
+        List<CourseGradesExportDto> students,
         int courseOfferingId)
     {
         using var workbook = new XLWorkbook();
@@ -116,16 +111,16 @@ public class ExportCourseGradesQueryHandler
 
         var column = 1;
 
-        // Header
+        // Header (fixed labels are constants, module names come from users)
         worksheet.Cell(1, column++).Value = "Student ID";
         worksheet.Cell(1, column++).Value = "Student Name";
         worksheet.Cell(1, column++).Value = "Student Code";
         worksheet.Cell(1, column++).Value = "Academic ID";
 
-        foreach (var module in modules)
+        foreach (var gradeColumn in students[0].Grades)
         {
             worksheet.Cell(1, column++).Value =
-                module.ModuleName;
+                gradeColumn.ModuleName;
         }
 
         // Header styling
@@ -146,30 +141,29 @@ public class ExportCourseGradesQueryHandler
         // Data
         var row = 2;
 
-        foreach (var enrollment in enrollments)
+        foreach (var student in students)
         {
             column = 1;
 
+            // Numeric: no sanitization needed
             worksheet.Cell(row, column++).Value =
-                enrollment.StudentID;
+                student.StudentId;
 
             worksheet.Cell(row, column++).Value =
-                enrollment.Student?.User?.FullName ?? string.Empty;
+                student.StudentName;
 
             worksheet.Cell(row, column++).Value =
-                enrollment.Student?.StudentCode ?? string.Empty;
+                student.StudentCode;
 
             worksheet.Cell(row, column++).Value =
-                enrollment.Student?.AcademicId ?? string.Empty;
+                student.AcademicId;
 
-            foreach (var module in modules)
+            foreach (var grade in student.Grades)
             {
-                if (grades.TryGetValue(
-                        (enrollment.EnrollmentID, module.ModuleID),
-                        out var degree))
+                if (grade.StudentDegree != null)
                 {
                     worksheet.Cell(row, column).Value =
-                        (double)degree;
+                        (double)grade.StudentDegree;
                 }
                 else
                 {
@@ -206,162 +200,102 @@ public class ExportCourseGradesQueryHandler
         };
     }
 
+    /// <summary>
+    /// Generate PDF.
+    /// </summary>
+    /// <param name="students">students.</param>
+    /// <param name="courseOfferingId">course Offering Id.</param>
     private static CourseGradesExportResult GeneratePdf(
-        List<ATLASDomain.Entities.Enrollment> enrollments,
-        List<ATLASDomain.Entities.AssessmentModule> modules,
-        Dictionary<(int EnrollmentId, int ModuleId), decimal> grades,
+        List<CourseGradesExportDto> students,
         int courseOfferingId)
     {
+        QuestPDF.Settings.License = LicenseType.Community;
+
+        var moduleNames = students[0].Grades
+            .Select(g => g.ModuleName)
+            .ToList();
+
         var document = Document.Create(container =>
         {
             container.Page(page =>
             {
                 page.Size(PageSizes.A4.Landscape());
-
-                page.Margin(20);
-
-                page.DefaultTextStyle(
-                    x => x.FontSize(8));
+                page.Margin(25);
+                page.DefaultTextStyle(x => x.FontSize(9));
 
                 page.Header()
-                    .Text($"Course Grades - Offering {courseOfferingId}")
-                    .Bold()
-                    .FontSize(18);
+                    .PaddingBottom(8)
+                    .Text($"Course Grades - Offering #{courseOfferingId}")
+                    .FontSize(14)
+                    .Bold();
 
-                page.Content()
-                    .PaddingTop(15)
-                    .Table(table =>
+                page.Content().Table(table =>
+                {
+                    table.ColumnsDefinition(columns =>
                     {
-                        table.ColumnsDefinition(columns =>
+                        columns.ConstantColumn(50);   // Student ID
+                        columns.RelativeColumn(3);    // Student Name
+                        columns.RelativeColumn(2);    // Student Code
+                        columns.RelativeColumn(2);    // Academic ID
+
+                        foreach (var _ in moduleNames)
+                            columns.RelativeColumn(1.5f);
+                    });
+
+                    // Repeats automatically on every page
+                    table.Header(header =>
+                    {
+                        header.Cell().Element(HeaderCell).Text("Student ID").Bold();
+                        header.Cell().Element(HeaderCell).Text("Student Name").Bold();
+                        header.Cell().Element(HeaderCell).Text("Student Code").Bold();
+                        header.Cell().Element(HeaderCell).Text("Academic ID").Bold();
+
+                        foreach (var name in moduleNames)
+                            header.Cell().Element(HeaderCell).Text(name).Bold();
+                    });
+
+                    foreach (var student in students)
+                    {
+                        table.Cell().Element(BodyCell).Text(student.StudentId.ToString());
+                        table.Cell().Element(BodyCell).Text(student.StudentName);
+                        table.Cell().Element(BodyCell).Text(student.StudentCode);
+                        table.Cell().Element(BodyCell).Text(student.AcademicId);
+
+                        foreach (var grade in student.Grades)
                         {
-                            columns.ConstantColumn(40);
-                            columns.RelativeColumn(2);
-                            columns.RelativeColumn(1.2f);
-                            columns.RelativeColumn(1.3f);
-
-                            foreach (var _ in modules)
-                            {
-                                columns.RelativeColumn(1);
-                            }
-                        });
-
-                        // Header
-                        table.Header(header =>
-                        {
-                            header.Cell()
-                                .Element(HeaderCell)
-                                .Text("ID");
-
-                            header.Cell()
-                                .Element(HeaderCell)
-                                .Text("Student Name");
-
-                            header.Cell()
-                                .Element(HeaderCell)
-                                .Text("Code");
-
-                            header.Cell()
-                                .Element(HeaderCell)
-                                .Text("Academic ID");
-
-                            foreach (var module in modules)
-                            {
-                                header.Cell()
-                                    .Element(HeaderCell)
-                                    .Text(module.ModuleName);
-                            }
-                        });
-
-                        // Students
-                        foreach (var enrollment in enrollments)
-                        {
-                            table.Cell()
-                                .Element(Cell)
-                                .Text(enrollment.StudentID.ToString());
-
-                            table.Cell()
-                                .Element(Cell)
-                                .Text(
-                                    enrollment.Student?.User?.FullName
-                                    ?? string.Empty);
-
-                            table.Cell()
-                                .Element(Cell)
-                                .Text(
-                                    enrollment.Student?.StudentCode
-                                    ?? string.Empty);
-
-                            table.Cell()
-                                .Element(Cell)
-                                .Text(
-                                    enrollment.Student?.AcademicId
-                                    ?? string.Empty);
-
-                            foreach (var module in modules)
-                            {
-                                if (grades.TryGetValue(
-                                        (
-                                            enrollment.EnrollmentID,
-                                            module.ModuleID),
-                                        out var degree))
-                                {
-                                    table.Cell()
-                                        .Element(Cell)
-                                        .Text(degree.ToString());
-                                }
-                                else
-                                {
-                                    table.Cell()
-                                        .Element(Cell)
-                                        .Text("-");
-                                }
-                            }
+                            table.Cell().Element(BodyCell).AlignCenter().Text(
+                                grade.StudentDegree is null
+                                    ? "-"
+                                    : grade.StudentDegree.Value.ToString("0.##"));
                         }
-                    });
+                    }
+                });
 
-                page.Footer()
-                    .AlignCenter()
-                    .Text(text =>
-                    {
-                        text.Span("Page ");
-                        text.CurrentPageNumber();
-                        text.Span(" of ");
-                        text.TotalPages();
-                    });
+                page.Footer().AlignCenter().Text(text =>
+                {
+                    text.Span("Page ");
+                    text.CurrentPageNumber();
+                    text.Span(" of ");
+                    text.TotalPages();
+                });
             });
         });
 
-        var pdfBytes = document.GeneratePdf();
-
         return new CourseGradesExportResult
         {
-            File = pdfBytes,
+            File = document.GeneratePdf(),
             ContentType = "application/pdf",
-            FileName =
-                $"CourseGrades_{courseOfferingId}.pdf"
+            FileName = $"CourseGrades_{courseOfferingId}.pdf"
         };
-    }
 
-    private static IContainer HeaderCell(
-        IContainer container)
-    {
-        return container
-            .Background("#1F4E78")
-            .Padding(5)
-            .Border(1)
-            .AlignCenter()
-            .AlignMiddle()
-            .DefaultTextStyle(
-                x => x.FontColor("#FFFFFF").Bold());
-    }
-
-    private static IContainer Cell(
-        IContainer container)
-    {
-        return container
+        static IContainer HeaderCell(IContainer c) => c
+            .Background(Colors.Grey.Lighten3)
+            .Border(0.5f).BorderColor(Colors.Grey.Medium)
             .Padding(4)
-            .Border(1)
-            .AlignCenter()
-            .AlignMiddle();
+            .AlignCenter().AlignMiddle();
+
+        static IContainer BodyCell(IContainer c) => c
+            .Border(0.5f).BorderColor(Colors.Grey.Lighten1)
+            .Padding(4);
     }
 }

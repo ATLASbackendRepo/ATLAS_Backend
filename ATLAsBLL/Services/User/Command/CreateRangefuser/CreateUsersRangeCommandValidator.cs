@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Features.Users.Commands.CreateUsersRange
 {
+    /// <summary>
+    /// Create Users Range Command Validator.
+    /// </summary>
     public class CreateUsersRangeCommandValidator : AbstractValidator<CreateUsersRangeCommand>
     {
         public CreateUsersRangeCommandValidator()

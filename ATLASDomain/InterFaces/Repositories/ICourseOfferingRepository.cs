@@ -1,10 +1,13 @@
-﻿using ATLASDomain.DTO.Analysis;
+using ATLASDomain.DTO.Analysis;
 using ATLASDomain.DTO.CourseOffring;
 using ATLASDomain.Entities;
 using ATLASDomain.InterFaces.Repositories;
 
 namespace ATLASDomain.Interfaces.Repositories;
 
+/// <summary>
+/// ICourse Offering Repository.
+/// </summary>
 public interface ICourseOfferingRepository : IGenericRepository<CourseOffering>
 {
     Task<CourseOffering?> GetOfferingDetailsAsync(int offeringId);

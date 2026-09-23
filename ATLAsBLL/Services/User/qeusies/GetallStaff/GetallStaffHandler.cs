@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.UnitOfWork;
+using ATLAsDCL.UnitOfWork;
 using ATLASDomain.Entities;
 using MediatR;
 using System;
@@ -9,14 +9,23 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.User.qeusies.GetallStaff
 {
+    /// <summary>
+    /// Getall Staff Handler.
+    /// </summary>
     public sealed class GetallStaffHandler : IRequestHandler<GetallStaff, IEnumerable<ATLASDomain.DTO.Staff.StaffDto>>
     {
+        /// <summary>
+        /// _uintofwork.
+        /// </summary>
         private readonly IUnitOfWork _uintofwork;
 
         public GetallStaffHandler(IUnitOfWork unitOfWork)
         {
             _uintofwork = unitOfWork;
         }
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<IEnumerable<ATLASDomain.DTO.Staff.StaffDto>> Handle(GetallStaff request, CancellationToken cancellationToken)
         {
             if (request== null)

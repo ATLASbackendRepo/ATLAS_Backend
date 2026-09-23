@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -11,8 +11,14 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ATLAsBLL.Services.Enrollment.Command.CreateEnrollmentRange
 {
+    /// <summary>
+    /// Create Enrollments Range Command Handler.
+    /// </summary>
     public class CreateEnrollmentsRangeCommandHandler : IRequestHandler<CreateEnrollmentsRangeCommand, bool>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public CreateEnrollmentsRangeCommandHandler(IUnitOfWork unitOfWork)
@@ -20,6 +26,9 @@ namespace ATLAsBLL.Services.Enrollment.Command.CreateEnrollmentRange
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<bool> Handle(CreateEnrollmentsRangeCommand request, CancellationToken cancellationToken)
         {
             if (request.BulkCreateEnrollment == null)

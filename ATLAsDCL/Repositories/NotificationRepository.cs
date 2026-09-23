@@ -9,14 +9,23 @@ using ATLAS.Domain.Entities;
 
 namespace ATLAsDCL.Repositories
 {
+    /// <summary>
+    /// Notification Repository.
+    /// </summary>
     public class NotificationRepository : GenericRepository<Notification>, INotificationRepository
     {
+        /// <summary>
+        /// base.
+        /// </summary>
         public NotificationRepository(AtLASDbContext context) : base(context)
         {
         }
 
       
 
+        /// <summary>
+        /// Get Unread For User Async.
+        /// </summary>
         public async Task<IEnumerable<Notification>> GetUnreadForUserAsync(int userId)
         {
             return await _dbSet.Where(n => n.RecipientUserID == userId && !n.IsRead)
@@ -24,12 +33,18 @@ namespace ATLAsDCL.Repositories
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Mark All As Read Async.
+        /// </summary>
         public async Task MarkAllAsReadAsync(int userId)
         {
             await _dbSet.Where(n => n.RecipientUserID == userId && !n.IsRead)
                 .ExecuteUpdateAsync(setters => setters.SetProperty(n => n.IsRead, true));
         }
 
+        /// <summary>
+        /// Mark As Read Async.
+        /// </summary>
         public async Task MarkAsReadAsync(int notificationId)
         {
             var item = await _dbSet.FindAsync(notificationId);

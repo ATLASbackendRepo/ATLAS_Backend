@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 using ATLASDomain.Entities;
@@ -6,8 +6,14 @@ using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Features.Department.Comand.CreateDepartment
 {
+    /// <summary>
+    /// Create Department Command Handler.
+    /// </summary>
     public class CreateDepartmentCommandHandler : IRequestHandler<CreateDepartmentCommand, int>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public CreateDepartmentCommandHandler(IUnitOfWork unitOfWork)
@@ -15,6 +21,9 @@ namespace ATLAsBLL.Features.Department.Comand.CreateDepartment
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<int> Handle(CreateDepartmentCommand request, CancellationToken cancellationToken)
         {
             var department = new ATLASDomain.Entities.Department

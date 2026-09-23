@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.CourseGroupMessage.Command.TogglePinCourseGroupMessage;
 
+/// <summary>
+/// Toggle Pin Course Group Message Command Handler.
+/// </summary>
 public class TogglePinCourseGroupMessageCommandHandler : IRequestHandler<TogglePinCourseGroupMessageCommand, int>
 {
+    /// <summary>
+    /// _unit Of Work.
+    /// </summary>
     private readonly IUnitOfWork _unitOfWork;
 
     public TogglePinCourseGroupMessageCommandHandler(IUnitOfWork unitOfWork)
@@ -15,6 +21,9 @@ public class TogglePinCourseGroupMessageCommandHandler : IRequestHandler<ToggleP
         _unitOfWork = unitOfWork;
     }
 
+    /// <summary>
+    /// Handle.
+    /// </summary>
     public async Task<int> Handle(TogglePinCourseGroupMessageCommand request, CancellationToken cancellationToken)
     {
         var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId);

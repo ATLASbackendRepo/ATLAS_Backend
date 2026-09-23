@@ -20,11 +20,17 @@ namespace ATLAS.Controllers;
 /// Manages course group messaging, including sending, editing, and reading messages.
 /// Authorization: Doctors/TAs can send/edit/pin; Students are read-only.
 /// </summary>
+/// <summary>
+/// Course Group Messages Controller.
+/// </summary>
 [Authorize]
 [ApiController]
 [Route("api/course/{courseOfferingId}/messages")]
 public class CourseGroupMessagesController : ControllerBase
 {
+    /// <summary>
+    /// _mediator.
+    /// </summary>
     private readonly IMediator _mediator;
 
     public CourseGroupMessagesController(IMediator mediator)
@@ -35,6 +41,10 @@ public class CourseGroupMessagesController : ControllerBase
     /// <summary>
     /// Get paginated list of messages in a course offering.
     /// Authorization: User must be enrolled student or assigned staff (Doctor/TA).
+    /// </summary>
+
+    /// <summary>
+    /// Get Messages.
     /// </summary>
     [HttpGet(Name = "GetMessages")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -75,6 +85,7 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Doctor,TeachingAssistant")]
     [EnableRateLimiting("MessagesPolicy")]
+  
     public async Task<ActionResult<int>> SendMessage(
         [FromRoute] int courseOfferingId,
         [FromBody] SendMessageRequest request,
@@ -115,6 +126,7 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Doctor,TeachingAssistant")]
     [EnableRateLimiting("MessagesPolicy")]
+
     public async Task<ActionResult<int>> EditMessage(
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
@@ -152,6 +164,7 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Doctor,TeachingAssistant")]
     [EnableRateLimiting("MessagesPolicy")]
+  
     public async Task<IActionResult> DeleteMessage(
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
@@ -188,6 +201,7 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Doctor,TeachingAssistant")]
     [EnableRateLimiting("MessagesPolicy")]
+    
     public async Task<IActionResult> TogglePin(  
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
@@ -223,6 +237,7 @@ public class CourseGroupMessagesController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
+   
     public async Task<IActionResult> MarkAsRead(
         [FromRoute] int courseOfferingId,
         [FromRoute] int messageId,
@@ -249,6 +264,9 @@ public class CourseGroupMessagesController : ControllerBase
         }
     }  // Done Integration test
 
+    /// <summary>
+    /// Get Current User Id.
+    /// </summary>
     private int GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -258,6 +276,9 @@ public class CourseGroupMessagesController : ControllerBase
         }
         return userId;
     }
+    /// <summary>
+    /// Get User Role.
+    /// </summary>
     private string GetUserRole()
     {
         var roleClaim = User.FindFirst(ClaimTypes.Role);
@@ -271,5 +292,11 @@ public class CourseGroupMessagesController : ControllerBase
     }
 }
 
+/// <summary>
+/// Send Message Request.
+/// </summary>
 public record SendMessageRequest(string Content);
+/// <summary>
+/// Edit Message Request.
+/// </summary>
 public record EditMessageRequest(string NewContent);

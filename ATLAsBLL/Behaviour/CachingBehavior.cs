@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Logging;
 using System;
@@ -7,10 +7,19 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Behaviors.Caching
 {
+    /// <summary>
+    /// Caching Behavior.
+    /// </summary>
     public class CachingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
+        /// <summary>
+        /// _cache.
+        /// </summary>
         private readonly IMemoryCache _cache;
+        /// <summary>
+        /// _logger.
+        /// </summary>
         private readonly ILogger<CachingBehavior<TRequest, TResponse>> _logger;
 
         public CachingBehavior(IMemoryCache cache, ILogger<CachingBehavior<TRequest, TResponse>> logger)
@@ -19,6 +28,9 @@ namespace ATLAsBLL.Behaviors.Caching
             _logger = logger;
             }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             // لو الـ Request مش مـورث من واجهة الكاش، كمل طريقك للـ Handler العادي

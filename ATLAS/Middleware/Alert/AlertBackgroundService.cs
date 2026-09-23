@@ -1,14 +1,26 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.Entities;
 using ATLASDomain.InterFaces;
 using Microsoft.EntityFrameworkCore;
 
 namespace ATLAS.Middleware.Alert
 {
+    /// <summary>
+    /// Alert Background Service.
+    /// </summary>
     public class AlertBackgroundService : BackgroundService
     {
+        /// <summary>
+        /// _scope Factory.
+        /// </summary>
         private readonly IServiceScopeFactory _scopeFactory;
+        /// <summary>
+        /// _logger.
+        /// </summary>
         private readonly ILogger<AlertBackgroundService> _logger;
+        /// <summary>
+        /// Poll Interval.
+        /// </summary>
         private static readonly TimeSpan PollInterval = TimeSpan.FromSeconds(15);
 
         public AlertBackgroundService(IServiceScopeFactory scopeFactory, ILogger<AlertBackgroundService> logger)
@@ -17,6 +29,9 @@ namespace ATLAS.Middleware.Alert
             _logger = logger;
         }
 
+        /// <summary>
+        /// Execute Async.
+        /// </summary>
         protected override async Task ExecuteAsync(CancellationToken stoppingToken)
         {
             while (!stoppingToken.IsCancellationRequested)
@@ -34,6 +49,9 @@ namespace ATLAS.Middleware.Alert
             }
         }
 
+        /// <summary>
+        /// Process Pending Alerts Async.
+        /// </summary>
         private async Task ProcessPendingAlertsAsync(CancellationToken cancellationToken)
         {
             using var scope = _scopeFactory.CreateScope();

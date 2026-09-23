@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Features.Semesters.Commands.CreateSemester
 {
+    /// <summary>
+    /// Create Semester Command Validator.
+    /// </summary>
     public class CreateSemesterCommandValidator : AbstractValidator<CreateSemesterCommand>
     {
         public CreateSemesterCommandValidator()

@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.DTO.Course;
 using ATLASDomain.DTO.Department;
 using ATLASDomain.Entities;
@@ -6,6 +6,9 @@ using ATLASDomain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Identity.Client;
 
+/// <summary>
+/// Course Repository.
+/// </summary>
 public class CourseRepository
     : GenericRepository<Course>, ICourseRepository
 {
@@ -16,6 +19,9 @@ public class CourseRepository
 
     }
 
+    /// <summary>
+    /// Get All Course.
+    /// </summary>
     public async Task<List<CourseDTO>> GetAllCourse(string? Name_Filter)
     {
         var query = _context.Courses

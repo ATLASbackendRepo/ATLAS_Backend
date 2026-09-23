@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Behaviors;
+using ATLAsBLL.Behaviors;
 using ATLAsDCL.Data;
 using ATLAsDomain.Entities;
 using Microsoft.EntityFrameworkCore;
@@ -11,10 +11,19 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Behaviour
 {
+    /// <summary>
+    /// Audit Service.
+    /// </summary>
     public class AuditService : IAuditService
     {
         // بنستخدم Factory مش الـ Context المشترك مع الـ Unit of Work
+        /// <summary>
+        /// _context Factory.
+        /// </summary>
         private readonly IDbContextFactory<AtLASDbContext> _contextFactory; // TODO: اسم الـ Context الحقيقي عندك
+        /// <summary>
+        /// _logger.
+        /// </summary>
         private readonly ILogger<AuditService> _logger;
 
         public AuditService(IDbContextFactory<AtLASDbContext> contextFactory, ILogger<AuditService> logger)
@@ -23,6 +32,9 @@ namespace ATLAsBLL.Behaviour
             _logger = logger;
         }
 
+        /// <summary>
+        /// Log Async.
+        /// </summary>
         public async Task LogAsync(AuditLogEntry entry, CancellationToken cancellationToken = default)
         {
             try

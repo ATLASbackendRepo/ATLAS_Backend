@@ -1,11 +1,17 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ATLAsDCL.Configuration
 {
+    /// <summary>
+    /// Course Configuration.
+    /// </summary>
     public class CourseConfiguration : IEntityTypeConfiguration<Course>
     {
+        /// <summary>
+        /// Configure.
+        /// </summary>
         public void Configure(EntityTypeBuilder<Course> builder)
         {
 

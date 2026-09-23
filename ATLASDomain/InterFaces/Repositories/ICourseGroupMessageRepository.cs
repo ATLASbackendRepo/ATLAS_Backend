@@ -5,6 +5,9 @@ using ATLASDomain.InterFaces.Repositories;
 
 namespace ATLASDomain.Interfaces.Repositories
 {
+    /// <summary>
+    /// ICourse Group Message Repository.
+    /// </summary>
     public interface ICourseGroupMessageRepository : IGenericRepository<CourseGroupMessage>
     {
         Task<IEnumerable<CourseGroupMessage>> GetByCourseOfferingAsync(int courseOfferingId, int page, int pageSize);

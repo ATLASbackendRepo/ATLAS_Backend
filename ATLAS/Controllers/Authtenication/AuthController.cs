@@ -1,4 +1,4 @@
-﻿using ATLAS;
+using ATLAS;
 using ATLAsBLL.Services;
 using ATLAsBLL.Services.Auth;
 using ATLAsBLL.Services.Auth.Queries;
@@ -22,13 +22,25 @@ using System.Text;
 
 namespace ATLAS.Controllers.Authtenication
 {
+    /// <summary>
+    /// Auth Controller.
+    /// </summary>
     [ApiController]
     [Route("api/Auth")]
  
     public class AuthController : ControllerBase
     {
+        /// <summary>
+        /// _mediator.
+        /// </summary>
         private readonly IMediator _mediator;
+        /// <summary>
+        /// _security Event Service.
+        /// </summary>
         private readonly ISecurityEventService _securityEventService;
+        /// <summary>
+        /// _jwt Options.
+        /// </summary>
         private readonly JwtOptions _jwtOptions;
 
 
@@ -40,6 +52,9 @@ namespace ATLAS.Controllers.Authtenication
         }
 
 
+        /// <summary>
+        /// Generate Refresh Token.
+        /// </summary>
         private static string GenerateRefreshToken()
         {
             var bytes = new byte[64];
@@ -50,6 +65,9 @@ namespace ATLAS.Controllers.Authtenication
 
 
 
+        /// <summary>
+        /// Login.
+        /// </summary>
         [HttpPost("Login")]
         [EnableRateLimiting("AuthLimiter")]
         [AllowAnonymous]
@@ -142,8 +160,10 @@ namespace ATLAS.Controllers.Authtenication
 
 
 
+        /// <summary>
+        /// Refresh.
+        /// </summary>
         [HttpPost("refresh")]
-   
         [EnableRateLimiting("AuthLimiter")]
         public async Task<IActionResult> Refresh([FromBody] ATLASDomain.DTO.Login.RefreshRequest request)
         {
@@ -223,7 +243,11 @@ namespace ATLAS.Controllers.Authtenication
             });
         }
 
+        /// <summary>
+        /// Logout.
+        /// </summary>
         [HttpPost("logout")]
+        [Authorize]
         public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
         {
             if (request is null ||
@@ -252,6 +276,9 @@ namespace ATLAS.Controllers.Authtenication
 
 
 
+        /// <summary>
+        /// Change Password.
+        /// </summary>
         [HttpPost("ChangePassword")]
         [Authorize]
         [EnableRateLimiting("AuthLimiter")]
@@ -305,6 +332,9 @@ namespace ATLAS.Controllers.Authtenication
             return Ok(new { message = "Password changed successfully." });
         }
 
+        /// <summary>
+        /// Get Current ACdimic Id.
+        /// </summary>
         private string GetCurrentACdimicId()
         {
             var userIdClaim = User.FindFirst("AcademicId");

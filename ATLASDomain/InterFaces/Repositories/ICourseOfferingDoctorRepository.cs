@@ -1,6 +1,9 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 using ATLASDomain.InterFaces.Repositories;
 
+/// <summary>
+/// ICourse Offering Doctor Repository.
+/// </summary>
 public interface ICourseOfferingDoctorRepository
     : IGenericRepository<CourseOfferingDoctor>
 {

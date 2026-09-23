@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Services.profile.Staff.command;
+using ATLAsBLL.Services.profile.Staff.command;
 using ATLAsDCL.UnitOfWork;
 using MediatR;
 using System;
@@ -9,8 +9,14 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.profile.Student.command
 {
+    /// <summary>
+    /// update Student Profile Info Handler.
+    /// </summary>
     public class updateStudentProfileInfoHandler : IRequestHandler<updateStudentProfileInfoCommand, bool>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public updateStudentProfileInfoHandler(IUnitOfWork unitOfWork)
@@ -18,6 +24,9 @@ namespace ATLAsBLL.Services.profile.Student.command
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<bool> Handle(
             updateStudentProfileInfoCommand request,
             CancellationToken cancellationToken)

@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Features.Courses.Commands.CreateCourse;
+using ATLAsBLL.Features.Courses.Commands.CreateCourse;
 using ATLAsBLL.Features.Courses.Commands.DeleteCourse;
 using ATLAsBLL.Features.Courses.Commands.UpdateCourse;
 using ATLAsBLL.Services.Course.Queries;
@@ -10,16 +10,23 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace ATLAS.Controllers.Course
 {
+    /// <summary>
+    /// Course Controller.
+    /// </summary>
     [Route("api/Course")]
     [ApiController]
     public class CourseController : Controller
     {
+       
         private readonly IMediator _mediator;
         public CourseController(IMediator mediator)
         {
             _mediator = mediator;
         }
 
+        /// <summary>
+        /// Create Course.
+        /// </summary>
         [HttpPost("CreateCourse")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -46,6 +53,9 @@ namespace ATLAS.Controllers.Course
             }
         }
 
+        /// <summary>
+        /// Update Course.
+        /// </summary>
         [HttpPut("UpdateCourse")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -76,6 +86,9 @@ namespace ATLAS.Controllers.Course
             }
         }
 
+            /// <summary>
+            /// Delete Course.
+            /// </summary>
             [HttpDelete("DeleteCourse")]
             [ProducesResponseType(StatusCodes.Status400BadRequest)]
             [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -97,12 +110,15 @@ namespace ATLAS.Controllers.Course
                 return Ok("Department deleted successfully.");
             }
 
+
+        /// <summary>
+        /// Get Courses.
+        /// </summary>
         [HttpGet("GetCourses")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminGetAllPolicy")]
-
         public async Task<IActionResult> GetCourses([FromQuery] string? Coursename)
         {
             var departments = await _mediator.Send(new GetAllCourseQuery(Coursename));

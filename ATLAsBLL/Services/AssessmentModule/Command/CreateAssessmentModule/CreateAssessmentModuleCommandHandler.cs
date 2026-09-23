@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 using ATLASDomain.Entities;
@@ -6,11 +6,20 @@ using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule
 {
+    /// <summary>
+    /// Create Assessment Module Command Handler.
+    /// </summary>
     public class CreateAssessmentModuleCommandHandler : IRequestHandler<CreateAssessmentModuleCommand, int>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
         public CreateAssessmentModuleCommandHandler(IUnitOfWork unitOfWork) => _unitOfWork = unitOfWork;
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<int> Handle(CreateAssessmentModuleCommand request, CancellationToken cancellationToken)
         {
             var DoctorsID = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(request.DTO.CourseOfferingId);

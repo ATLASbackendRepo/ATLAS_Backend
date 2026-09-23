@@ -1,4 +1,4 @@
-﻿//using ATLAsBLL.Features.CourseGrades.Commands.CreateCourseGradesRange;
+//using ATLAsBLL.Features.CourseGrades.Commands.CreateCourseGradesRange;
 using ATLAS;
 using ATLAsBLL.Features.CourseGrades.Commands.CreateCourseGradesRange;
 using ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade;
@@ -12,11 +12,20 @@ using Microsoft.AspNetCore.RateLimiting;
 using System.Threading.Tasks;
 namespace ATLASAPI.Controllers
 {
+    /// <summary>
+    /// Course Grade Controller.
+    /// </summary>
     [ApiController]
     [Route("api/CourseGrade")]
     public class CourseGradeController : ControllerBase
     {
+        /// <summary>
+        /// _mediator.
+        /// </summary>
         private readonly IMediator _mediator;
+        /// <summary>
+        /// _course Authorization.
+        /// </summary>
         private readonly ICourseOfferingAuthorizationService _courseAuthorization;
 
         public CourseGradeController(IMediator mediator, ICourseOfferingAuthorizationService courseAuthorization)
@@ -32,6 +41,12 @@ namespace ATLASAPI.Controllers
         /// <param name="pageNumber">Page number to fetch (default is 1).</param>
         /// <param name="pageSize">Number of items per page (default is 9).</param>
         /// <param name="searchTerm">Optional search term to filter students by name, academic ID, or code.</param>
+      
+        
+        
+        /// <summary>
+        /// Get Course Students Paged.
+        /// </summary>
         [HttpGet("course-offering/{courseOfferingId:int}/students")]
         [ProducesResponseType(typeof(PagedResultDto<StudentCardDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -67,6 +82,9 @@ namespace ATLASAPI.Controllers
 
 
 
+        /// <summary>
+        /// Assign Grade.
+        /// </summary>
         [HttpPost("assign")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -137,6 +155,9 @@ namespace ATLASAPI.Controllers
         //    });
         //}
 
+        /// <summary>
+        /// Assign Grades Range.
+        /// </summary>
         [HttpPost("assign-range")]
         [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
         [EnableRateLimiting("CourseGradeAssignPolicy")]
@@ -289,6 +310,9 @@ namespace ATLASAPI.Controllers
 
 
 
+        /// <summary>
+        /// Export Grades.
+        /// </summary>
         [HttpGet("export")]
         [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
         [EnableRateLimiting("CourseGradeAssignPolicy")]

@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.UnitOfWork;
+using ATLAsDCL.UnitOfWork;
 using MediatR;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,8 +8,14 @@ using ATLASDomain.DTO.CourseOffring;
 
 namespace ATLAsBLL.Services.CourseOffering.Queries.GetCourseDetails
 {
+    /// <summary>
+    /// Get Course Details Query Handler.
+    /// </summary>
     public class GetCourseDetailsQueryHandler : IRequestHandler<GetCourseDetailsQuery, IEnumerable<CourseofferingDetailsDTO>>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public GetCourseDetailsQueryHandler(IUnitOfWork unitOfWork)
@@ -17,6 +23,9 @@ namespace ATLAsBLL.Services.CourseOffering.Queries.GetCourseDetails
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<IEnumerable<CourseofferingDetailsDTO>> Handle(GetCourseDetailsQuery request, CancellationToken cancellationToken)
         {
            

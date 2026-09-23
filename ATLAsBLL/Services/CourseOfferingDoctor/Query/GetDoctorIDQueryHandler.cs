@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.UnitOfWork;
+using ATLAsDCL.UnitOfWork;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -8,8 +8,14 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.CourseOfferingDoctor.Query
 {
+    /// <summary>
+    /// Get Doctor IDQuery Handler.
+    /// </summary>
     internal class GetDoctorIDQueryHandler : IRequestHandler<GetDoctorIDQuery, IEnumerable<int>>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public GetDoctorIDQueryHandler(IUnitOfWork unitOfWork)
@@ -17,6 +23,9 @@ namespace ATLAsBLL.Services.CourseOfferingDoctor.Query
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<IEnumerable<int>> Handle(GetDoctorIDQuery request, CancellationToken cancellationToken)
         {
             var DoctorIDs = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(request.CourseOfferingID);

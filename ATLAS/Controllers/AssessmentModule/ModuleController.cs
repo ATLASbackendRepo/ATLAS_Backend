@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule;
+using ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule;
 using ATLAsBLL.Features.AssessmentModules.Commands.DeleteAssessmentModule;
 using ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule;
 using ATLAsBLL.Services.AssessmentModule.Qureies;
@@ -12,11 +12,20 @@ using System.Security.Claims;
 namespace ATLAS.Controllers.AssessmentModule
 {
 
+    /// <summary>
+    /// Module Controller.
+    /// </summary>
     [Authorize]
     [Route("api/Module")]
     public class ModuleController : Controller
     {
+        /// <summary>
+        /// _mediator.
+        /// </summary>
         private readonly IMediator _mediator;
+        /// <summary>
+        /// _course Authorization.
+        /// </summary>
         private readonly ICourseOfferingAuthorizationService _courseAuthorization;
 
         public ModuleController(IMediator mediator, ICourseOfferingAuthorizationService courseAuthorization)
@@ -25,6 +34,9 @@ namespace ATLAS.Controllers.AssessmentModule
             _courseAuthorization = courseAuthorization;
         }
 
+        /// <summary>
+        /// Get Current User Id.
+        /// </summary>
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -35,6 +47,9 @@ namespace ATLAS.Controllers.AssessmentModule
             return userId;
         }
 
+        /// <summary>
+        /// Display Assessment Module.
+        /// </summary>
         [HttpGet("DisplayAssessmentModule")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -69,6 +84,9 @@ namespace ATLAS.Controllers.AssessmentModule
             }
         }
 
+        /// <summary>
+        /// Create Assessment Module.
+        /// </summary>
         [HttpPost("CreateAssessmentModule")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -99,6 +117,9 @@ namespace ATLAS.Controllers.AssessmentModule
         }
 
 
+        /// <summary>
+        /// Update Assessment Module.
+        /// </summary>
         [HttpPut("UpdateAssessmentModule")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -130,6 +151,9 @@ namespace ATLAS.Controllers.AssessmentModule
                 return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
             }
         }
+        /// <summary>
+        /// Delete Assessment Module.
+        /// </summary>
         [HttpDelete("DeleteAssessmentModule")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]

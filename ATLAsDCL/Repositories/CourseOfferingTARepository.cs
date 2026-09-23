@@ -1,7 +1,10 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.Entities;
 using Microsoft.EntityFrameworkCore;
 
+/// <summary>
+/// Course Offering TARepository.
+/// </summary>
 public class CourseOfferingTARepository
     : GenericRepository<CourseOfferingTA>, ICourseOfferingTARepository
 {
@@ -10,6 +13,9 @@ public class CourseOfferingTARepository
     {
     }
 
+    /// <summary>
+    /// Get By TAAsync.
+    /// </summary>
     public async Task<IEnumerable<CourseOfferingTA>> GetByTAAsync(int taId)
     {
         return await _context.CourseOfferingTAs
@@ -19,6 +25,9 @@ public class CourseOfferingTARepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Get TAs By Offering Async.
+    /// </summary>
     public async Task<IEnumerable<CourseOfferingTA>> GetTAsByOfferingAsync(int offeringId)
     {
         return await _context.CourseOfferingTAs

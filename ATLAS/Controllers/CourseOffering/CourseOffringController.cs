@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Services.CourseOffering.Queries;
+using ATLAsBLL.Services.CourseOffering.Queries;
 using ATLAsBLL.Services.User.qeusies.GetUserID;
 using ATLASDomain.DTO.CourseOffring;
 using MediatR;
@@ -13,11 +13,20 @@ using Microsoft.Extensions.Logging;
 namespace ATLAS.Controllers.CourseOffering
 
 {
+    /// <summary>
+    /// Course Offring Controller.
+    /// </summary>
     [Route("api/CourseOffring")]
     [ApiController]
     public class CourseOffringController : ControllerBase
     {
+        /// <summary>
+        /// _mediator.
+        /// </summary>
         private readonly IMediator _mediator;
+        /// <summary>
+        /// _logger.
+        /// </summary>
         private readonly ILogger<CourseOffringController> _logger;
 
         public CourseOffringController(IMediator mediator, ILogger<CourseOffringController> logger)
@@ -27,6 +36,9 @@ namespace ATLAS.Controllers.CourseOffering
         }
 
 
+        /// <summary>
+        /// Get Student My Courses.
+        /// </summary>
         [HttpGet("Student/MyCourses", Name = "GetStudentMyCourses")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -53,6 +65,9 @@ namespace ATLAS.Controllers.CourseOffering
 
 
 
+        /// <summary>
+        /// Get Admin Student My Courses.
+        /// </summary>
         [HttpGet("Admin/Student/MyCourses/{AcdimicID}", Name = "GetAdminStudentMyCourses")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -101,6 +116,9 @@ namespace ATLAS.Controllers.CourseOffering
 
 
 
+        /// <summary>
+        /// Get Staff My Courses.
+        /// </summary>
         [HttpGet("Staff/MyCourses", Name = "GetStaffMyCourses")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -123,6 +141,9 @@ namespace ATLAS.Controllers.CourseOffering
         }
 
 
+        /// <summary>
+        /// Get Admin Staff My Courses.
+        /// </summary>
 
         [HttpGet("Admin/Staff/MyCourses/{AcdimicID}", Name = "GetAdminStaffMyCourses")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -170,6 +191,9 @@ namespace ATLAS.Controllers.CourseOffering
         }
 
 
+        /// <summary>
+        /// Get Course Details.
+        /// </summary>
         [HttpGet("CourseDetails", Name = "GetCourseDetails")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -195,6 +219,9 @@ namespace ATLAS.Controllers.CourseOffering
 
 
 
+        /// <summary>
+        /// Get Doctor IDs.
+        /// </summary>
         [HttpGet("DoctorIDs", Name = "GetDoctorIDs")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -226,6 +253,9 @@ namespace ATLAS.Controllers.CourseOffering
                 return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
             }
         }
+        /// <summary>
+        /// Get Current User Id.
+        /// </summary>
         private int GetCurrentUserId()
         {
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
@@ -235,6 +265,9 @@ namespace ATLAS.Controllers.CourseOffering
             }
             return userId;
         }
+        /// <summary>
+        /// Get Current User Id.
+        /// </summary>
         private async Task<int> GetCurrentUserId(string academicId)
         {
             if (string.IsNullOrWhiteSpace(academicId))

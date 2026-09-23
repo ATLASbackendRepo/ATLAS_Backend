@@ -1,10 +1,13 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.DTO.Student;
 using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
+/// <summary>
+/// Student Repository.
+/// </summary>
 public class StudentRepository
     : GenericRepository<Student>, IStudentRepository
 {
@@ -13,6 +16,9 @@ public class StudentRepository
     {
     }
 
+    /// <summary>
+    /// Get Student With Department Async.
+    /// </summary>
     public async Task<Student?> GetStudentWithDepartmentAsync(int studentId)
     {
         return await _context.Students
@@ -21,6 +27,9 @@ public class StudentRepository
             .FirstOrDefaultAsync(s => s.StudentId == studentId);
     }
 
+    /// <summary>
+    /// Get All Students.
+    /// </summary>
     public async Task<List<StudentDTO>> GetAllStudents(StudentFilterDTO fillter)
     {
         var students = _context.Students
@@ -62,6 +71,9 @@ public class StudentRepository
         return studentDtos;
     }
 
+    /// <summary>
+    /// Get Student With Enrollments Async.
+    /// </summary>
     public async Task<Student?> GetStudentWithEnrollmentsAsync(int studentId)
     {
         return await _context.Students
@@ -73,6 +85,9 @@ public class StudentRepository
             .FirstOrDefaultAsync(s => s.StudentId == studentId);
     }
 
+    /// <summary>
+    /// Get Student With User Async.
+    /// </summary>
     public async Task<Student?> GetStudentWithUserAsync(string studentCode)
     {
         return await _context.Students
@@ -80,6 +95,9 @@ public class StudentRepository
             .Include(s => s.User)
             .FirstOrDefaultAsync(s => s.StudentCode.Contains(studentCode));
     }
+    /// <summary>
+    /// Get Student By User IDAsync.
+    /// </summary>
     public async Task<Student?> GetStudentByUserIDAsync(int UserID)
     {
         return await _context.Students
@@ -87,6 +105,9 @@ public class StudentRepository
             .FirstOrDefaultAsync(s => s.UserId  == UserID);
     }
 
+    /// <summary>
+    /// Student Code Exists Async.
+    /// </summary>
     public async Task<bool> StudentCodeExistsAsync(string studentCode)
     {
         return await _context.Students
@@ -94,12 +115,18 @@ public class StudentRepository
     }
 
 
+    /// <summary>
+    /// Get Student By Code Async.
+    /// </summary>
     public async Task<Student?> GetStudentByCodeAsync(string studentCode)
     {
         return await _context.Students
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.StudentCode == studentCode);
     }
+    /// <summary>
+    /// Get Student By Academic IDAsync.
+    /// </summary>
     public async Task<Student?> GetStudentByAcademicIDAsync(string academicID)
     {
         return await _context.Students
@@ -108,6 +135,9 @@ public class StudentRepository
             .FirstOrDefaultAsync(s => s.AcademicId == academicID);
     }
 
+    /// <summary>
+    /// Get All Student With Level Async.
+    /// </summary>
     public async Task<IEnumerable<Student>> GetAllStudentWithLevelAsync(int level)
     {
         return await _context.Students
@@ -116,6 +146,9 @@ public class StudentRepository
             .Where(s => s.AcademicLevel == level)
             .ToListAsync();
     }
+    /// <summary>
+    /// Get All Student With Courseffering Async.
+    /// </summary>
     public async Task<IEnumerable<Student>> GetAllStudentWithCoursefferingAsync(int courseOfferingID)
     {
         return await _context.Students
@@ -128,6 +161,9 @@ public class StudentRepository
     }
 
 
+    /// <summary>
+    /// Get All Student With Mode Async.
+    /// </summary>
     public async Task<IEnumerable<StudentGradeDto>> GetAllStudentWithModeAsync(int courseOfferingID, int modelId)
     {
         return await _context.StudentGradeModels
@@ -142,6 +178,9 @@ public class StudentRepository
             })
             .ToListAsync();
     }
+    /// <summary>
+    /// Get Student With Mode Async.
+    /// </summary>
     public async Task<StudentGradeDto?> GetStudentWithModeAsync(int courseOfferingID, int modelId, string StudentCode)
     {
         return await _context.StudentGradeModels

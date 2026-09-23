@@ -1,9 +1,12 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.DTO.AssessmentModule;
 using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
+/// <summary>
+/// Assessment Module Repository.
+/// </summary>
 public class AssessmentModuleRepository
     : GenericRepository<AssessmentModule>, IAssessmentModuleRepository
 {
@@ -12,6 +15,9 @@ public class AssessmentModuleRepository
     {
     }
 
+    /// <summary>
+    /// Get Modules By Course Offering Async.
+    /// </summary>
     public async Task<IEnumerable<AssessmentModelDisplayDTO>> GetModulesByCourseOfferingAsync(int courseOfferingId)
     {
         return await _context.AssessmentModules

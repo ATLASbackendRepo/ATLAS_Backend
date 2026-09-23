@@ -1,7 +1,10 @@
-﻿        using FluentValidation;
+        using FluentValidation;
 
 namespace ATLAsBLL.Features.Students.Commands.DeleteStudent
 {
+    /// <summary>
+    /// Delete Student Command Validator.
+    /// </summary>
     public class DeleteStudentCommandValidator : AbstractValidator<DeleteStudentCommand>
     {
         public DeleteStudentCommandValidator()

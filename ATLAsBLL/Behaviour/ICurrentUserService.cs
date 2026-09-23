@@ -1,14 +1,23 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
+/// <summary>
+/// ICurrent User Service.
+/// </summary>
 public interface ICurrentUserService
 {
     int? UserId { get; }
     enUserRole? Role { get; }
 }
+/// <summary>
+/// Current User Service.
+/// </summary>
 public class CurrentUserService : ICurrentUserService
 {
+    /// <summary>
+    /// _http Context Accessor.
+    /// </summary>
     private readonly IHttpContextAccessor _httpContextAccessor;
 
     public CurrentUserService(IHttpContextAccessor httpContextAccessor)

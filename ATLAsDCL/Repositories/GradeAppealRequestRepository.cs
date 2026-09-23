@@ -1,10 +1,16 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.DTO.Request;
 using ATLASDomain.Entities;
 using Microsoft.EntityFrameworkCore;
 
+/// <summary>
+/// Grade Appeal Request Repository.
+/// </summary>
 public class GradeAppealRequestRepository : IGradeAppealRequestRepository
 {
+    /// <summary>
+    /// _context.
+    /// </summary>
     private readonly AtLASDbContext _context;
 
     public GradeAppealRequestRepository(AtLASDbContext context)
@@ -12,6 +18,9 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
         _context = context;
     }
 
+    /// <summary>
+    /// Get By Id Async.
+    /// </summary>
     public async Task<GradeAppealRequestDto?> GetByIdAsync(int requestId)
     {
         return await _context.GradeAppealRequests
@@ -40,6 +49,9 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
             .FirstOrDefaultAsync();
     }
 
+    /// <summary>
+    /// Get By Student Id Async.
+    /// </summary>
     public async Task<List<GradeAppealRequestDto>> GetByStudentIdAsync(int studentId)
     {
         return await _context.GradeAppealRequests
@@ -65,6 +77,9 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Get By Doctor Id Async.
+    /// </summary>
     public async Task<List<GradeAppealRequestDto>> GetByDoctorIdAsync(int doctorUserId)
     {
         return await _context.GradeAppealRequests
@@ -90,6 +105,9 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
             .ToListAsync();
     }
 
+    /// <summary>
+    /// Has Open Request Async.
+    /// </summary>
     public async Task<bool> HasOpenRequestAsync(
         int studentId,
         int assessmentModuleId)
@@ -100,6 +118,9 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
             (x.Status == enGradeAppealStatus.Pending
              || x.Status == enGradeAppealStatus.UnderReview));
     }
+    /// <summary>
+    /// Add Async.
+    /// </summary>
     public async Task<int> AddAsync(
         CreateGradeAppealRequestDto dto,
         int studentId)
@@ -121,6 +142,9 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
 
         return request.RequestID;
     }
+    /// <summary>
+    /// Update Async.
+    /// </summary>
     public async Task<bool> UpdateAsync(
         int requestId,
         int doctorUserId,

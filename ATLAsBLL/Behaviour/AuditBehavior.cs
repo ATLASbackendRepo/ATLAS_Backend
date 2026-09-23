@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Behaviors;
+using ATLAsBLL.Behaviors;
 using MediatR;
 using System;
 using System.Collections.Generic;
@@ -11,14 +11,32 @@ namespace ATLAsBLL.Behaviour
 
 
 
+    /// <summary>
+    /// Audit Behavior.
+    /// </summary>
     public class AuditBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
       where TRequest : IRequest<TResponse>
     {
+        /// <summary>
+        /// Audited Prefixes.
+        /// </summary>
         private static readonly string[] AuditedPrefixes = { "Create", "Update", "Delete" };
+        /// <summary>
+        /// Admin Role.
+        /// </summary>
         private const string AdminRole = "Admin"; // لو الـ Role اسمه مختلف عندك، غيّرها هنا
 
+        /// <summary>
+        /// _current User Service.
+        /// </summary>
         private readonly ICurrentUserService _currentUserService;
+        /// <summary>
+        /// _audit Service.
+        /// </summary>
         private readonly IAuditService _auditService;
+        /// <summary>
+        /// _correlation Id Accessor.
+        /// </summary>
         private readonly ICorrelationIdAccessor _correlationIdAccessor;
 
         public AuditBehavior(
@@ -31,6 +49,9 @@ namespace ATLAsBLL.Behaviour
             _correlationIdAccessor = correlationIdAccessor;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             // الـ Queries مستبعدة تمامًا حتى لو الـ Admin هو اللي بيعمل الاستعلام

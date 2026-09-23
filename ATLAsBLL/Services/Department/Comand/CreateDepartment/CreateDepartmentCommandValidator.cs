@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Features.Department.Comand.CreateDepartment
 {
+    /// <summary>
+    /// Create Department Command Validator.
+    /// </summary>
     public class CreateDepartmentCommandValidator : AbstractValidator<CreateDepartmentCommand>
     {
         public CreateDepartmentCommandValidator()

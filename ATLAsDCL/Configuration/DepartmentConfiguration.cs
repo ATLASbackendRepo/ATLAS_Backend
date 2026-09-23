@@ -1,11 +1,17 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ATLAsDCL.Configuration
 {
+    /// <summary>
+    /// Department Configuration.
+    /// </summary>
     internal class DepartmentConfiguration : IEntityTypeConfiguration<Department>
     {
+        /// <summary>
+        /// Configure.
+        /// </summary>
         public void Configure(EntityTypeBuilder<Department> builder)
         {
             builder.HasKey(d => d.DepartmentId);

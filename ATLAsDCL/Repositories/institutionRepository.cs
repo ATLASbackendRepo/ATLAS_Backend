@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.Entities;
 using ATLASDomain.InterFaces.Repositories;
 using Microsoft.EntityFrameworkCore;
@@ -10,11 +10,20 @@ using System.Threading.Tasks;
 
 namespace ATLAsDCL.Repositories
 {
+    /// <summary>
+    /// institution Repository.
+    /// </summary>
     public class institutionRepository : GenericRepository<Institution>, IinstitutionRepository
     {
+        /// <summary>
+        /// base.
+        /// </summary>
         public institutionRepository(AtLASDbContext context) : base(context)
         {
         }
+        /// <summary>
+        /// Get Institution With Name Async.
+        /// </summary>
         public async Task<int> GetInstitutionWithNameAsync(string institutionName)
         {
            
@@ -46,6 +55,9 @@ namespace ATLAsDCL.Repositories
 
 
 
+        /// <summary>
+        /// Get All Institutions Async.
+        /// </summary>
         public async Task<List<InstitutionDto>> GetAllInstitutionsAsync()
         {
             return await _context.Institutions
@@ -57,6 +69,9 @@ namespace ATLAsDCL.Repositories
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Get Institution By Id Async.
+        /// </summary>
         public async Task<InstitutionDto> GetInstitutionByIdAsync( int id)
         {
             return await _context.Institutions
@@ -69,6 +84,9 @@ namespace ATLAsDCL.Repositories
                 .FirstOrDefaultAsync();
         }
 
+        /// <summary>
+        /// Create Institution Async.
+        /// </summary>
         public async Task<InstitutionDto> CreateInstitutionAsync( CreateInstitutionDto dto)
         {
             var institution = new Institution
@@ -86,6 +104,9 @@ namespace ATLAsDCL.Repositories
             };
         }
 
+        /// <summary>
+        /// Update Institution Async.
+        /// </summary>
         public async Task<bool> UpdateInstitutionAsync( UpdateInstitutionDto dto)
         {
             var institution = await _context.Institutions.FindAsync(dto.InstitutionID);
@@ -97,6 +118,9 @@ namespace ATLAsDCL.Repositories
             return true;
         }
 
+        /// <summary>
+        /// Delete Institution Async.
+        /// </summary>
         public async Task<bool> DeleteInstitutionAsync(int id)
         {
             var institution = await _context.Institutions.FindAsync(id);

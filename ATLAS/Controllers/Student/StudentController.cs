@@ -1,4 +1,4 @@
-﻿using ATLAS;
+using ATLAS;
 using ATLAsBLL.Features.Students.Commands.CreateStudent;
 using ATLAsBLL.Features.Students.Commands.CreateStudentsRange;
 using ATLAsBLL.Features.Students.Commands.DeleteStudent;
@@ -21,9 +21,18 @@ namespace ATLAS.Controllers.Student
 {
     [Route("api/Students")]
     [ApiController]
+    /// <summary>
+    /// Student Controller.
+    /// </summary>
     public class StudentController : ControllerBase
     {
+        /// <summary>
+        /// _mediator.
+        /// </summary>
         private readonly IMediator _mediator;
+        /// <summary>
+        /// _course Authorization.
+        /// </summary>
         private readonly ICourseOfferingAuthorizationService _courseAuthorization;
 
         public StudentController(IMediator mediator, ICourseOfferingAuthorizationService courseAuthorization)
@@ -37,6 +46,9 @@ namespace ATLAS.Controllers.Student
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [EnableRateLimiting("AdminGetAllPolicy")]
+        /// <summary>
+        /// Get All Student.
+        /// </summary>
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetAllStudent([FromQuery] StudentFilterDTO studentFilter)
         {
 
@@ -54,6 +66,9 @@ namespace ATLAS.Controllers.Student
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminCreateRangePolicy")]
+        /// <summary>
+        /// Create Students.
+        /// </summary>
         public async Task<ActionResult> CreateStudents(IFormFile file)
         {
             try
@@ -105,6 +120,9 @@ namespace ATLAS.Controllers.Student
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
+        /// <summary>
+        /// Create Student.
+        /// </summary>
         public async Task<ActionResult> CreateStudent([FromBody] CreateStudentDTO createStudentDTO)
         {
                  var studentId = await _mediator.Send(new CreateStudentCommand(createStudentDTO));
@@ -123,6 +141,9 @@ namespace ATLAS.Controllers.Student
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
+        /// <summary>
+        /// update Student.
+        /// </summary>
         public async Task<ActionResult> updateStudent([FromBody] UpdateStudentDto UpdateStudentDTO)
         {
                  var student = await _mediator.Send(new UpdateStudentCommand( UpdateStudentDTO));
@@ -141,6 +162,9 @@ namespace ATLAS.Controllers.Student
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminSoftDeletePolicy")]
+        /// <summary>
+        /// delete Student.
+        /// </summary>
         public async Task<ActionResult> deleteStudent([FromQuery] string StudentCode)
         {
                  var student = await _mediator.Send(new DeleteStudentCommand(StudentCode));
@@ -250,6 +274,9 @@ namespace ATLAS.Controllers.Student
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        /// <summary>
+        /// Get My Grade.
+        /// </summary>
         public async Task<ActionResult<StudentGradeDto>> GetMyGrade(int courseOfferingId, int moduleId, CancellationToken cancellationToken)
         {
             if (courseOfferingId < 1 || moduleId < 1)

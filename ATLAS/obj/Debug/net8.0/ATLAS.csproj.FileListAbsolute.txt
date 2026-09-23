@@ -207,3 +207,9 @@ C:\vs-communtiy2026\ATLAS\ATLAS\obj\Debug\net8.0\refint\ATLAS.dll
 C:\vs-communtiy2026\ATLAS\ATLAS\obj\Debug\net8.0\ATLAS.pdb
 C:\vs-communtiy2026\ATLAS\ATLAS\obj\Debug\net8.0\ATLAS.genruntimeconfig.cache
 C:\vs-communtiy2026\ATLAS\ATLAS\obj\Debug\net8.0\ref\ATLAS.dll
+C:\vs-communtiy2026\ATLAS\ATLAS\bin\Debug\net8.0\ATLAsBLL.xml
+C:\vs-communtiy2026\ATLAS\ATLAS\bin\Debug\net8.0\ATLAsDCL.xml
+C:\vs-communtiy2026\ATLAS\ATLAS\bin\Debug\net8.0\ATLASDomain.xml
+C:\vs-communtiy2026\ATLAS\ATLAS\bin\Debug\net8.0\ATLAS.xml
+C:\vs-communtiy2026\ATLAS\ATLAS\obj\Debug\net8.0\ATLAS.xml
+C:\vs-communtiy2026\ATLAS\ATLAS\obj\Debug\net8.0\staticwebassets.upToDateCheck.txt

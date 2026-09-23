@@ -4,11 +4,17 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace ATLAS.Controllers.Attendance;
+/// <summary>
+/// Attendance Controller.
+/// </summary>
 
 [ApiController]
 [Route("api/attendance")]
 public sealed class AttendanceController(IAttendanceService attendance, ICourseOfferingAuthorizationService offeringAuthorization) : ControllerBase
 {
+    /// <summary>
+    /// Start.
+    /// </summary>
     [HttpPost("sessions")]
     [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
     [ProducesResponseType(typeof(AttendanceSessionDto), StatusCodes.Status201Created)]
@@ -27,6 +33,9 @@ public sealed class AttendanceController(IAttendanceService attendance, ICourseO
     }
 
 
+    /// <summary>
+    /// Get Session.
+    /// </summary>
     [HttpGet("sessions/{sessionId:guid}")]
     [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
     public async Task<ActionResult<AttendanceSessionDto>> GetSession(Guid sessionId, CancellationToken cancellationToken)
@@ -38,6 +47,9 @@ public sealed class AttendanceController(IAttendanceService attendance, ICourseO
     }
 
     
+    /// <summary>
+    /// Get Qr.
+    /// </summary>
     [HttpGet("sessions/{sessionId:guid}/qr")]
     [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
     [ProducesResponseType(typeof(AttendanceQrDto), StatusCodes.Status200OK)]
@@ -50,6 +62,9 @@ public sealed class AttendanceController(IAttendanceService attendance, ICourseO
         return qr is null ? Conflict(new { message = "This attendance session is no longer active." }) : Ok(qr);
     }
 
+    /// <summary>
+    /// Scan.
+    /// </summary>
     [HttpPost("scan")]
     [Authorize(Roles = "Student")]
     [ProducesResponseType(typeof(AttendanceScanResult), StatusCodes.Status200OK)]
@@ -63,6 +78,9 @@ public sealed class AttendanceController(IAttendanceService attendance, ICourseO
     }
 
 
+    /// <summary>
+    /// End.
+    /// </summary>
     [HttpPost("sessions/{sessionId:guid}/end")]
     [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
     public async Task<ActionResult<AttendanceSessionDto>> End(Guid sessionId, CancellationToken cancellationToken)
@@ -73,6 +91,9 @@ public sealed class AttendanceController(IAttendanceService attendance, ICourseO
         return Ok(await attendance.EndAsync(sessionId, cancellationToken));
     }
 
+    /// <summary>
+    /// Report.
+    /// </summary>
     [HttpGet("sessions/{sessionId:guid}/report")]
     [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
     [ProducesResponseType(typeof(AttendanceReportDto), StatusCodes.Status200OK)]
@@ -84,6 +105,9 @@ public sealed class AttendanceController(IAttendanceService attendance, ICourseO
         return Ok(report);
     }
 
+    /// <summary>
+    /// Export Csv.
+    /// </summary>
     [HttpGet("{sessionId:guid}/export/csv")]
     [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
     [ResponseCache(NoStore = true)]
@@ -111,6 +135,9 @@ public sealed class AttendanceController(IAttendanceService attendance, ICourseO
         return new EmptyResult();
     }
 
+    /// <summary>
+    /// Export Pdf.
+    /// </summary>
     [HttpGet("{sessionId:guid}/export/pdf")]
     [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
     [ResponseCache(NoStore = true)]
@@ -136,5 +163,8 @@ public sealed class AttendanceController(IAttendanceService attendance, ICourseO
             $"attendance-{sessionId}.pdf");
     }
 
+    /// <summary>
+    /// Try Get User Id.
+    /// </summary>
     private bool TryGetUserId(out int userId) => int.TryParse(User.FindFirstValue(ClaimTypes.NameIdentifier), out userId);
 }

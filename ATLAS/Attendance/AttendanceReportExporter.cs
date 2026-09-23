@@ -6,12 +6,18 @@ using QuestPDF.Infrastructure;
 
 namespace ATLAS.Attendance;
 
+/// <summary>
+/// Attendance Report Exporter.
+/// </summary>
 internal static class AttendanceReportExporter
 {
     // =========================================================
     // CSV EXPORT
     // =========================================================
 
+    /// <summary>
+    /// Write Csv Async.
+    /// </summary>
     public static async Task WriteCsvAsync(
         AttendanceReportDto report,
         Stream output,
@@ -48,6 +54,9 @@ internal static class AttendanceReportExporter
         await writer.FlushAsync(cancellationToken);
     }
 
+    /// <summary>
+    /// Escape Csv.
+    /// </summary>
     private static string EscapeCsv(string? value)
     {
         if (string.IsNullOrEmpty(value))
@@ -65,6 +74,9 @@ internal static class AttendanceReportExporter
     // PDF EXPORT
     // =========================================================
 
+    /// <summary>
+    /// Write Pdf.
+    /// </summary>
     public static void WritePdf(
         AttendanceReportDto report,
         Stream output)
@@ -99,6 +111,9 @@ internal static class AttendanceReportExporter
     }
 
 
+    /// <summary>
+    /// Compose Header.
+    /// </summary>
     private static void ComposeHeader(
         IContainer container,
         AttendanceReportDto report)
@@ -128,6 +143,9 @@ internal static class AttendanceReportExporter
     }
 
 
+    /// <summary>
+    /// Compose Content.
+    /// </summary>
     private static void ComposeContent(
         IContainer container,
         AttendanceReportDto report)
@@ -200,6 +218,9 @@ internal static class AttendanceReportExporter
     }
 
 
+    /// <summary>
+    /// Header Cell Style.
+    /// </summary>
     private static IContainer HeaderCellStyle(IContainer container)
     {
         return container
@@ -212,6 +233,9 @@ internal static class AttendanceReportExporter
     }
 
 
+    /// <summary>
+    /// Body Cell Style.
+    /// </summary>
     private static IContainer BodyCellStyle(IContainer container)
     {
         return container

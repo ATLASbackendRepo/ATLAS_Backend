@@ -1,14 +1,29 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 using ATLASDomain.InterFaces;
 using Microsoft.Extensions.Options;
 
 namespace ATLAS.Middleware.Alert
 {
+    /// <summary>
+    /// Discord Notification Provider.
+    /// </summary>
     public class DiscordNotificationProvider : INotificationProvider
     {
+        /// <summary>
+        /// _http Client.
+        /// </summary>
         private readonly HttpClient _httpClient;
+        /// <summary>
+        /// _options.
+        /// </summary>
         private readonly DiscordOptions _options;
+        /// <summary>
+        /// _logger.
+        /// </summary>
         private readonly ILogger<DiscordNotificationProvider> _logger;
+        /// <summary>
+        /// Name.
+        /// </summary>
         public string Name => "Discord";
 
         public DiscordNotificationProvider(HttpClient httpClient, IOptions<DiscordOptions> options, ILogger<DiscordNotificationProvider> logger)
@@ -18,6 +33,9 @@ namespace ATLAS.Middleware.Alert
             _logger = logger;
         }
 
+        /// <summary>
+        /// Send Async.
+        /// </summary>
         public async Task SendAsync(
     SecurityEvent securityEvent,
     CancellationToken cancellationToken)

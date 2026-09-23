@@ -9,9 +9,18 @@ using ATLAS.Domain.Entities;
 
 namespace ATLAsDCL.Repositories
 {
+    /// <summary>
+    /// Course Group Message Repository.
+    /// </summary>
     public class CourseGroupMessageRepository : GenericRepository<CourseGroupMessage>, ICourseGroupMessageRepository
     {
+        /// <summary>
+        /// _Context.
+        /// </summary>
         private readonly AtLASDbContext _Context;
+        /// <summary>
+        /// base.
+        /// </summary>
         public CourseGroupMessageRepository(AtLASDbContext context) : base(context)
         {
             _Context = context;
@@ -20,6 +29,9 @@ namespace ATLAsDCL.Repositories
 
       
 
+        /// <summary>
+        /// Get By Course Offering Async.
+        /// </summary>
         public async Task<IEnumerable<CourseGroupMessage>> GetByCourseOfferingAsync(int courseOfferingId, int page, int pageSize)
         {
             return await _Context.CourseGroupMessages
@@ -32,6 +44,9 @@ namespace ATLAsDCL.Repositories
                 .ToListAsync();
         }
 
+        /// <summary>
+        /// Soft Delete Async.
+        /// </summary>
         public Task SoftDeleteAsync(CourseGroupMessage message)
         {
             message.IsDeleted = true;
@@ -39,6 +54,9 @@ namespace ATLAsDCL.Repositories
             return Task.CompletedTask;
         }
 
+        /// <summary>
+        /// Toggle Pin Async.
+        /// </summary>
         public Task TogglePinAsync(CourseGroupMessage message)
         {
             message.IsPinned = !message.IsPinned;

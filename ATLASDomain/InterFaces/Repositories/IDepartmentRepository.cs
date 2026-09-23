@@ -1,9 +1,12 @@
-﻿using ATLASDomain.DTO.Department;
+using ATLASDomain.DTO.Department;
 using ATLASDomain.Entities;
 using ATLASDomain.InterFaces.Repositories;
 
 namespace ATLASDomain.Interfaces.Repositories;
 
+/// <summary>
+/// IDepartment Repository.
+/// </summary>
 public interface IDepartmentRepository : IGenericRepository<Department>
 {
     Task<Department?> GetDepartmentWithStudentsAsync(int departmentId);

@@ -1,4 +1,4 @@
-﻿using FluentValidation;
+using FluentValidation;
 using MediatR;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,9 +7,15 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Behaviors
 {
+    /// <summary>
+    /// Validation Behavior.
+    /// </summary>
     public class ValidationBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
+        /// <summary>
+        /// _validators.
+        /// </summary>
         private readonly IEnumerable<IValidator<TRequest>> _validators;
 
         
@@ -18,6 +24,9 @@ namespace ATLAsBLL.Behaviors
             _validators = validators;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
             if (_validators.Any())

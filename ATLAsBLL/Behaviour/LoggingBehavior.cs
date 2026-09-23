@@ -1,13 +1,19 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using System.Diagnostics;
 
 namespace ATLAsBLL.Behaviors
 {
+    /// <summary>
+    /// Logging Behavior.
+    /// </summary>
     public class LoggingBehavior<TRequest, TResponse>
         : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
+        /// <summary>
+        /// _logger.
+        /// </summary>
         private readonly ILogger<LoggingBehavior<TRequest, TResponse>> _logger;
 
         public LoggingBehavior(
@@ -16,6 +22,9 @@ namespace ATLAsBLL.Behaviors
             _logger = logger;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<TResponse> Handle(
             TRequest request,
             RequestHandlerDelegate<TResponse> next,

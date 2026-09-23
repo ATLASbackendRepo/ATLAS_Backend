@@ -1,4 +1,4 @@
-﻿
+
     using ATLAsDCL.UnitOfWork;
     using ATLASDomain.Entities;
     using global::ATLAsBLL.Events;
@@ -13,9 +13,18 @@ namespace ATLAsBLL.Services.profile.Student
 
     namespace ATLAsBLL.Services.Notifications
     {
+        /// <summary>
+        /// Create Student On User Created.
+        /// </summary>
         public class CreateStudentOnUserCreated : INotificationHandler<StudentCreatedDomainEvent>
         {
+            /// <summary>
+            /// _unit Of Work.
+            /// </summary>
             private readonly IUnitOfWork _unitOfWork;
+            /// <summary>
+            /// _publisher.
+            /// </summary>
             private readonly IPublisher _publisher;
 
             public CreateStudentOnUserCreated(IUnitOfWork unitOfWork, IPublisher publisher)
@@ -24,6 +33,9 @@ namespace ATLAsBLL.Services.profile.Student
                 _publisher = publisher;
             }
 
+            /// <summary>
+            /// Handle.
+            /// </summary>
             public async Task Handle(StudentCreatedDomainEvent student, CancellationToken cancellationToken)
             {
 

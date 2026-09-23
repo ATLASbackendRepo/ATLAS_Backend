@@ -1,7 +1,10 @@
-﻿using System.Linq.Expressions;
+using System.Linq.Expressions;
 
 namespace ATLASDomain.InterFaces.Repositories
 {
+    /// <summary>
+    /// IGeneric Repository.
+    /// </summary>
     public interface IGenericRepository<TEntity>
     where TEntity : class
     {

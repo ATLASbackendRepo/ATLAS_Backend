@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Exceptions;
+using ATLAsBLL.Exceptions;
 using ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest;
 using ATLAsBLL.Services.Request.Command.UpdateGradeAppealRequest;
 using ATLAsBLL.Services.Request.Qeuries;
@@ -13,8 +13,14 @@ namespace ATLAS.Controllers.Requests;
 
     [ApiController]
 [Route("api/Request")]
+/// <summary>
+/// Request Controller.
+/// </summary>
 public class RequestController : ControllerBase
 {
+    /// <summary>
+    /// _mediator.
+    /// </summary>
     private readonly IMediator _mediator;
 
     public RequestController(IMediator mediator)
@@ -27,6 +33,9 @@ public class RequestController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [Authorize(Roles = "Student")]
     [EnableRateLimiting("RequestWritePolicy")]
+    /// <summary>
+    /// Create.
+    /// </summary>
     public async Task<IActionResult> Create(
         [FromBody] CreateGradeAppealRequestDto dto,
         CancellationToken cancellationToken)
@@ -62,6 +71,9 @@ public class RequestController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [Authorize(Roles = "Doctor")]
     [EnableRateLimiting("RequestWritePolicy")]
+    /// <summary>
+    /// Update.
+    /// </summary>
     public async Task<IActionResult> Update(
         int requestId,
         [FromBody] UpdateGradeAppealRequestDto dto,
@@ -83,6 +95,9 @@ public class RequestController : ControllerBase
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [Authorize(Roles = "Student")]
     [EnableRateLimiting("RequestReadPolicy")]
+    /// <summary>
+    /// Get My Requests.
+    /// </summary>
     public async Task<ActionResult<List<GradeAppealRequestDto>>> GetMyRequests(
         CancellationToken cancellationToken)
     {
@@ -104,6 +119,9 @@ public class RequestController : ControllerBase
     [Authorize(Roles = "Doctor")]
     [EnableRateLimiting("RequestReadPolicy")]
 
+    /// <summary>
+    /// Get Doctor Requests.
+    /// </summary>
     public async Task<ActionResult<List<GradeAppealRequestDto>>> GetDoctorRequests(
         CancellationToken cancellationToken)
     {
@@ -123,6 +141,9 @@ public class RequestController : ControllerBase
 
     [HttpGet("{requestId:int}")]
     [Authorize(Roles = "Student")]
+    /// <summary>
+    /// Get By Id.
+    /// </summary>
     public async Task<ActionResult<GradeAppealRequestDto>> GetById(
     int requestId,
     CancellationToken cancellationToken)
@@ -151,6 +172,9 @@ public class RequestController : ControllerBase
 
 
 
+    /// <summary>
+    /// Get Current User Id.
+    /// </summary>
     private int GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);

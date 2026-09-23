@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade
 {
+    /// <summary>
+    /// Assign Course Grade Command Validator.
+    /// </summary>
     public class AssignCourseGradeCommandValidator : AbstractValidator<AssignCourseGradeCommand>
     {
         public AssignCourseGradeCommandValidator()

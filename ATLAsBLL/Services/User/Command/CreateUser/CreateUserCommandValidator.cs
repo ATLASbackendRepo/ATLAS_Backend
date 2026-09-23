@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Features.Users.Commands.CreateUser
 {
+    /// <summary>
+    /// Create User Command Validator.
+    /// </summary>
     public class CreateUserCommandValidator : AbstractValidator<CreateUserCommand>
     {
         public CreateUserCommandValidator()

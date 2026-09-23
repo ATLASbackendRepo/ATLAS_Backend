@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Services.profile.Staff.Query;
+using ATLAsBLL.Services.profile.Staff.Query;
 using ATLAsDCL.UnitOfWork;
 using ATLASDomain.DTO.Profile;
 using System;
@@ -10,8 +10,14 @@ using MediatR;
 
 namespace ATLAsBLL.Services.profile.Student.Query
 {
+    /// <summary>
+    /// Get Student Profile By User Id Query Handler.
+    /// </summary>
     public class GetStudentProfileByUserIdQueryHandler : IRequestHandler<GetStudentProfileByUserIdQuery, StudentProfileResponseDTO?>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public GetStudentProfileByUserIdQueryHandler(IUnitOfWork unitOfWork)
@@ -19,6 +25,9 @@ namespace ATLAsBLL.Services.profile.Student.Query
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<StudentProfileResponseDTO?> Handle(
             GetStudentProfileByUserIdQuery request,
             CancellationToken cancellationToken)

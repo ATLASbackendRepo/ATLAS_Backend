@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
@@ -7,10 +7,19 @@ using ATLAsDCL.UnitOfWork; // تأكد من وجود آلية الـ Transaction
 
 namespace ATLAsBLL.Behaviors
 {
+    /// <summary>
+    /// Transaction Behavior.
+    /// </summary>
     public class TransactionBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse>
         where TRequest : IRequest<TResponse>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
+        /// <summary>
+        /// _logger.
+        /// </summary>
         private readonly ILogger<TransactionBehavior<TRequest, TResponse>> _logger;
 
         public TransactionBehavior(IUnitOfWork unitOfWork, ILogger<TransactionBehavior<TRequest, TResponse>> logger)
@@ -19,6 +28,9 @@ namespace ATLAsBLL.Behaviors
             _logger = logger;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
          

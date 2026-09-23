@@ -1,9 +1,12 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.DTO.Department;
 using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
 using Microsoft.EntityFrameworkCore;
 
+/// <summary>
+/// Department Repository.
+/// </summary>
 public class DepartmentRepository
     : GenericRepository<Department>, IDepartmentRepository
 {
@@ -12,6 +15,9 @@ public class DepartmentRepository
     {
 
     }
+    /// <summary>
+    /// Get Department With Students Async.
+    /// </summary>
     public async Task<Department?> GetDepartmentWithStudentsAsync(int departmentId)
     {
         return await _context.Departments
@@ -21,6 +27,9 @@ public class DepartmentRepository
             .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
     }
 
+    /// <summary>
+    /// Get Department With Doctors Async.
+    /// </summary>
     public async Task<Department?> GetDepartmentWithDoctorsAsync(int departmentId)
     {
         return await _context.Departments
@@ -29,6 +38,9 @@ public class DepartmentRepository
             .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
     }
 
+    /// <summary>
+    /// Get Department Withname Async.
+    /// </summary>
     public async Task<int> GetDepartmentWithnameAsync(string departmentName, int institutionId)
     {
         var departmentId = await _context.Departments
@@ -52,6 +64,9 @@ public class DepartmentRepository
         return newDepartment.DepartmentId;
     }
 
+    /// <summary>
+    /// Get Departments.
+    /// </summary>
     public async Task<List<DepartmentDTO>> GetDepartments(string? departmentName)
     {
         var query = _context.Departments

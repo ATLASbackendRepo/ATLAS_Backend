@@ -1,4 +1,4 @@
-﻿using ATLAS.Domain.Entities;
+using ATLAS.Domain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -7,6 +7,9 @@ using System.Threading.Tasks;
 
 namespace ATLASDomain.InterFaces.Repositories
 {
+    /// <summary>
+    /// IStudent Profile Repository.
+    /// </summary>
     public interface IStudentProfileRepository :IGenericRepository<StudentProfile>
     {
         Task<StudentProfile?> GetByUserIdAsync(int UserId);

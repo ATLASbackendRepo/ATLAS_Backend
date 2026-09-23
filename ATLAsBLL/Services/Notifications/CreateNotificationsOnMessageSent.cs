@@ -10,9 +10,18 @@ using ATLAS.Domain.Entities;
 
 namespace ATLAsBLL.Services.Notifications
 {
+    /// <summary>
+    /// Create Notifications On Message Sent.
+    /// </summary>
     public class CreateNotificationsOnMessageSent : INotificationHandler<CourseGroupMessageSentEvent>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
+        /// <summary>
+        /// Body Preview Length.
+        /// </summary>
         private const int BodyPreviewLength = 500;
 
         public CreateNotificationsOnMessageSent(IUnitOfWork unitOfWork)
@@ -20,6 +29,9 @@ namespace ATLAsBLL.Services.Notifications
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task Handle(CourseGroupMessageSentEvent notification, CancellationToken cancellationToken)
         {
             var preview = notification.Content.Length <= BodyPreviewLength

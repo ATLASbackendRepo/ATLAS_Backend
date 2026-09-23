@@ -8,8 +8,14 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.Student.Queries.GetallStudent
 {
+    /// <summary>
+    /// Get All Students Query Handler.
+    /// </summary>
     public class GetAllStudentsQueryHandler : IRequestHandler<GetAllStudentsQuery, IEnumerable<StudentDTO>>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public GetAllStudentsQueryHandler(IUnitOfWork unitOfWork)
@@ -17,6 +23,9 @@ namespace ATLAsBLL.Services.Student.Queries.GetallStudent
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<IEnumerable<StudentDTO>> Handle(GetAllStudentsQuery request, CancellationToken cancellationToken)
         {
           

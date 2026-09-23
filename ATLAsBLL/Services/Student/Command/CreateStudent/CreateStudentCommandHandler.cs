@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 using ATLASDomain.Entities;
@@ -8,9 +8,18 @@ using System.Security.Cryptography;
 
 namespace ATLAsBLL.Features.Students.Commands.CreateStudent
 {
+    /// <summary>
+    /// Create Student Command Handler.
+    /// </summary>
     public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand, int>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
+        /// <summary>
+        /// _publisher.
+        /// </summary>
         private readonly IPublisher _publisher;
 
         public CreateStudentCommandHandler(IUnitOfWork unitOfWork, IPublisher publisher)
@@ -19,6 +28,9 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
             _publisher = publisher;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<int> Handle(CreateStudentCommand request, CancellationToken cancellationToken)
         {
             

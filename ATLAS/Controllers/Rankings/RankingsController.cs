@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Services.CourseGrade.Queries;
+using ATLAsBLL.Services.CourseGrade.Queries;
 using ATLAsBLL.Services.CourseGrade.Queries.GetMySemesterRank;
 using ATLASDomain.DTO.CourseGrade;
 using MediatR;
@@ -11,8 +11,14 @@ namespace ATLAS.API.Controllers;
 
 [ApiController]
 [Route("api/semesters/{semesterId:int}/rankings")]
+/// <summary>
+/// Rankings Controller.
+/// </summary>
 public class RankingsController : ControllerBase
 {
+    /// <summary>
+    /// _mediator.
+    /// </summary>
     private readonly IMediator _mediator;
 
     public RankingsController(IMediator mediator)
@@ -29,6 +35,9 @@ public class RankingsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Student")]
     [EnableRateLimiting("RankingsPolicy")]
+    /// <summary>
+    /// Get My Rank.
+    /// </summary>
     public async Task<ActionResult<MyRankDto>> GetMyRank(
     int semesterId, 
     CancellationToken cancellationToken)
@@ -62,6 +71,9 @@ public class RankingsController : ControllerBase
     [ProducesResponseType(typeof(List<TopRankedStudentDto>), StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Student")]
     [EnableRateLimiting("RankingsPolicy")]
+    /// <summary>
+    /// Get Top Ranked.
+    /// </summary>
     public async Task<ActionResult<List<TopRankedStudentDto>>> GetTopRanked(   // forget level (int)
         int semesterId,
         int AcademicLevel,
@@ -87,6 +99,9 @@ public class RankingsController : ControllerBase
     }
 
 
+    /// <summary>
+    /// Get Current User Id.
+    /// </summary>
     private int GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);

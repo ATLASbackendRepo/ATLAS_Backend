@@ -9,8 +9,14 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.Student.Queries.GetallStudent
 {
+    /// <summary>
+    /// Get Student By Code Handler.
+    /// </summary>
     public class GetStudentByCodeHandler : IRequestHandler<GetStudentByCodeQuery, StudentDTO>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public GetStudentByCodeHandler(IUnitOfWork unitOfWork)
@@ -18,6 +24,9 @@ namespace ATLAsBLL.Services.Student.Queries.GetallStudent
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<StudentDTO> Handle(GetStudentByCodeQuery request, CancellationToken cancellationToken)
         {
 

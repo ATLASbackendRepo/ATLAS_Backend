@@ -1,9 +1,12 @@
-﻿using ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule;
+using ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule;
 using FluentValidation;
 using AssessmentModuleEntity = ATLASDomain.Entities.AssessmentModule;
 
 namespace ATLAsBLL.Services.AssessmentModule.Command.CreateAssessmentModule
 {
+    /// <summary>
+    /// Create Assessment Module Command Validator.
+    /// </summary>
     public class CreateAssessmentModuleCommandValidator : AbstractValidator<CreateAssessmentModuleCommand>
     {
       public CreateAssessmentModuleCommandValidator()

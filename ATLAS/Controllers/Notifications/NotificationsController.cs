@@ -15,8 +15,14 @@ namespace ATLAS.Controllers;
 [Authorize]
 [ApiController]
 [Route("api/notifications")]
+/// <summary>
+/// Notifications Controller.
+/// </summary>
 public class NotificationsController : ControllerBase
 {
+    /// <summary>
+    /// _mediator.
+    /// </summary>
     private readonly IMediator _mediator;
 
     public NotificationsController(IMediator mediator)
@@ -31,6 +37,9 @@ public class NotificationsController : ControllerBase
     [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
     [EnableRateLimiting("NotificationsPolicy")]
 
+    /// <summary>
+    /// Get Notifications.
+    /// </summary>
     public async Task<ActionResult<List<NotificationDto>>> GetNotifications(
         [FromQuery] bool unreadOnly = false,
         CancellationToken cancellationToken = default)
@@ -53,6 +62,9 @@ public class NotificationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
     [EnableRateLimiting("NotificationsPolicy")]
+    /// <summary>
+    /// Mark As Read.
+    /// </summary>
     public async Task<IActionResult> MarkAsRead(
     [FromRoute] int notificationId,
     CancellationToken cancellationToken = default)
@@ -85,6 +97,9 @@ public class NotificationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
     [EnableRateLimiting("NotificationsReadAllPolicy")]
+    /// <summary>
+    /// Mark All As Read.
+    /// </summary>
     public async Task<IActionResult> MarkAllAsRead(CancellationToken cancellationToken = default)
     {
         try
@@ -100,6 +115,9 @@ public class NotificationsController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get Current User Id.
+    /// </summary>
     private int     GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);

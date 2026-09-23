@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Features.Department.Comand.CreateDepartment;
+using ATLAsBLL.Features.Department.Comand.CreateDepartment;
 using ATLAsBLL.Features.Department.Comand.DeleteDepartment;
 using ATLAsBLL.Features.Department.Comand.UpdateDepartment;
 using ATLAsBLL.Services.Department.Query;
@@ -9,22 +9,31 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 
 namespace ATLAS.Controllers.Instution
-{
+{    /// <summary>
+    /// Instutoin Controller.
+    /// </summary>
     [Route("api/Instutoin")]
     [ApiController]
+
     public class InstutoinController : Controller
     {
+        /// <summary>
+        /// _mediator.
+        /// </summary>
         private readonly IMediator _mediator;
         public InstutoinController(IMediator mediator)
         {
             _mediator = mediator;
         }
-
+       /// <summary>
+        /// Create Instutoin.
+        /// </summary>
         [HttpPost("CreateInstutoin")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
+ 
         public async Task<IActionResult> CreateInstutoin([FromBody] CreateInstitutionDto institutionDto)
         {
             if (institutionDto != null)
@@ -38,7 +47,9 @@ namespace ATLAS.Controllers.Instution
             }
             return BadRequest();
         }
-
+        /// <summary>
+        /// Update Instutoin.
+        /// </summary>
 
         [HttpPut("UpdateInstutoin")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -46,6 +57,7 @@ namespace ATLAS.Controllers.Instution
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
+
         public async Task<IActionResult> UpdateInstutoin([FromBody] UpdateInstitutionDto Dto)
         {
             try
@@ -66,13 +78,16 @@ namespace ATLAS.Controllers.Instution
         }
 
 
-
+        /// <summary>
+        /// Delete Instutoin.
+        /// </summary>
         [HttpDelete("DeleteInstutoin")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminSoftDeletePolicy")]
+
         public async Task<IActionResult> DeleteInstutoin(int InstutionID)
         {
             if (InstutionID <= 0)
@@ -91,13 +106,16 @@ namespace ATLAS.Controllers.Instution
 
 
 
-
+     /// <summary>
+        /// Get Instutoin.
+        /// </summary>
         [HttpGet("GetInstutoin")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminGetAllPolicy")]
 
+   
         public async Task<IActionResult> GetInstutoin()
         {
             var instution = await _mediator.Send(new GetAllInstitutionsQuery());
@@ -110,13 +128,16 @@ namespace ATLAS.Controllers.Instution
 
 
         }
-
+ /// <summary>
+        /// Get Instutoin By ID.
+        /// </summary>
         [HttpGet("GetInstutoinByID")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminGetAllPolicy")]
 
+       
         public async Task<IActionResult> GetInstutoinByID(int InstutionID)
         {
             var instution = await _mediator.Send(new GetInstitutionByIdQuery(InstutionID));

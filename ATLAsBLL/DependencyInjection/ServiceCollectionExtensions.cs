@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Behaviors;
+using ATLAsBLL.Behaviors;
 using ATLAsBLL.Behaviors.Caching;
 using ATLAsBLL.Behaviour;
 using ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade;
@@ -11,8 +11,14 @@ using System.Reflection;
 
 namespace ATLAsBLL // أو اسم الـ Namespace الحقيقي عندك
 {
+    /// <summary>
+    /// Dependency Injection.
+    /// </summary>
     public static class DependencyInjection
     {
+        /// <summary>
+        /// Add Business Logic Layer.
+        /// </summary>
         public static IServiceCollection AddBusinessLogicLayer(this IServiceCollection services)
         {
             var assembly = Assembly.GetExecutingAssembly();

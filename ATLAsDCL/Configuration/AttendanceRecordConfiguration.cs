@@ -4,8 +4,14 @@ using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ATLAsDCL.Configuration;
 
+/// <summary>
+/// Attendance Record Configuration.
+/// </summary>
 public sealed class AttendanceRecordConfiguration : IEntityTypeConfiguration<AttendanceRecord>
 {
+    /// <summary>
+    /// Configure.
+    /// </summary>
     public void Configure(EntityTypeBuilder<AttendanceRecord> builder)
     {
         builder.HasKey(x => x.AttendanceRecordId);

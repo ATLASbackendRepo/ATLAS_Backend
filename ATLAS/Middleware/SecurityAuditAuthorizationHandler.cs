@@ -1,4 +1,4 @@
-﻿using ATLASDomain.InterFaces;
+using ATLASDomain.InterFaces;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Authorization.Policy;
 using Microsoft.AspNetCore.Http;
@@ -11,12 +11,21 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.Auth
 {
+    /// <summary>
+    /// Security Audit Authorization Handler.
+    /// </summary>
     public class SecurityAuditAuthorizationHandler : IAuthorizationMiddlewareResultHandler
     {
+        /// <summary>
+        /// _default Handler.
+        /// </summary>
         private readonly AuthorizationMiddlewareResultHandler _defaultHandler = new();
 
         // مفيش ISecurityEventService هنا خالص في الـ Constructor
 
+        /// <summary>
+        /// Handle Async.
+        /// </summary>
         public async Task HandleAsync(
             RequestDelegate next,
             HttpContext context,
@@ -44,6 +53,9 @@ namespace ATLAsBLL.Services.Auth
             await _defaultHandler.HandleAsync(next, context, policy, authorizeResult);
         }
 
+        /// <summary>
+        /// Try Get User Id.
+        /// </summary>
         private static int? TryGetUserId(HttpContext context)
         {
             var claim = context.User?.FindFirst(ClaimTypes.NameIdentifier)?.Value;

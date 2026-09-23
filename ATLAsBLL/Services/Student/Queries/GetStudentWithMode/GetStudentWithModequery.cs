@@ -8,6 +8,9 @@ using MediatR;
 
 namespace ATLAsBLL.Services.Student.Queries.GetStudentWithMode
 {
+    /// <summary>
+    /// Get Student With Modequery.
+    /// </summary>
     public record GetStudentWithModequery(int CourseOfferingID, int ModelID) : IQuery<IEnumerable<StudentGradeDto>>
     {
     }

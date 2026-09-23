@@ -1,9 +1,12 @@
-﻿using ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule;
+using ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule;
 using FluentValidation;
 using AssessmentModuleEntity = ATLASDomain.Entities.AssessmentModule;
 
 namespace ATLAsBLL.Services.AssessmentModule.Command.UpdateAssessmentModule
 {
+    /// <summary>
+    /// Update Assessment Module Command Validator.
+    /// </summary>
     internal class UpdateAssessmentModuleCommandValidator : AbstractValidator<UpdateAssessmentModuleCommand>
     {
         public UpdateAssessmentModuleCommandValidator()

@@ -1,7 +1,10 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Features.Students.Commands.CreateStudent
 {
+    /// <summary>
+    /// Create Student Command Validator.
+    /// </summary>
     public class CreateStudentCommandValidator : AbstractValidator<CreateStudentCommand>
     {
         public CreateStudentCommandValidator()

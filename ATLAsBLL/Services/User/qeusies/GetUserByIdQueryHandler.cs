@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.UnitOfWork;
+using ATLAsDCL.UnitOfWork;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,9 +7,15 @@ namespace ATLAsBLL.Services.User.qeusies
 
 
  
+    /// <summary>
+    /// Get User By Id Query Handler.
+    /// </summary>
     public sealed class GetUserByIdQueryHandler
         : IRequestHandler<GetUserByIdQuery, ATLASDomain.Entities.User?>
     {
+        /// <summary>
+        /// _uintofwork.
+        /// </summary>
         private readonly IUnitOfWork _uintofwork;
 
         public GetUserByIdQueryHandler(IUnitOfWork unitOfWork)
@@ -17,6 +23,9 @@ namespace ATLAsBLL.Services.User.qeusies
             _uintofwork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<ATLASDomain.Entities.User?> Handle(
             GetUserByIdQuery request,
             CancellationToken cancellationToken)

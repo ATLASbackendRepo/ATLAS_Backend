@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.Data;
+using ATLAsDCL.Data;
 using ATLASDomain.Interfaces.Repositories;
 using ATLAsDCL.UnitOfWork;
 using Microsoft.EntityFrameworkCore;
@@ -10,8 +10,14 @@ using ATLASDomain.InterFaces.Repositories;
 
 namespace ATLAsDCL.DependencyInjection;
 
+/// <summary>
+/// Service Collection Extensions.
+/// </summary>
 public static class ServiceCollectionExtensions
 {
+    /// <summary>
+    /// Add DAL.
+    /// </summary>
     public static IServiceCollection AddDAL(
         this IServiceCollection services,
         IConfiguration configuration)

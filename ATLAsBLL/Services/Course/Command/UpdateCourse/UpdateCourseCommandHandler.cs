@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using ATLAsDCL.UnitOfWork;
 using System.IO; 
 using System.Threading;
@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Features.Courses.Commands.UpdateCourse
 {
+    /// <summary>
+    /// Update Course Command Handler.
+    /// </summary>
     public class UpdateCourseCommandHandler : IRequestHandler<UpdateCourseCommand, bool>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public UpdateCourseCommandHandler(IUnitOfWork unitOfWork)
@@ -15,6 +21,9 @@ namespace ATLAsBLL.Features.Courses.Commands.UpdateCourse
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<bool> Handle(UpdateCourseCommand request, CancellationToken cancellationToken)
         {
             var course = await _unitOfWork.Courses.GetByIdAsync(request.UpdateCourseDTO.Id);

@@ -3,6 +3,9 @@ using ATLAsBLL.Services.CourseGroupMessage.Command.EditCourseGroupMessage;
 
 namespace ATLAsBLL.Services.CourseGroupMessage.Command.EditCourseGroupMessage;
 
+/// <summary>
+/// Edit Course Group Message Command Validator.
+/// </summary>
 public class EditCourseGroupMessageCommandValidator : AbstractValidator<EditCourseGroupMessageCommand>
 {
     public EditCourseGroupMessageCommandValidator()

@@ -1,4 +1,4 @@
-﻿using ATLAsDCL.UnitOfWork;
+using ATLAsDCL.UnitOfWork;
 using ATLASDomain.Entities;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -7,8 +7,14 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade
 {
+    /// <summary>
+    /// Assign Course Grade Command Handler.
+    /// </summary>
     public class AssignCourseGradeCommandHandler : IRequestHandler<AssignCourseGradeCommand, bool>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public AssignCourseGradeCommandHandler(IUnitOfWork unitOfWork)
@@ -16,6 +22,9 @@ namespace ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<bool> Handle(AssignCourseGradeCommand request, CancellationToken cancellationToken)
         {
             var enrollment = await _unitOfWork.Enrollments.GetByIdAsync(request.EnrollmentId);

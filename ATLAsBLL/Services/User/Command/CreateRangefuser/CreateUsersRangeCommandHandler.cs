@@ -1,13 +1,22 @@
-﻿using ATLAsBLL.Events;
+using ATLAsBLL.Events;
 using ATLAsDCL.UnitOfWork;
 using ATLASDomain.Entities;
 using MediatR;
 
 namespace ATLAsBLL.Features.Users.Commands.CreateUsersRange
 {
+    /// <summary>
+    /// Create Users Range Command Handler.
+    /// </summary>
     public class CreateUsersRangeCommandHandler : IRequestHandler<CreateUsersRangeCommand, string>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
+        /// <summary>
+        /// _publisher.
+        /// </summary>
         private readonly IPublisher _publisher;
 
         public CreateUsersRangeCommandHandler(IUnitOfWork unitOfWork, IPublisher publisher)
@@ -16,6 +25,9 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUsersRange
             _publisher = publisher;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<string> Handle(CreateUsersRangeCommand request, CancellationToken cancellationToken)
         {  
             var usersEntities = new List<User>();

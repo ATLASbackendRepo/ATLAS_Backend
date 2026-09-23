@@ -6,6 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ATLAS.Attendance;
 
+/// <summary>
+/// IAttendance Service.
+/// </summary>
 public interface IAttendanceService
 {
     Task<AttendanceSessionDto> StartAsync(int courseOfferingId, int userId, int durationMinutes, CancellationToken cancellationToken);
@@ -15,11 +18,20 @@ public interface IAttendanceService
     Task<AttendanceReportDto?> GetReportAsync(Guid sessionId, CancellationToken cancellationToken);
 }
 
+/// <summary>
+/// Attendance Service.
+/// </summary>
 public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeProvider) : IAttendanceService
 {
     // QR payloads are verified server-side; a captured payload is valid for one five-second slot only.
+    /// <summary>
+    /// Rotation Seconds.
+    /// </summary>
     private const int RotationSeconds = 5;
 
+    /// <summary>
+    /// Start Async.
+    /// </summary>
     public async Task<AttendanceSessionDto> StartAsync(int courseOfferingId, int userId, int durationMinutes, CancellationToken cancellationToken)
     {
         var now = timeProvider.GetUtcNow().UtcDateTime;
@@ -42,6 +54,9 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
         return ToDto(session, 0);
     }
 
+    /// <summary>
+    /// Get Current Qr Async.
+    /// </summary>
     public async Task<AttendanceQrDto?> GetCurrentQrAsync(Guid sessionId, CancellationToken cancellationToken)
     {
         var session = await context.AttendanceSessions.SingleOrDefaultAsync(x => x.AttendanceSessionId == sessionId, cancellationToken);
@@ -56,6 +71,9 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
         return new AttendanceQrDto(session.AttendanceSessionId, BuildToken(session, slot), validUntil, session.ExpiresAt);
     }
 
+    /// <summary>
+    /// Record Scan Async.
+    /// </summary>
     public async Task<AttendanceScanResult> RecordScanAsync(string qrToken, int studentUserId, string deviceId, CancellationToken cancellationToken)
     {
         if (string.IsNullOrWhiteSpace(deviceId) || deviceId.Length < 16 || deviceId.Length > 256)
@@ -90,6 +108,9 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
         return new AttendanceScanResult(session.AttendanceSessionId, now, "Attendance recorded.");
     }
 
+    /// <summary>
+    /// End Async.
+    /// </summary>
     public async Task<AttendanceSessionDto?> EndAsync(Guid sessionId, CancellationToken cancellationToken)
     {
         var session = await context.AttendanceSessions.Include(x => x.Records).SingleOrDefaultAsync(x => x.AttendanceSessionId == sessionId, cancellationToken);
@@ -98,6 +119,9 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
         return ToDto(session, session.Records.Count);
     }
 
+    /// <summary>
+    /// Get Report Async.
+    /// </summary>
     public async Task<AttendanceReportDto?> GetReportAsync(Guid sessionId, CancellationToken cancellationToken)
     {
         var session = await context.AttendanceSessions.AsNoTracking().SingleOrDefaultAsync(x => x.AttendanceSessionId == sessionId, cancellationToken);
@@ -110,12 +134,33 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
             rows.Select(x => new AttendanceReportRowDto(x.StudentID, x.StudentCode, x.StudentName, x.RecordedAt.HasValue ? "Present" : "Absent", x.RecordedAt)).ToList());
     }
 
+    /// <summary>
+    /// To Dto.
+    /// </summary>
     private static AttendanceSessionDto ToDto(AttendanceSession x, int count) => new(x.AttendanceSessionId, x.CourseOfferingId, x.StartedAt, x.ExpiresAt, x.EndedAt, x.Status.ToString(), count);
+    /// <summary>
+    /// Expire If Needed.
+    /// </summary>
     private static void ExpireIfNeeded(AttendanceSession x, DateTime now) { if (x.Status == AttendanceSessionStatus.Active && x.ExpiresAt <= now) { x.Status = AttendanceSessionStatus.Expired; x.EndedAt ??= x.ExpiresAt; } }
+    /// <summary>
+    /// Build Token.
+    /// </summary>
     private static string BuildToken(AttendanceSession session, long slot) => $"{session.AttendanceSessionId:N}.{slot}.{Sign(session, slot)}";
+    /// <summary>
+    /// Sign.
+    /// </summary>
     private static string Sign(AttendanceSession session, long slot) { using var hmac = new HMACSHA256(Convert.FromBase64String(session.SigningKey)); return Convert.ToHexString(hmac.ComputeHash(Encoding.UTF8.GetBytes($"{session.AttendanceSessionId:N}.{slot}"))); }
+    /// <summary>
+    /// Parse Token.
+    /// </summary>
     private static (Guid SessionId, long Slot, string Signature)? ParseToken(string token) { var parts = token?.Split('.') ?? []; return parts.Length == 3 && Guid.TryParseExact(parts[0], "N", out var id) && long.TryParse(parts[1], out var slot) && parts[2].Length == 64 ? (id, slot, parts[2]) : null; }
 }
 
+/// <summary>
+/// Attendance Validation Exception.
+/// </summary>
 public sealed class AttendanceValidationException(string message) : Exception(message);
+/// <summary>
+/// Attendance Conflict Exception.
+/// </summary>
 public sealed class AttendanceConflictException(string message) : Exception(message);

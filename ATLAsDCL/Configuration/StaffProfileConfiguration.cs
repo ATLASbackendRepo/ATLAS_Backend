@@ -1,12 +1,18 @@
-﻿// Persistence/Configurations/StaffProfileConfiguration.cs
+// Persistence/Configurations/StaffProfileConfiguration.cs
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 using ATLAS.Domain.Entities;
 
 namespace ATLAS.Persistence.Configurations
 {
+    /// <summary>
+    /// Staff Profile Configuration.
+    /// </summary>
     public class StaffProfileConfiguration : IEntityTypeConfiguration<StaffProfile>
     {
+        /// <summary>
+        /// Configure.
+        /// </summary>
         public void Configure(EntityTypeBuilder<StaffProfile> builder)
         {
             builder.ToTable("StaffProfiles");

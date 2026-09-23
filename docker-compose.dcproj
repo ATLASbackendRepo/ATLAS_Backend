@@ -10,11 +10,19 @@
   </PropertyGroup>
   <ItemGroup>
     <None Include=".env" />
+    <None Include="AddDocumentation.ps1" />
+    <None Include="AddXmlDocs.ps1" />
+    <None Include="AddXmlDocumentation.ps1" />
+    <None Include="CleanMultipleDocs.ps1" />
+    <None Include="DeduplicateXmlDocs.ps1" />
     <None Include="docker-compose.override.yml">
       <DependentUpon>docker-compose.yml</DependentUpon>
     </None>
     <None Include="docker-compose.yml" />
     <None Include=".dockerignore" />
+    <None Include="FixDocPlacement.ps1" />
+    <None Include="FixXmlDocPlacement.ps1" />
+    <None Include="MoveXmlDocsBeforeAttributes.ps1" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="sql-backups\" />

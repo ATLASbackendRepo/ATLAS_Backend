@@ -5,14 +5,23 @@ using Microsoft.EntityFrameworkCore;
 
 namespace ATLAS;
 
+/// <summary>
+/// ICourse Offering Authorization Service.
+/// </summary>
 public interface ICourseOfferingAuthorizationService
 {
     Task<bool> CanAccessOfferingAsync(ClaimsPrincipal user, int courseOfferingId, CancellationToken cancellationToken = default);
     Task<bool> CanManageGradeAsync(ClaimsPrincipal user, int enrollmentId, int moduleId, CancellationToken cancellationToken = default);
 }
 
+/// <summary>
+/// Course Offering Authorization Service.
+/// </summary>
 public sealed class CourseOfferingAuthorizationService(AtLASDbContext context) : ICourseOfferingAuthorizationService
 {
+    /// <summary>
+    /// Can Access Offering Async.
+    /// </summary>
     public async Task<bool> CanAccessOfferingAsync(ClaimsPrincipal user, int courseOfferingId, CancellationToken cancellationToken = default)
     {
         if (user.IsInRole("Admin") || user.IsInRole("SAdmin"))
@@ -30,6 +39,9 @@ public sealed class CourseOfferingAuthorizationService(AtLASDbContext context) :
         return false;
     }
 
+    /// <summary>
+    /// Can Manage Grade Async.
+    /// </summary>
     public async Task<bool> CanManageGradeAsync(ClaimsPrincipal user, int enrollmentId, int moduleId, CancellationToken cancellationToken = default)
     {
         var offeringId = await context.Enrollments

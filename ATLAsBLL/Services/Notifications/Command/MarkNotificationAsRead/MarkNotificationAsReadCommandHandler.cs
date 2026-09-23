@@ -5,8 +5,14 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.Notifications.Command.MarkNotificationAsRead;
 
+/// <summary>
+/// Mark Notification As Read Command Handler.
+/// </summary>
 public class MarkNotificationAsReadCommandHandler : IRequestHandler<MarkNotificationAsReadCommand, int>
 {
+    /// <summary>
+    /// _unit Of Work.
+    /// </summary>
     private readonly IUnitOfWork _unitOfWork;
 
     public MarkNotificationAsReadCommandHandler(IUnitOfWork unitOfWork)
@@ -14,6 +20,9 @@ public class MarkNotificationAsReadCommandHandler : IRequestHandler<MarkNotifica
         _unitOfWork = unitOfWork;
     }
 
+    /// <summary>
+    /// Handle.
+    /// </summary>
     public async Task<int> Handle(MarkNotificationAsReadCommand request, CancellationToken cancellationToken)
     {
         var notification = await _unitOfWork.Notifications.GetByIdAsync(request.NotificationId);

@@ -1,9 +1,12 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 using ATLASDomain.DTO.Student;
 using ATLASDomain.InterFaces.Repositories;
 
 namespace ATLASDomain.Interfaces.Repositories;
 
+/// <summary>
+/// IStudent Repository.
+/// </summary>
 public interface IStudentRepository : IGenericRepository<Student>
 {
     Task<Student?> GetStudentWithUserAsync(string studentCode);

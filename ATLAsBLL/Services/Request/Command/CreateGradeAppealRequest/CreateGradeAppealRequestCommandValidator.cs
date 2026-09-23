@@ -1,8 +1,11 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
 {
 
+    /// <summary>
+    /// Create Grade Appeal Request Command Validator.
+    /// </summary>
     public class CreateGradeAppealRequestCommandValidator
         : AbstractValidator<CreateGradeAppealRequestCommand>
     {

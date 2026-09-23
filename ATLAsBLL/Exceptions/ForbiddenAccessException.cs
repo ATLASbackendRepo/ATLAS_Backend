@@ -6,5 +6,8 @@ namespace ATLAsBLL.Exceptions;
 /// </summary>
 public class ForbiddenAccessException : Exception
 {
+    /// <summary>
+    /// base.
+    /// </summary>
     public ForbiddenAccessException(string message) : base(message) { }
 }

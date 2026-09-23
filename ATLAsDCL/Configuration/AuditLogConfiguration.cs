@@ -1,11 +1,17 @@
-﻿using ATLAsDomain.Entities;
+using ATLAsDomain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ATLAsDCL.Configuration
 {
+    /// <summary>
+    /// Audit Log Configuration.
+    /// </summary>
     public class AuditLogConfiguration : IEntityTypeConfiguration<AuditLog>
     {
+        /// <summary>
+        /// Configure.
+        /// </summary>
         public void Configure(EntityTypeBuilder<AuditLog> builder)
         {
             builder.ToTable("AuditLogs");

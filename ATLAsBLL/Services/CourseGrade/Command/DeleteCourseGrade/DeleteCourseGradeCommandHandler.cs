@@ -1,12 +1,18 @@
-﻿using MediatR;
+using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Features.CourseGrades.Commands.DeleteCourseGrade
 {
+    /// <summary>
+    /// Delete Course Grade Command Handler.
+    /// </summary>
     public class DeleteCourseGradeCommandHandler : IRequestHandler<DeleteCourseGradeCommand, bool>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public DeleteCourseGradeCommandHandler(IUnitOfWork unitOfWork)
@@ -14,6 +20,9 @@ namespace ATLAsBLL.Features.CourseGrades.Commands.DeleteCourseGrade
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<bool> Handle(DeleteCourseGradeCommand request, CancellationToken cancellationToken)
         {
             var grade = await _unitOfWork.CourseGrades.GetByIdAsync(request.CG_ID);

@@ -1,4 +1,4 @@
-﻿using MediatR;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
@@ -11,11 +11,20 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace ATLASAPI.Controllers
 {
+    /// <summary>
+    /// Analysis Controller.
+    /// </summary>
     [ApiController]
     [Route("api/Analysis")]
     public class AnalysisController : ControllerBase
     {
+        /// <summary>
+        /// _mediator.
+        /// </summary>
         private readonly IMediator _mediator;
+        /// <summary>
+        /// _course Authorization.
+        /// </summary>
         private readonly ICourseOfferingAuthorizationService _courseAuthorization;
 
         public AnalysisController(IMediator mediator, ICourseOfferingAuthorizationService courseAuthorization)
@@ -25,6 +34,9 @@ namespace ATLASAPI.Controllers
         }
 
 
+        /// <summary>
+        /// Get Course Analysis.
+        /// </summary>
         [HttpGet("course-offering/{courseOfferingId:int}")]
         [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
         [ProducesResponseType(typeof(CourseAnalysisResponseDto), StatusCodes.Status200OK)]

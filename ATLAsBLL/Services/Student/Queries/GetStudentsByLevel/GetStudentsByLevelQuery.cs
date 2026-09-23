@@ -9,5 +9,8 @@ using ATLASDomain.DTO.Student;
 
 namespace ATLAsBLL.Services.Student.Queries.GetStudentsByLevel
 {
+    /// <summary>
+    /// Get Students By Level Query.
+    /// </summary>
     public record GetStudentsByLevelQuery(int Level) : IQuery<IEnumerable<StudentDTO>>;
 }

@@ -6,8 +6,14 @@ using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.CourseGroupMessage.Command.DeleteCourseGroupMessage;
 
+/// <summary>
+/// Delete Course Group Message Command Handler.
+/// </summary>
 public class DeleteCourseGroupMessageCommandHandler : IRequestHandler<DeleteCourseGroupMessageCommand, int>
 {
+    /// <summary>
+    /// _unit Of Work.
+    /// </summary>
     private readonly IUnitOfWork _unitOfWork;
 
     public DeleteCourseGroupMessageCommandHandler(IUnitOfWork unitOfWork)
@@ -15,6 +21,9 @@ public class DeleteCourseGroupMessageCommandHandler : IRequestHandler<DeleteCour
         _unitOfWork = unitOfWork;
     }
 
+    /// <summary>
+    /// Handle.
+    /// </summary>
     public async Task<int> Handle(DeleteCourseGroupMessageCommand request, CancellationToken cancellationToken)
     {
         var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId);

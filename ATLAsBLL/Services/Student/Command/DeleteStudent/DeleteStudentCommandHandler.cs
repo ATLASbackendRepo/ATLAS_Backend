@@ -1,12 +1,18 @@
-﻿using MediatR;
+using MediatR;
 using System.Threading;
 using System.Threading.Tasks;
 using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Features.Students.Commands.DeleteStudent
 {
+    /// <summary>
+    /// Delete Student Command Handler.
+    /// </summary>
     public class DeleteStudentCommandHandler : IRequestHandler<DeleteStudentCommand, bool>
     {
+        /// <summary>
+        /// _unit Of Work.
+        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
 
         public DeleteStudentCommandHandler(IUnitOfWork unitOfWork)
@@ -14,6 +20,9 @@ namespace ATLAsBLL.Features.Students.Commands.DeleteStudent
             _unitOfWork = unitOfWork;
         }
 
+        /// <summary>
+        /// Handle.
+        /// </summary>
         public async Task<bool> Handle(DeleteStudentCommand request, CancellationToken cancellationToken)
         {
             

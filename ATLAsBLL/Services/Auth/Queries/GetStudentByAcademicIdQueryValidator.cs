@@ -1,8 +1,11 @@
-﻿using FluentValidation;
+using FluentValidation;
 
 
 namespace ATLAsBLL.Services.Auth.Queries
 {
+    /// <summary>
+    /// Get Student By Academic Id Query Validator.
+    /// </summary>
     public sealed class GetStudentByAcademicIdQueryValidator
       : AbstractValidator<GetUserByAcademicIdQuery>
     {

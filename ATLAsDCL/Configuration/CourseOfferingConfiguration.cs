@@ -1,11 +1,17 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace ATLAsDCL.Configuration
 {
+    /// <summary>
+    /// Course Offering Configuration.
+    /// </summary>
     public class CourseOfferingConfiguration : IEntityTypeConfiguration<CourseOffering>
     {
+        /// <summary>
+        /// Configure.
+        /// </summary>
         public void Configure(EntityTypeBuilder<CourseOffering> builder)
         {
             builder.HasKey(co => co.CourseOfferingID);

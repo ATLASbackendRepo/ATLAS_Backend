@@ -1,4 +1,4 @@
-﻿using ATLASDomain.Entities;
+using ATLASDomain.Entities;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +8,9 @@ using System.Threading.Tasks;
 
 namespace ATLASDomain.InterFaces.Repositories
 {
+    /// <summary>
+    /// Iinstitution Repository.
+    /// </summary>
     public interface IinstitutionRepository : IGenericRepository<Institution>
     {
 

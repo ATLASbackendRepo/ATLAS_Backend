@@ -1,4 +1,4 @@
-﻿using ATLAsBLL.Features.Department.Comand.CreateDepartment;
+using ATLAsBLL.Features.Department.Comand.CreateDepartment;
 using ATLAsBLL.Features.Department.Comand.DeleteDepartment;
 using ATLAsBLL.Features.Department.Comand.UpdateDepartment;
 using ATLAsBLL.Services.Department.Query;
@@ -9,16 +9,23 @@ using Microsoft.AspNetCore.RateLimiting;
 
 namespace ATLAS.Controllers.Department
 {
+    /// <summary>
+    /// Department Controller.
+    /// </summary>
     [Route("api/Department")]
     [ApiController]
     public class DepartmentController : Controller
     {
+
         private readonly IMediator _mediator;
         public DepartmentController(IMediator mediator)
         {
             _mediator = mediator;
         }
 
+        /// <summary>
+        /// Create Department.
+        /// </summary>
         [HttpPost("CreateDepartment")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -37,6 +44,9 @@ namespace ATLAS.Controllers.Department
             }
             return BadRequest();
         }
+        /// <summary>
+        /// Update Department.
+        /// </summary>
         [HttpPut("UpdateDepartment")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -61,6 +71,9 @@ namespace ATLAS.Controllers.Department
                 return NotFound("Department not found.");
             }
         }
+        /// <summary>
+        /// Delete Department.
+        /// </summary>
 
         [HttpDelete("DeleteDepartment")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -83,12 +96,14 @@ namespace ATLAS.Controllers.Department
             return Ok("Department deleted successfully.");
         }
 
+        /// <summary>
+        /// Get Departments.
+        /// </summary>
         [HttpGet("GetDepartments")]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminGetAllPolicy")]
-
         public async Task<IActionResult> GetDepartments([FromQuery] string? departmentName)
         {
             var departments = await _mediator.Send(new GetAllDepartment(departmentName));
