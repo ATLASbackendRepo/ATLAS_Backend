@@ -169,6 +169,12 @@ namespace ATLASAPI.Controllers
                 {
             try
             {
+                if (courseOfferingId <= 0 || modelId <= 0)
+                {
+                    return BadRequest(
+                        "Course offering ID and module ID must be greater than zero.");
+                }
+
                 const long maxUploadBytes = 10 * 1024 * 1024;
 
                 var extension = Path
@@ -257,10 +263,10 @@ namespace ATLASAPI.Controllers
                 }
 
                 var command = new AssignCourseGradesRangeCommand(
-                    filePath,
-                    courseOfferingId,
-                    userId,
-                    modelId);
+                    FilePath: filePath,
+                    CourseOfferingID: courseOfferingId,
+                    ModelID: modelId,
+                    UserID: userId);
 
                 var result = await _mediator.Send(
                     command,
