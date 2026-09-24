@@ -1,4 +1,5 @@
 using ATLAS;
+using ATLAS.Claims;
 using ATLAsBLL.Services;
 using ATLAsBLL.Services.Auth;
 using ATLAsBLL.Services.Auth.Queries;
@@ -106,7 +107,21 @@ namespace ATLAS.Controllers.Authtenication
             }
 
             if (User.MustChangePassword)
-                return StatusCode(StatusCodes.Status428PreconditionRequired, new { message = "Password change is required before signing in." });
+            {
+                // The account still holds the one-time password it was created
+                // with. Only the password-change endpoints are reachable until
+                // the mandatory change is completed, and no refresh token is
+                // issued for this restricted token.
+                return StatusCode(
+                    StatusCodes.Status428PreconditionRequired,
+                    new
+                    {
+                        message = "Password change is required before signing in.",
+                        accessToken = CreatePasswordChangeToken(User),
+                        refreshToken = (string?)null,
+                        expiresInMinutes = PasswordChangeTokenMinutes
+                    });
+            }
 
 
 
@@ -263,6 +278,9 @@ namespace ATLAS.Controllers.Authtenication
             if (user == null)
                 return Ok(); 
 
+            if (string.IsNullOrWhiteSpace(user.RefreshTokenHash))
+                return Ok();
+
             bool refreshValid = BCrypt.Net.BCrypt.Verify(request.RefreshToken, user.RefreshTokenHash);
             if (!refreshValid)
                 return Ok();
@@ -330,6 +348,49 @@ namespace ATLAS.Controllers.Authtenication
             }
 
             return Ok(new { message = "Password changed successfully." });
+        }
+
+        /// <summary>
+        /// Lifetime of the restricted token issued for the mandatory first
+        /// password change.
+        /// </summary>
+        private const int PasswordChangeTokenMinutes = 10;
+
+        /// <summary>
+        /// Creates the short-lived token that is only accepted by the
+        /// password-change endpoints. It carries the caller's identity plus the
+        /// <see cref="AtlasClaims.PasswordChangeOnly"/> marker, and it is never
+        /// paired with a refresh token.
+        /// </summary>
+        /// <param name="user">Account that must change its password.</param>
+        /// <returns>The signed restricted JWT.</returns>
+        private string CreatePasswordChangeToken(User user)
+        {
+            var claims = new[]
+            {
+                new Claim(ClaimTypes.NameIdentifier, user.UserId.ToString()),
+                new Claim(ClaimTypes.Name, user.FullName),
+                new Claim(ClaimTypes.Role, user.Role.ToString()),
+                new Claim(AtlasClaims.AcademicId, user.AcademicId),
+                new Claim(AtlasClaims.PasswordChangeOnly, "true")
+            };
+
+            var key = new SymmetricSecurityKey(
+                Encoding.UTF8.GetBytes(_jwtOptions.Key));
+
+            var token = new JwtSecurityToken(
+                issuer: _jwtOptions.Issuer,
+                audience: _jwtOptions.Audience,
+                claims: claims,
+                expires: DateTime.UtcNow.AddMinutes(PasswordChangeTokenMinutes),
+                signingCredentials: new SigningCredentials(
+                    key,
+                    SecurityAlgorithms.HmacSha256));
+
+            var handler = new JwtSecurityTokenHandler();
+            handler.OutboundClaimTypeMap.Clear();
+
+            return handler.WriteToken(token);
         }
 
         /// <summary>

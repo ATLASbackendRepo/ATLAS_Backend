@@ -66,6 +66,11 @@ services:
       - Jwt__Key=${Jwt__Key}
       - Discord__WebhookUrl=${Discord__WebhookUrl}
       - Discord__Enabled=true
+      - Seed__FirstAdmin__AcademicId=${Seed__FirstAdmin__AcademicId}
+      - Seed__FirstAdmin__Password=${Seed__FirstAdmin__Password}
+      - Seed__FirstAdmin__FullName=${Seed__FirstAdmin__FullName}
+      - Seed__Institution__Name=${Seed__Institution__Name}
+      - Seed__Department__Name=${Seed__Department__Name}
 
     ports:
       - "127.0.0.1:8080:8080"

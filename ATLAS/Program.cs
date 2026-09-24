@@ -1,5 +1,6 @@
 using ATLAs.API.Middleware;
 using ATLAS;
+using ATLAS.Claims;
 using ATLAS.Middleware.Alert;
 using ATLAsBLL;
 using ATLAsBLL.Behaviors;
@@ -164,6 +165,34 @@ builder.Services
 
                 ClockSkew = TimeSpan.Zero
             };
+
+        options.Events = new JwtBearerEvents
+        {
+            OnTokenValidated = context =>
+            {
+                // A token issued for the mandatory first password change is
+                // only accepted by the endpoints that complete that change.
+                var restricted = context.Principal?
+                    .HasClaim(AtlasClaims.PasswordChangeOnly, "true") == true;
+
+                if (restricted)
+                {
+                    var path = context.HttpContext.Request.Path;
+
+                    var allowed =
+                        path.StartsWithSegments("/api/Auth/ChangePassword") ||
+                        path.StartsWithSegments("/api/Auth/logout");
+
+                    if (!allowed)
+                    {
+                        context.Fail(
+                            "This token may only be used to change the password.");
+                    }
+                }
+
+                return Task.CompletedTask;
+            }
+        };
     });
 
 // ======================================================
