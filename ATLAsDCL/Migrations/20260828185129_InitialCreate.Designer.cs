@@ -1099,14 +1099,14 @@ namespace ATLAsDCL.Migrations
                     b.HasOne("ATLASDomain.Entities.Department", "Department")
                         .WithMany("Users")
                         .HasForeignKey("DepartmentId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_Users_Departments");
 
                     b.HasOne("ATLASDomain.Entities.Institution", "Institution")
                         .WithMany("Users")
                         .HasForeignKey("InstitutionID")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired()
                         .HasConstraintName("FK_User_Insutition");
 

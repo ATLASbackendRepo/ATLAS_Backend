@@ -198,7 +198,7 @@ namespace ATLAsDCL.Migrations
                 column: "InstitutionID",
                 principalTable: "Institutions",
                 principalColumn: "InstitutionID",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             migrationBuilder.AddForeignKey(
                 name: "FK_Users_Departments",
@@ -206,7 +206,7 @@ namespace ATLAsDCL.Migrations
                 column: "DepartmentId",
                 principalTable: "Departments",
                 principalColumn: "DepartmentId",
-                onDelete: ReferentialAction.Cascade);
+                onDelete: ReferentialAction.Restrict);
 
             // Dropping the sequence is only safe after the AlterColumn above has
             // removed the default constraint that references it.
