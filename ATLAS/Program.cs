@@ -776,13 +776,71 @@ await using (var scope = app.Services.CreateAsyncScope())
     var database = scope.ServiceProvider.GetRequiredService<AtLASDbContext>();
     await database.Database.MigrateAsync();
 
+    // Bootstrap the first administrator.
+    // A brand new database has no institution and no department, and the
+    // endpoints that create them already require an administrator, so the seed
+    // creates both of them itself before it creates the SAdmin account.
     var adminAcademicId = app.Configuration["Seed:FirstAdmin:AcademicId"];
     var adminPassword = app.Configuration["Seed:FirstAdmin:Password"];
-    var hasInstitutionId = int.TryParse(app.Configuration["Seed:FirstAdmin:InstitutionId"], out var institutionId);
-    var hasDepartmentId = int.TryParse(app.Configuration["Seed:FirstAdmin:DepartmentId"], out var departmentId);
-    if (!string.IsNullOrWhiteSpace(adminAcademicId) && !string.IsNullOrWhiteSpace(adminPassword) && hasInstitutionId && hasDepartmentId &&
+
+    if (!string.IsNullOrWhiteSpace(adminAcademicId) &&
+        !string.IsNullOrWhiteSpace(adminPassword) &&
         !await database.Users.AnyAsync(user => user.Role == ATLASDomain.Entities.enUserRole.SAdmin))
     {
+        var institutionName =
+            app.Configuration["Seed:Institution:Name"] ?? "ATLAS University";
+
+        var departmentName =
+            app.Configuration["Seed:Department:Name"] ?? "General";
+
+        var configuredInstitutionId = int.TryParse(
+            app.Configuration["Seed:FirstAdmin:InstitutionId"],
+            out var institutionId)
+            ? institutionId
+            : 0;
+
+        var institution = configuredInstitutionId > 0
+            ? await database.Institutions.FirstOrDefaultAsync(
+                row => row.InstitutionID == configuredInstitutionId)
+            : await database.Institutions.FirstOrDefaultAsync(
+                row => row.name == institutionName);
+
+        if (institution is null)
+        {
+            institution = new ATLASDomain.Entities.Institution
+            {
+                name = institutionName
+            };
+
+            database.Institutions.Add(institution);
+            await database.SaveChangesAsync();
+        }
+
+        var configuredDepartmentId = int.TryParse(
+            app.Configuration["Seed:FirstAdmin:DepartmentId"],
+            out var departmentId)
+            ? departmentId
+            : 0;
+
+        var department = configuredDepartmentId > 0
+            ? await database.Departments.FirstOrDefaultAsync(
+                row => row.DepartmentId == configuredDepartmentId)
+            : await database.Departments.FirstOrDefaultAsync(
+                row => row.D_Name == departmentName &&
+                       row.InstitutionID == institution.InstitutionID);
+
+        if (department is null)
+        {
+            department = new ATLASDomain.Entities.Department
+            {
+                D_Name = departmentName,
+                InstitutionID = institution.InstitutionID
+            };
+
+            database.Departments.Add(department);
+            await database.SaveChangesAsync();
+        }
+
         database.Users.Add(new ATLASDomain.Entities.User
         {
             AcademicId = adminAcademicId,
@@ -791,8 +849,8 @@ await using (var scope = app.Services.CreateAsyncScope())
             Role = ATLASDomain.Entities.enUserRole.SAdmin,
             IsActive = true,
             MustChangePassword = false,
-            InstitutionID = institutionId,
-            DepartmentId = departmentId
+            InstitutionID = institution.InstitutionID,
+            DepartmentId = department.DepartmentId
         });
         await database.SaveChangesAsync();
     }

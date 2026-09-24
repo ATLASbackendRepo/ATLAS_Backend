@@ -25,9 +25,15 @@ public static class ServiceCollectionExtensions
         var connectionString =
             configuration.GetConnectionString("DefaultConnection");
 
-        // DbContext used by repositories/services
-        services.AddDbContext<AtLASDbContext>(options =>
-            options.UseSqlServer(connectionString));
+        // DbContext used by repositories/services.
+        // The options are a singleton because the factory below is a singleton:
+        // a scoped DbContextOptions cannot be consumed from the root provider,
+        // which is what made the Development environment fail service scope
+        // validation at startup. The options are immutable configuration, so a
+        // single instance is shared by every scope.
+        services.AddDbContext<AtLASDbContext>(
+            options => options.UseSqlServer(connectionString),
+            optionsLifetime: ServiceLifetime.Singleton);
 
         // DbContextFactory used by Audit/Security services
         services.AddDbContextFactory<AtLASDbContext>(options =>
