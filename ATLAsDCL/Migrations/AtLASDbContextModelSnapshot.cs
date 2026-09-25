@@ -680,7 +680,8 @@ namespace ATLAsDCL.Migrations
 
                     b.Property<string>("AcademicId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)")
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)")
                         .HasColumnName("AcademicId");
 
                     b.Property<int>("AcademicLevel")
@@ -716,6 +717,9 @@ namespace ATLAsDCL.Migrations
 
                     b.HasKey("StudentId");
 
+                    b.HasIndex("AcademicId")
+                        .IsUnique();
+
                     b.HasIndex("DepartmentId");
 
                     b.HasIndex("InstitutionID");
@@ -744,7 +748,8 @@ namespace ATLAsDCL.Migrations
 
                     b.Property<string>("AcademicId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
@@ -795,6 +800,9 @@ namespace ATLAsDCL.Migrations
                         .HasColumnType("nvarchar(50)");
 
                     b.HasKey("UserId");
+
+                    b.HasIndex("AcademicId")
+                        .IsUnique();
 
                     b.HasIndex("DepartmentId");
 

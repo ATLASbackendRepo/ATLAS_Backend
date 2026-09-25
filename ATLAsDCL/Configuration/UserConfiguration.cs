@@ -37,6 +37,15 @@ builder.Property(u => u.PreviousRefreshTokenHash)
           .HasMaxLength(50)
           .IsRequired();
 
+            // The academic id is the login identity, so it is bounded in length
+            // and unique across every account.
+            builder.Property(u => u.AcademicId)
+                .IsRequired()
+                .HasMaxLength(50);
+
+            builder.HasIndex(u => u.AcademicId)
+                .IsUnique();
+
             builder.ToTable(t =>
                t.HasCheckConstraint(
                   "CK__Users__Role",

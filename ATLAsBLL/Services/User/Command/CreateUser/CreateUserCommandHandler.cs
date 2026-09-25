@@ -35,6 +35,19 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUser
         /// </summary>
         public async Task<int> Handle(CreateUserCommand request, CancellationToken cancellationToken)
         {
+            var academicId = request.create_StaffDto.AcademicId;
+
+            // The academic id is the login identity; a second account reusing it
+            // would make logins and imports resolve to an arbitrary row.
+            var academicIdTaken = await _unitOfWork.Users
+                .AnyAsync(existing => existing.AcademicId == academicId);
+
+            if (academicIdTaken)
+            {
+                throw new InvalidOperationException(
+                    $"Academic ID '{academicId}' is already in use.");
+            }
+
             var user = new User
             {
                 FullName = request.create_StaffDto.FullName,

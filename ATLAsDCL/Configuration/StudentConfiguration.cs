@@ -37,7 +37,8 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
 
         builder.Property(x => x.AcademicId)
                .HasColumnName("AcademicId")
-               .IsRequired();
+               .IsRequired()
+               .HasMaxLength(50);
 
         builder.Property(x => x.AcademicLevel)
                .HasColumnName("AcademicLevel")
@@ -61,6 +62,11 @@ public class StudentConfiguration : IEntityTypeConfiguration<Student>
 
         // Unique StudentCode
         builder.HasIndex(x => x.StudentCode)
+               .IsUnique();
+
+        // The academic id identifies the student in logins and in the imports,
+        // so it must be unique as well.
+        builder.HasIndex(x => x.AcademicId)
                .IsUnique();
         builder.HasIndex(x => x.UserId);
         builder.HasIndex(x => x.DepartmentId);

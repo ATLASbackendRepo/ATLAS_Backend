@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ATLAsDCL")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d9d91d240e9c925d49437d6eff70fbd0d62a70eb")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+39b9ab7b4c84d236f54e125d1124d814268f29df")]
 [assembly: System.Reflection.AssemblyProductAttribute("ATLAsDCL")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ATLAsDCL")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
