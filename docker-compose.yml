@@ -61,6 +61,11 @@ services:
         condition: service_started
 
     environment:
+      # The image is built for a production run. The Visual Studio debug
+      # environment lives in docker-compose.vs.yml and is only applied when it
+      # is named explicitly on the command line.
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_HTTP_PORTS=8080
       - ConnectionStrings__DefaultConnection=Server=sqlserver,1433;Database=ATLAS;User Id=sa;Password=${MSSQL_SA_PASSWORD};TrustServerCertificate=True;
       - Seq__ServerUrl=http://seq:80
       - Jwt__Key=${Jwt__Key}
@@ -79,7 +84,7 @@ services:
       test:
         [
           "CMD-SHELL",
-          "if [ -f /usr/share/dotnet/dotnet ]; then exit 0; else exit 1; fi"
+          "curl -fsS http://localhost:8080/readyz || exit 1"
         ]
       interval: 10s
       timeout: 5s

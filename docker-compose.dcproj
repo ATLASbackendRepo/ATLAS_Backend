@@ -15,7 +15,7 @@
     <None Include="AddXmlDocumentation.ps1" />
     <None Include="CleanMultipleDocs.ps1" />
     <None Include="DeduplicateXmlDocs.ps1" />
-    <None Include="docker-compose.override.yml">
+    <None Include="docker-compose.vs.yml">
       <DependentUpon>docker-compose.yml</DependentUpon>
     </None>
     <None Include="docker-compose.yml" />
