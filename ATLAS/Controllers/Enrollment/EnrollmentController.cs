@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Claims;
 
 namespace ATLAS.Controllers.Enrollment
 {    /// <summary>
@@ -42,13 +43,34 @@ namespace ATLAS.Controllers.Enrollment
                 return BadRequest("Academic ID is required.");
             }
 
-            var result = await _mediator.Send(new CreateEnrollmentCommand(academicId, dto));
-            if (!result)
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out var userId))
             {
-                return BadRequest("Failed to create enrollment.");
+                return Unauthorized();
             }
 
-            return Ok("Enrollment created successfully.");
+            try
+            {
+                var result = await _mediator.Send(
+                    new CreateEnrollmentCommand(academicId, dto, userId));
+
+                if (!result)
+                {
+                    return BadRequest(
+                        "The student is already enrolled in this course offering.");
+                }
+
+                return Ok("Enrollment created successfully.");
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
         }
 
         /// <summary>
@@ -64,10 +86,20 @@ namespace ATLAS.Controllers.Enrollment
         {
             try
             {
-                var result = await _mediator.Send(new CreateEnrollmentsRangeCommand(dto));
+                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+                if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out var userId))
+                {
+                    return Unauthorized();
+                }
+
+                var result = await _mediator.Send(
+                    new CreateEnrollmentsRangeCommand(dto, userId));
+
                 if (!result)
                 {
-                    return BadRequest("Failed to create enrollment range.");
+                    return BadRequest(
+                        "No student matched the enrollment filter, or they are already enrolled.");
                 }
 
                 return Ok("Enrollments range created successfully.");
@@ -75,6 +107,10 @@ namespace ATLAS.Controllers.Enrollment
             catch (KeyNotFoundException ex)
             {
                 return NotFound(ex.Message);
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(ex.Message);
             }
         }
        /// <summary>

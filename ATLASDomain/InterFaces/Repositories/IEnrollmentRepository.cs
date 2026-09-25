@@ -42,8 +42,8 @@ public interface IEnrollmentRepository : IGenericRepository<Enrollment>
         int semesterId, int academicLevel, int topCount, CancellationToken cancellationToken);
 
 
-    Task<int> BulkEnrollStudentsFastAsync(BulkCreateEnrollmentDTO dto);
-    Task<bool> AddSingleStudentToEnrollmentAsync(string AcdimicID, BulkCreateEnrollmentDTO dto);
+    Task<int> BulkEnrollStudentsFastAsync(BulkCreateEnrollmentDTO dto, int createdByUserId);
+    Task<bool> AddSingleStudentToEnrollmentAsync(string AcdimicID, BulkCreateEnrollmentDTO dto, int createdByUserId);
     Task<bool> DeleteEnrollmentByIdAsync(int enrollmentId);
     Task<PagedResultDto<CourseEnrollmentSummaryDto>> GetEnrollmentsOverviewAsync(
       string? searchKeyword = null,

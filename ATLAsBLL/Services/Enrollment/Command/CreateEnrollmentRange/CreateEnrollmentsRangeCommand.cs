@@ -7,7 +7,7 @@ namespace ATLAsBLL.Features.Enrollments.Commands.CreateEnrollmentsRange
     /// <summary>
     /// Create Enrollments Range Command.
     /// </summary>
-    public record CreateEnrollmentsRangeCommand(BulkCreateEnrollmentDTO BulkCreateEnrollment) : ICommand<bool>;
+    public record CreateEnrollmentsRangeCommand(BulkCreateEnrollmentDTO BulkCreateEnrollment, int CreatedByUserId) : ICommand<bool>;
 
    
 }

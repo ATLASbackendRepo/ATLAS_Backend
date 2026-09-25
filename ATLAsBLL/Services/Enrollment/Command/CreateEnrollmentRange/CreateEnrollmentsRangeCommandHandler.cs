@@ -35,7 +35,7 @@ namespace ATLAsBLL.Services.Enrollment.Command.CreateEnrollmentRange
                 return false;
 
 
-            var RowAffected = await _unitOfWork.Enrollments.BulkEnrollStudentsFastAsync(request.BulkCreateEnrollment);
+            var RowAffected = await _unitOfWork.Enrollments.BulkEnrollStudentsFastAsync(request.BulkCreateEnrollment, request.CreatedByUserId);
 
             if(RowAffected <1)
             {

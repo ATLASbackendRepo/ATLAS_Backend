@@ -161,119 +161,148 @@ public class EnrollmentRepository
 
     /// <summary>
     /// Bulk Enroll Students Fast Async.
+    /// Enrolls every active student of one department and academic level into an
+    /// existing course offering with a single INSERT ... SELECT statement.
+    /// The semester and the course offering must already exist: enrolling never
+    /// creates them as a side effect. The acting user is stored on every row so
+    /// the audit trail is complete.
     /// </summary>
-    public async Task<int> BulkEnrollStudentsFastAsync(BulkCreateEnrollmentDTO dto)
+    /// <param name="dto">Course, semester, department and level to enroll.</param>
+    /// <param name="createdByUserId">User that performs the enrollment.</param>
+    /// <returns>Number of inserted enrollment rows.</returns>
+    public async Task<int> BulkEnrollStudentsFastAsync(
+        BulkCreateEnrollmentDTO dto,
+        int createdByUserId)
     {
-        var semester = await _context.Semesters
-        .FirstOrDefaultAsync(s => s.AcademicYear == dto.AcademicYear
-                               && s.SemesterName == dto.SemesterName);
-
-        if (semester == null)
+        if (createdByUserId <= 0)
         {
-            semester = new Semester
-            {
-                AcademicYear = dto.AcademicYear,
-                SemesterName = dto.SemesterName
-            };
-
-            _context.Semesters.Add(semester);
-            await _context.SaveChangesAsync(); 
+            throw new ArgumentException(
+                "The acting user is required to enroll students.");
         }
 
-       
+        var semester = await _context.Semesters
+            .AsNoTracking()
+            .FirstOrDefaultAsync(s => s.AcademicYear == dto.AcademicYear
+                                   && s.SemesterName == dto.SemesterName);
+
+        if (semester is null)
+        {
+            throw new KeyNotFoundException(
+                $"Semester '{dto.SemesterName}' of academic year " +
+                $"'{dto.AcademicYear}' was not found.");
+        }
+
         var courseOfferingId = await _context.CourseOfferings
-            .Where(co => co.CourseID == dto.CourseID && co.SemesterID == semester.SemesterID)
+            .AsNoTracking()
+            .Where(co => co.CourseID == dto.CourseID
+                      && co.SemesterID == semester.SemesterID)
             .Select(co => co.CourseOfferingID)
             .FirstOrDefaultAsync();
 
         if (courseOfferingId == 0)
         {
-            var newOffering = new CourseOffering
-            {
-                CourseID = dto.CourseID,
-                SemesterID = semester.SemesterID
-            };
-
-            _context.CourseOfferings.Add(newOffering);
-            await _context.SaveChangesAsync();
-
-            courseOfferingId = newOffering.CourseOfferingID;
+            throw new KeyNotFoundException(
+                $"Course {dto.CourseID} is not offered in semester " +
+                $"'{dto.SemesterName}' of academic year '{dto.AcademicYear}'.");
         }
 
         var rowsAffected = await _context.Database.ExecuteSqlInterpolatedAsync($@"
-        INSERT INTO Enrollments (StudentID, CourseOfferingID, EnrollmentDate)
+        INSERT INTO Enrollments (StudentID, CourseOfferingID, EnrollmentDate, CreatedByUserID)
         SELECT 
             s.StudentID, 
-            co.CourseOfferingID, 
-            {DateTime.UtcNow}
+            {courseOfferingId}, 
+            {DateTime.UtcNow},
+            {createdByUserId}
         FROM Students s
-        CROSS JOIN CourseOfferings co
-        INNER JOIN Semesters sem ON co.SemesterID = sem.SemesterID
         WHERE s.DepartmentID = {dto.DepartmentID} 
           AND s.AcademicLevel = {dto.level} 
           AND s.IsActive = 1
-          AND co.CourseID = {dto.CourseID}
-          AND sem.AcademicYear = {dto.AcademicYear}
-          AND sem.SemesterName = {dto.SemesterName}
           AND NOT EXISTS (
               SELECT 1 
               FROM Enrollments e 
               WHERE e.StudentID = s.StudentID 
-                AND e.CourseOfferingID = co.CourseOfferingID
+                AND e.CourseOfferingID = {courseOfferingId}
           );
     ");
 
-        return rowsAffected; 
+        return rowsAffected;
     }
+
     /// <summary>
     /// Add Single Student To Enrollment Async.
+    /// The semester and the course offering must already exist and the student
+    /// is resolved by academic id, so nothing is created as a side effect.
     /// </summary>
-    public async Task<bool> AddSingleStudentToEnrollmentAsync(string AcdimicID, BulkCreateEnrollmentDTO dto)
+    /// <param name="AcadimicID">Academic id of the student to enroll.</param>
+    /// <param name="dto">Course and semester the student is enrolled into.</param>
+    /// <param name="createdByUserId">User that performs the enrollment.</param>
+    /// <returns>True when a new enrollment row was inserted.</returns>
+    public async Task<bool> AddSingleStudentToEnrollmentAsync(
+        string AcdimicID,
+        BulkCreateEnrollmentDTO dto,
+        int createdByUserId)
     {
+        if (createdByUserId <= 0)
+        {
+            throw new ArgumentException(
+                "The acting user is required to enroll a student.");
+        }
 
-
-        
         var semester = await _context.Semesters
+            .AsNoTracking()
             .FirstOrDefaultAsync(s => s.AcademicYear == dto.AcademicYear
                                    && s.SemesterName == dto.SemesterName);
 
-        if (semester == null)
+        if (semester is null)
         {
-            semester = new Semester { AcademicYear = dto.AcademicYear, SemesterName = dto.SemesterName };
-            _context.Semesters.Add(semester);
-            await _context.SaveChangesAsync();
+            throw new KeyNotFoundException(
+                $"Semester '{dto.SemesterName}' of academic year " +
+                $"'{dto.AcademicYear}' was not found.");
         }
 
-       
-        var courseOffering = await _context.CourseOfferings
-            .FirstOrDefaultAsync(co => co.CourseID == dto.CourseID && co.SemesterID == semester.SemesterID);
+        var courseOfferingId = await _context.CourseOfferings
+            .AsNoTracking()
+            .Where(co => co.CourseID == dto.CourseID
+                      && co.SemesterID == semester.SemesterID)
+            .Select(co => co.CourseOfferingID)
+            .FirstOrDefaultAsync();
 
-        if (courseOffering == null)
+        if (courseOfferingId == 0)
         {
-            courseOffering = new CourseOffering { CourseID = dto.CourseID, SemesterID = semester.SemesterID };
-            _context.CourseOfferings.Add(courseOffering);
-            await _context.SaveChangesAsync();
+            throw new KeyNotFoundException(
+                $"Course {dto.CourseID} is not offered in semester " +
+                $"'{dto.SemesterName}' of academic year '{dto.AcademicYear}'.");
         }
 
-        var StudentID = await _context.Students
-                        .Where(s => s.AcademicId == AcdimicID)
-                        .Select(s => s.StudentId)
-                        .FirstOrDefaultAsync();
-        
+        var studentId = await _context.Students
+            .AsNoTracking()
+            .Where(s => s.AcademicId == AcdimicID)
+            .Select(s => s.StudentId)
+            .FirstOrDefaultAsync();
+
+        if (studentId == 0)
+        {
+            throw new KeyNotFoundException(
+                $"Student with academic ID '{AcdimicID}' was not found.");
+        }
+
         var isAlreadyEnrolled = await _context.Enrollments
-            .AnyAsync(e => e.StudentID == StudentID && e.CourseOfferingID == courseOffering.CourseOfferingID);
+            .AnyAsync(e => e.StudentID == studentId
+                        && e.CourseOfferingID == courseOfferingId);
 
-        if (isAlreadyEnrolled) return false; 
-
-        
-        var enrollment = new Enrollment
+        if (isAlreadyEnrolled)
         {
-            StudentID = StudentID,
-            CourseOfferingID = courseOffering.CourseOfferingID,
-            EnrollmentDate = DateTime.UtcNow
-        };
+            return false;
+        }
 
-        _context.Enrollments.Add(enrollment);
+        _context.Enrollments.Add(new Enrollment
+        {
+            StudentID = studentId,
+            CourseOfferingID = courseOfferingId,
+            EnrollmentDate = DateTime.UtcNow,
+            CreatedByUserID = createdByUserId
+        });
+
         await _context.SaveChangesAsync();
 
         return true;
