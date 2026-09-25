@@ -1,6 +1,7 @@
 using ATLAs.API.Middleware;
 using ATLAS;
 using ATLAS.Claims;
+using ATLAS.Middleware;
 using ATLAS.Middleware.Alert;
 using ATLAsBLL;
 using ATLAsBLL.Behaviors;
@@ -41,6 +42,7 @@ builder.Host.UseSerilog((context, configuration) =>
 
 builder.Services.AddControllers();
 builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 
 builder.Services.AddScoped
    <ICourseOfferingAuthorizationService,
@@ -899,13 +901,15 @@ if (app.Environment.IsDevelopment())
 // Middleware Pipeline
 // ======================================================
 
+// First in the pipeline so every failure raised further down is translated
+// into one consistent problem response.
+app.UseExceptionHandler();
+
 app.UseHttpsRedirection();
 
 app.UseCors("StudentApiCorsPolicy");
 
 app.UseMiddleware<CorrelationIdMiddleware>();
-
-app.UseExceptionHandler();
 
 app.UseAuthentication();
 

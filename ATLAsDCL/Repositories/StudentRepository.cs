@@ -90,10 +90,19 @@ public class StudentRepository
     /// </summary>
     public async Task<Student?> GetStudentWithUserAsync(string studentCode)
     {
+        if (string.IsNullOrWhiteSpace(studentCode))
+        {
+            return null;
+        }
+
+        var code = studentCode.Trim();
+
+        // The write handlers mutate the returned graph, so the entity must stay
+        // tracked, and the code must match exactly: a partial code must never
+        // resolve to an arbitrary student.
         return await _context.Students
-            .AsNoTracking()
             .Include(s => s.User)
-            .FirstOrDefaultAsync(s => s.StudentCode.Contains(studentCode));
+            .FirstOrDefaultAsync(s => s.StudentCode == code);
     }
     /// <summary>
     /// Get Student By User IDAsync.

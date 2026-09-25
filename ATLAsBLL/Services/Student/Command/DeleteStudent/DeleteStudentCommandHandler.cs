@@ -45,9 +45,11 @@ namespace ATLAsBLL.Features.Students.Commands.DeleteStudent
             }
 
            
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            var affected = await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            return true;
+            // Report failure when nothing was written, for example when the
+            // student was already deactivated.
+            return affected > 0;
         }
     }
 }

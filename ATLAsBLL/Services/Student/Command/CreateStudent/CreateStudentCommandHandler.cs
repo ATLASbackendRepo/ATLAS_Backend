@@ -42,7 +42,9 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
                 AcademicId = request.CreateStudentDTO.AcademicId 
                 , Role = enUserRole.Student,
                 IsActive =true,
-                MustChangePassword = true
+                MustChangePassword = true,
+                InstitutionID = request.CreateStudentDTO.InstitutionId,
+                DepartmentId = request.CreateStudentDTO.DepartmentId
 
             };
 
