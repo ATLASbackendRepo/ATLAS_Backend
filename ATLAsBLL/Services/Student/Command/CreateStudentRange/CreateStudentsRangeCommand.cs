@@ -8,7 +8,12 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
     /// <summary>
     /// Create Students Range Command.
     /// </summary>
-    public record CreateStudentsRangeCommand(string filePath) : ICommand<bool>;
+    /// <remarks>
+    /// The handler manages its own transaction
+    /// (<see cref="ISelfManagedTransactionCommand{TResponse}"/>) so the file is
+    /// parsed and every password is hashed before the transaction opens.
+    /// </remarks>
+    public record CreateStudentsRangeCommand(string filePath) : ISelfManagedTransactionCommand<bool>;
 
     
 }

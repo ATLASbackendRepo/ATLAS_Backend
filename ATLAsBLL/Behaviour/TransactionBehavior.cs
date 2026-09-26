@@ -37,6 +37,11 @@ namespace ATLAsBLL.Behaviors
             if (request is IQuery<TResponse>)
                 return await next();
 
+            // A self-managed command opens its own transaction after the expensive
+            // preparation work, so the behavior must not wrap the handler.
+            if (request is ISelfManagedTransactionCommand<TResponse>)
+                return await next();
+
             if (request is not ICommand<TResponse>)
                 return await next();
 

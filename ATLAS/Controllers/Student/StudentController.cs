@@ -71,48 +71,47 @@ namespace ATLAS.Controllers.Student
         /// </summary>
         public async Task<ActionResult> CreateStudents(IFormFile file)
         {
-            try
+            // No blanket try/catch here: a rejected file must report why, so
+            // InvalidDataException from the handler becomes a 400 through the
+            // global exception handler instead of a generic "invaliddata".
+            const long maxUploadBytes = 10 * 1024 * 1024;
+            var extension = Path.GetExtension(file?.FileName ?? string.Empty).ToLowerInvariant();
+            if (file == null || file.Length == 0 || file.Length > maxUploadBytes || extension is not ".xlsx" and not ".xls")
             {
-                const long maxUploadBytes = 10 * 1024 * 1024;
-                var extension = Path.GetExtension(file?.FileName ?? string.Empty).ToLowerInvariant();
-                if (file == null || file.Length == 0 || file.Length > maxUploadBytes || extension is not ".xlsx" and not ".xls")
-                {
-                    return BadRequest("Upload a non-empty Excel file no larger than 10 MB.");
-                }
-
-                var signature = new byte[8];
-                var bytesRead = await file.OpenReadStream().ReadAsync(signature);
-                var isXlsx = signature.Take(2).SequenceEqual(new byte[] { 0x50, 0x4B });
-                var isXls = signature.Take(bytesRead).SequenceEqual(new byte[] { 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1 });
-                if ((extension == ".xlsx" && !isXlsx) || (extension == ".xls" && !isXls))
-                    return BadRequest("The uploaded file does not match its Excel format.");
-
-                var uploadsFolder = Path.Combine(Path.GetTempPath(), "ATLAS", "uploads");
-                if (!Directory.Exists(uploadsFolder))
-                {
-                    Directory.CreateDirectory(uploadsFolder);
-                }
-
-                var filename = $"{Guid.NewGuid()}{extension}";
-                var filePath = Path.Combine(uploadsFolder, filename);
-
-                using (var stream = new FileStream(filePath, FileMode.Create))
-                {
-                    await file.CopyToAsync(stream);
-                }
-
-
-
-                bool insertSecessfully = await _mediator.Send(new CreateStudentsRangeCommand(filePath));
-
-                return Ok(new { message = "File uploaded and data saved successfully." });
+                return BadRequest("Upload a non-empty Excel file no larger than 10 MB.");
             }
-            catch
+
+            var signature = new byte[8];
+            var bytesRead = await file.OpenReadStream().ReadAsync(signature);
+            var isXlsx = signature.Take(2).SequenceEqual(new byte[] { 0x50, 0x4B });
+            var isXls = signature.Take(bytesRead).SequenceEqual(new byte[] { 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1 });
+            if ((extension == ".xlsx" && !isXlsx) || (extension == ".xls" && !isXls))
+                return BadRequest("The uploaded file does not match its Excel format.");
+
+            var uploadsFolder = Path.Combine(Path.GetTempPath(), "ATLAS", "uploads");
+            if (!Directory.Exists(uploadsFolder))
             {
-                return BadRequest("invaliddata");
-
-
+                Directory.CreateDirectory(uploadsFolder);
             }
+
+            var filename = $"{Guid.NewGuid()}{extension}";
+            var filePath = Path.Combine(uploadsFolder, filename);
+
+            using (var stream = new FileStream(filePath, FileMode.Create))
+            {
+                await file.CopyToAsync(stream);
+            }
+
+            bool insertSecessfully = await _mediator.Send(new CreateStudentsRangeCommand(filePath));
+
+            return Ok(new
+            {
+                message = "File uploaded and data saved successfully.",
+                // The import never stores a shared default password: every account
+                // gets a random one-time password that only an administrator can
+                // replace, and the change is forced at the first login.
+                note = "Imported accounts must change their password at first login. An administrator sets the initial password through the admin password change endpoint."
+            });
         }
 
         [HttpPost("CreateStudent")]

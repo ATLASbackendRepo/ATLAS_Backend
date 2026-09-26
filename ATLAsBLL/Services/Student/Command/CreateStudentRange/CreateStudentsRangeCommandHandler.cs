@@ -1,8 +1,9 @@
-using ATLAsBLL.Events;
+using ATLAS.Domain.Entities;
 using ATLAsDCL.UnitOfWork;
 using ATLASDomain.Entities;
 using ExcelDataReader;
 using MediatR;
+using System.Security.Cryptography;
 using System.Text;
 
 namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
@@ -10,25 +11,37 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
     /// <summary>
     /// Create Students Range Command Handler.
     /// </summary>
+    /// <remarks>
+    /// The handler manages its own transaction
+    /// (<see cref="ISelfManagedTransactionCommand{TResponse}"/>): the workbook is
+    /// parsed and every one-time password is hashed before the transaction opens,
+    /// so the import cannot hold database locks while the CPU-bound BCrypt calls
+    /// run. The whole file is written with a bounded number of round trips and the
+    /// number of rows is capped by <see cref="MaxImportRows"/>.
+    /// </remarks>
     public class CreateStudentsRangeCommandHandler
         : IRequestHandler<CreateStudentsRangeCommand, bool>
     {
         /// <summary>
+        /// Largest number of data rows a single import may contain.
+        /// </summary>
+        public const int MaxImportRows = 10_000;
+
+        /// <summary>
+        /// Number of random bytes behind one generated one-time password.
+        /// </summary>
+        private const int OneTimePasswordBytes = 18;
+
+        /// <summary>
         /// _unit Of Work.
         /// </summary>
         private readonly IUnitOfWork _unitOfWork;
-        /// <summary>
-        /// _publisher.
-        /// </summary>
-        private readonly IPublisher _publisher;
 
 
         public CreateStudentsRangeCommandHandler(
-            IUnitOfWork unitOfWork,
-            IPublisher publisher)
+            IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _publisher = publisher;
         }
 
         /// <summary>
@@ -43,26 +56,50 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
 
             try
             {
-                var students = await ReadStudentsFromExcelAsync(
+                // Parsing the workbook and hashing a password per row is CPU-bound
+                // and needs no database write, so it happens before the transaction
+                // opens. The transaction then only covers the two batched inserts.
+                var preparedRows = await ReadStudentsFromExcelAsync(
                     request.filePath,
                     cancellationToken);
 
-                if (students.Count == 0)
+                if (preparedRows.Count == 0)
                     return true;
 
-               
-                await _unitOfWork.Students.AddRangeAsync(students);
+                var students = preparedRows
+                    .Select(row => row.ToStudent(GenerateOneTimePassword()))
+                    .ToList();
 
-                await _unitOfWork.SaveChangesAsync(cancellationToken);
+                await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
-                // Publish events AFTER SaveChanges
-                foreach (var student in students)
+                try
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
+                    // One round trip for every user and student in the file.
+                    await _unitOfWork.Students.AddRangeAsync(students);
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-                    await _publisher.Publish(
-                        new StudentCreatedDomainEvent(student.StudentId),
-                        cancellationToken);
+                    // The generated student ids are known now, so every profile is
+                    // written in one more round trip. The previous implementation
+                    // published a domain event per student and each event ran its
+                    // own SaveChanges, which made a file of N rows cost N+1 round
+                    // trips.
+                    var profiles = students
+                        .Select(student => new StudentProfile
+                        {
+                            StudentID = student.StudentId,
+                            CreatedAt = DateTime.UtcNow
+                        })
+                        .ToList();
+
+                    await _unitOfWork.StudentProfile.AddRangeAsync(profiles);
+                    await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+                    await _unitOfWork.CommitTransactionAsync(cancellationToken);
+                }
+                catch
+                {
+                    await _unitOfWork.RollbackTransactionAsync(cancellationToken);
+                    throw;
                 }
 
                 return true;
@@ -74,13 +111,18 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
         }
 
         /// <summary>
-        /// Read Students From Excel Async.
+        /// Reads and validates every data row of the workbook.
         /// </summary>
-        private async Task<List<Student>> ReadStudentsFromExcelAsync(
+        /// <remarks>
+        /// Only parsing, validation and read-only lookups happen here. The rows come
+        /// back as <see cref="PreparedStudent"/> values, so no password is generated
+        /// or hashed until the row cap has been enforced.
+        /// </remarks>
+        private async Task<List<PreparedStudent>> ReadStudentsFromExcelAsync(
             string filePath,
             CancellationToken cancellationToken)
         {
-            var students = new List<Student>();
+            var rows = new List<PreparedStudent>();
 
             
            
@@ -204,33 +246,95 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                     int academicLevel =
                         ParseAcademicLevel(level);
 
-                    var student = new Student
+                    // The cap is checked before a row is accepted and before any
+                    // password is hashed, so an oversized file fails fast without
+                    // burning minutes of BCrypt work.
+                    if (rows.Count >= MaxImportRows)
                     {
-                        InstitutionID = institutionId,
-                        DepartmentId = departmentId,
-                        AcademicId = academicNumber,
-                        AcademicLevel = academicLevel,
-                        IsActive = true,
+                        throw new InvalidDataException(
+                            $"The file contains more than {MaxImportRows} students. Split it into smaller files.");
+                    }
 
-                        User = new User
-                        {
-                            AcademicId = academicNumber,
-                            FullName = fullName,
-                            DepartmentId = departmentId,
-                            InstitutionID = institutionId,
-                            Password = BCrypt.Net.BCrypt.HashPassword("12345678"),
-                            Role = enUserRole.Student,
-                            IsActive = true,
-                            MustChangePassword = true
-                        }
-                    };
-
-                    students.Add(student);
+                    rows.Add(new PreparedStudent(
+                        institutionId,
+                        departmentId,
+                        fullName,
+                        academicNumber,
+                        academicLevel));
                 }
 
             } while (reader.NextResult());
 
-            return students;
+            return rows;
+        }
+
+        /// <summary>
+        /// A validated row of the workbook that is ready to become a student.
+        /// </summary>
+        /// <param name="InstitutionId">Resolved institution id.</param>
+        /// <param name="DepartmentId">Resolved department id.</param>
+        /// <param name="FullName">Student full name.</param>
+        /// <param name="AcademicNumber">Academic id, unique inside the file.</param>
+        /// <param name="AcademicLevel">Parsed academic level.</param>
+        private sealed record PreparedStudent(
+            int InstitutionId,
+            int DepartmentId,
+            string FullName,
+            string AcademicNumber,
+            int AcademicLevel)
+        {
+            /// <summary>
+            /// Builds the student and its user account, hashing the supplied
+            /// one-time password.
+            /// </summary>
+            /// <param name="oneTimePassword">
+            /// Random password generated for this account.
+            /// </param>
+            /// <returns>The student, with its user, ready to be inserted.</returns>
+            public Student ToStudent(string oneTimePassword)
+            {
+                return new Student
+                {
+                    InstitutionID = InstitutionId,
+                    DepartmentId = DepartmentId,
+                    AcademicId = AcademicNumber,
+                    AcademicLevel = AcademicLevel,
+                    IsActive = true,
+
+                    User = new User
+                    {
+                        AcademicId = AcademicNumber,
+                        FullName = FullName,
+                        DepartmentId = DepartmentId,
+                        InstitutionID = InstitutionId,
+                        Password = BCrypt.Net.BCrypt.HashPassword(oneTimePassword),
+                        Role = enUserRole.Student,
+                        IsActive = true,
+                        MustChangePassword = true
+                    }
+                };
+            }
+        }
+
+        /// <summary>
+        /// Generates a cryptographically random one-time password for an account.
+        /// </summary>
+        /// <remarks>
+        /// Only the BCrypt hash is stored, so the plaintext never exists outside this
+        /// method and the account cannot be claimed with a known default. The user
+        /// has to change the password at the first login, and an administrator hands
+        /// out a new one through the admin password-change endpoint when needed.
+        /// </remarks>
+        /// <returns>A random password of <see cref="OneTimePasswordBytes"/> bytes.</returns>
+        private static string GenerateOneTimePassword()
+        {
+            Span<byte> buffer = stackalloc byte[OneTimePasswordBytes];
+            RandomNumberGenerator.Fill(buffer);
+
+            return Convert.ToBase64String(buffer)
+                .Replace('+', '-')
+                .Replace('/', '_')
+                .TrimEnd('=');
         }
 
         /// <summary>
