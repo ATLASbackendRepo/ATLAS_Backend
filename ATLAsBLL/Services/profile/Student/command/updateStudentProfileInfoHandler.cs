@@ -41,13 +41,16 @@ namespace ATLAsBLL.Services.profile.Student.command
             if (profile == null || profile.Student == null || profile.Student.User == null)
                 return false;
 
-            // Update the profile with the new information
+            // The repository returns a tracked graph, so EF Core writes only the
+            // properties changed here. Calling Update on the graph instead would
+            // mark every column as modified and overwrite the user's password,
+            // refresh-token hash and activation flag with stale values.
             profile.Student.User.FullName = request.StudentUpdateProfileInfoDTO.FullName;
             profile.Faculty = request.StudentUpdateProfileInfoDTO.Faculty;
             profile.SectionNumber = request.StudentUpdateProfileInfoDTO.SectionNumber;
             profile.LinkedInUrl = request.StudentUpdateProfileInfoDTO.LinkedInUrl;
+            profile.UpdatedAt = DateTime.UtcNow;
 
-            _unitOfWork.StudentProfile.Update(profile);
             await _unitOfWork.SaveChangesAsync();
 
             return true;

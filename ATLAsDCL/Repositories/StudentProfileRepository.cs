@@ -28,16 +28,18 @@ namespace ATLAS.Persistence.Repositories
         /// <summary>
         /// Get By User Id Async.
         /// </summary>
+        /// <remarks>
+        /// The profile, its student and that student's user are returned tracked so
+        /// a caller that edits them only writes the columns it actually changed. A
+        /// detached graph forces the caller to call Update, which rewrites every
+        /// property, including the user's password and refresh-token hash.
+        /// </remarks>
         public async Task<StudentProfile?> GetByUserIdAsync(int studentId)
         {
-         
-        
             return await _context.StudentProfiles
-                .AsNoTracking()
                 .Include(p => p.Student)
                     .ThenInclude(s => s.User)
                 .FirstOrDefaultAsync(p => p.StudentID == studentId);
-       
         }
 
         // IGenericRepository<StudentProfile> implementations

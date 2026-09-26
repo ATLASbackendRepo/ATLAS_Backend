@@ -29,22 +29,18 @@ namespace ATLAS.Persistence.Repositories
         /// <summary>
         /// Get By User Id Async.
         /// </summary>
+        /// <remarks>
+        /// The profile and its user are returned tracked so a caller that edits
+        /// them only writes the columns it actually changed. The previous detached
+        /// projection forced the caller to call Update, which rewrote the whole
+        /// graph: StaffProfiles.UserID was written as 0 and the user's password and
+        /// refresh-token hash were overwritten with values read earlier.
+        /// </remarks>
         public async Task<StaffProfile?> GetByUserIdAsync(int userId)
         {
             return await _context.StaffProfiles
-                .AsNoTracking()
-                .Where(p => p.UserID == userId)
-                .Select(p => new StaffProfile
-                {
-                    StaffProfileID = p.StaffProfileID,
-                    AcademicId = p.AcademicId,
-                    Role = p.Role,
-                    DepartmentID = p.DepartmentID,
-                    TeachingYears = p.TeachingYears,
-                    User = p.User
-
-                })
-                .FirstOrDefaultAsync();
+                .Include(p => p.User)
+                .FirstOrDefaultAsync(p => p.UserID == userId);
         }
 
         // IGenericRepository<StaffProfile> implementations

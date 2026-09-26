@@ -39,12 +39,15 @@ namespace ATLAsBLL.Services.profile.Staff.command
                 == null)
                 return false;
 
-            // Update the profile with the new information
+            // The repository returns a tracked graph, so EF Core writes only the
+            // properties changed here. Calling Update on the graph instead would
+            // mark every column as modified and overwrite the user's password,
+            // refresh-token hash and activation flag with stale values.
             profile.User.FullName = request.StaffProfileUpdateDTO.FullName;
             profile.DepartmentID = request.StaffProfileUpdateDTO.DepartmentID;
             profile.TeachingYears = request.StaffProfileUpdateDTO.TeachingYears;
+            profile.UpdatedAt = DateTime.UtcNow;
 
-             _unitOfWork.staffProfile.Update(profile);
             await _unitOfWork.SaveChangesAsync();
 
             return true;
