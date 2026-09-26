@@ -16,4 +16,4 @@ jobs:
           dotnet-version: 9.0.x
       - run: dotnet restore ATLAS.slnx
       - run: dotnet build ATLAS.slnx --no-restore --configuration Release
-      - run: dotnet test ATLAS.Tests/ATLAS.Tests.csproj --no-build --configuration Release
+      - run: dotnet test ATLAS.Tests/ATLAS.Tests.csproj --no-build --configuration Release --collect:"XPlat Code Coverage"

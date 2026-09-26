@@ -4,5 +4,8 @@ obj/
 **/bin/
 **/obj/
 
+# Coverage output produced by "dotnet test --collect:XPlat Code Coverage"
+TestResults/
+
 .env
 *.env
