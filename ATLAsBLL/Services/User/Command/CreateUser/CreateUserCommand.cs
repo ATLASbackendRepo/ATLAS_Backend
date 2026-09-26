@@ -9,6 +9,6 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUser
     /// Create User Command.
     /// </summary>
     public record CreateUserCommand(
-       Create_Update_StaffDto create_StaffDto
+       CreateStaffDto create_StaffDto
     ) : ICommand<int>;
 }

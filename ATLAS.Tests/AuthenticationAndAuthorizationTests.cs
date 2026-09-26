@@ -25,6 +25,7 @@ public class AuthenticationAndAuthorizationTests
             UserId = 42,
             AcademicId = "A-100",
             IsActive = true,
+            Role = enUserRole.Student,
             FullName = "Test Student",
             Password = BCrypt.Net.BCrypt.HashPassword("correct-password")
         };

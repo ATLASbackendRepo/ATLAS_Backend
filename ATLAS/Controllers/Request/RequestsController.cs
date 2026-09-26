@@ -28,40 +28,33 @@ public class RequestController : ControllerBase
         _mediator = mediator;
     }
 
+    /// <summary>
+    /// Create.
+    /// </summary>
     [HttpPost]
     [ProducesResponseType(StatusCodes.Status201Created)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [Authorize(Roles = "Student")]
     [EnableRateLimiting("RequestWritePolicy")]
-    /// <summary>
-    /// Create.
-    /// </summary>
     public async Task<IActionResult> Create(
         [FromBody] CreateGradeAppealRequestDto dto,
         CancellationToken cancellationToken)
     {
-        try
-        { 
+         
         var UserId = GetCurrentUserId();
+        if (UserId == null)
+            return Unauthorized("User ID not found in token.");
 
 
         var requestId = await _mediator.Send(
-            new CreateGradeAppealRequestCommand(UserId, dto),
+            new CreateGradeAppealRequestCommand(UserId.Value, dto),
             cancellationToken);
 
         return CreatedAtAction(
             nameof(GetById),
             new { requestId },
             new { requestId });
-         }
-        catch (ForbiddenAccessException)
-        {
-            return Forbid();
-}
-        catch (Exception)
-        {
-            return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
-        }
+       
     }
 
 
@@ -81,47 +74,49 @@ public class RequestController : ControllerBase
     {
         // Standard JWT user identifier claim.
         var doctorUserId = GetCurrentUserId();
+        if (doctorUserId == null)
+            return Unauthorized("User ID not found in token.");
 
         var updated = await _mediator.Send(
-            new UpdateGradeAppealRequestCommand(requestId, doctorUserId, dto),
+            new UpdateGradeAppealRequestCommand(requestId, doctorUserId.Value, dto),
             cancellationToken);
 
         return updated ? NoContent() : NotFound();
     }
 
 
+    /// <summary>
+    /// Get My Requests.
+    /// </summary>
     [HttpGet("student")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [Authorize(Roles = "Student")]
     [EnableRateLimiting("RequestReadPolicy")]
-    /// <summary>
-    /// Get My Requests.
-    /// </summary>
     public async Task<ActionResult<List<GradeAppealRequestDto>>> GetMyRequests(
         CancellationToken cancellationToken)
     {
         var UserId = GetCurrentUserId();
-
-
+        if (UserId == null)
+            return Unauthorized("User ID not found in token.");
 
         var requests = await _mediator.Send(
-            new GetStudentGradeAppealsQuery(UserId),
+            new GetStudentGradeAppealsQuery(UserId.Value),
             cancellationToken);
 
         return Ok(requests);
     }
 
 
+    /// <summary>
+    /// Get Doctor Requests.
+    /// </summary>
     [HttpGet("doctor")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [Authorize(Roles = "Doctor")]
     [EnableRateLimiting("RequestReadPolicy")]
 
-    /// <summary>
-    /// Get Doctor Requests.
-    /// </summary>
     public async Task<ActionResult<List<GradeAppealRequestDto>>> GetDoctorRequests(
         CancellationToken cancellationToken)
     {
@@ -139,11 +134,11 @@ public class RequestController : ControllerBase
 
 
 
-    [HttpGet("{requestId:int}")]
-    [Authorize(Roles = "Student")]
     /// <summary>
     /// Get By Id.
     /// </summary>
+    [HttpGet("{requestId:int}")]
+    [Authorize(Roles = "Student")]
     public async Task<ActionResult<GradeAppealRequestDto>> GetById(
     int requestId,
     CancellationToken cancellationToken)
@@ -175,12 +170,12 @@ public class RequestController : ControllerBase
     /// <summary>
     /// Get Current User Id.
     /// </summary>
-    private int GetCurrentUserId()
+    private int? GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
         {
-            throw new UnauthorizedAccessException("User ID not found in token.");
+            return null;
         }
         return userId;
     }

@@ -349,6 +349,58 @@ namespace ATLAS.Controllers.Authtenication
 
             return Ok(new { message = "Password changed successfully." });
         }
+ /// <summary>
+        /// Change Password.
+        /// </summary>
+        [HttpPost("ChangePasswordAdmin")]
+         [Authorize(Roles = "SAdmin,Admin")]
+        [EnableRateLimiting("AuthLimiter")]
+        public async Task<IActionResult> ChangePasswordAdmin([FromBody] ChangePasswordAdmin model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+          
+
+            var AcademicId = GetCurrentACdimicId();
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var user = !string.IsNullOrEmpty(userId) && int.TryParse(userId, out var parsedUserId)
+                ? await _mediator.Send(new GetUserByIdQuery(parsedUserId))
+                : !string.IsNullOrWhiteSpace(AcademicId)
+                    ? await _mediator.Send(new GetUserByAcademicIdQuery(AcademicId))
+                    : null;
+            if (user == null)
+            {
+                return Unauthorized();
+            }
+
+            // 5. Change Password via UserManager
+            bool isChange;
+            try
+            {
+                isChange = await _mediator.Send(new ChangePasswordAdimincommand(user, model));
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Unauthorized();
+            }
+            catch (InvalidDataException exception)
+            {
+                return BadRequest(new { message = exception.Message });
+            }
+
+            // 6. Check Output Result
+            if (!isChange)
+            {
+                return BadRequest("Password change failed." );
+            }
+
+            return Ok(new { message = "Password changed successfully." });
+        }
+
 
         /// <summary>
         /// Lifetime of the restricted token issued for the mandatory first

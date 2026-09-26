@@ -28,4 +28,22 @@ namespace ATLASDomain.DTO.Login
         [MinLength(8)]
         public string ConfirmPassword { get; set;  }
     }
+
+
+
+    public  class ChangePasswordAdmin
+    {
+
+        
+        [Required]
+        [MinLength(8)]
+        public string NewPassword { get; set; }
+
+        /// <summary>
+        /// Confirm Password. Must match the new password.
+        /// </summary>
+        [Required]
+        [MinLength(8)]
+        public string ConfirmPassword { get; set;  }
+    }
 }

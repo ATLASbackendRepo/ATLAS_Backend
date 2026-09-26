@@ -50,8 +50,7 @@ namespace ATLAS.Controllers.Enrollment
                 return Unauthorized();
             }
 
-            try
-            {
+            
                 var result = await _mediator.Send(
                     new CreateEnrollmentCommand(academicId, dto, userId));
 
@@ -62,15 +61,7 @@ namespace ATLAS.Controllers.Enrollment
                 }
 
                 return Ok("Enrollment created successfully.");
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            
         }
 
         /// <summary>
@@ -84,8 +75,6 @@ namespace ATLAS.Controllers.Enrollment
         
         public async Task<IActionResult> CreateRangeEnrollment([FromBody] BulkCreateEnrollmentDTO dto)
         {
-            try
-            {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
                 if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out var userId))
@@ -103,15 +92,7 @@ namespace ATLAS.Controllers.Enrollment
                 }
 
                 return Ok("Enrollments range created successfully.");
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(ex.Message);
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(ex.Message);
-            }
+            
         }
        /// <summary>
         /// Delete Enrollment.

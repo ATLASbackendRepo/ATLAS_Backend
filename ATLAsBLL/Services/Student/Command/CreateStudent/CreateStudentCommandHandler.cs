@@ -21,7 +21,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
         /// _publisher.
         /// </summary>
         private readonly IPublisher _publisher;
-
+          public const int MinimumPasswordLength = 8;
         public CreateStudentCommandHandler(IUnitOfWork unitOfWork, IPublisher publisher)
         {
             _unitOfWork = unitOfWork;
@@ -34,6 +34,12 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
         public async Task<int> Handle(CreateStudentCommand request, CancellationToken cancellationToken)
         {
             
+
+             if (string.IsNullOrWhiteSpace(request.CreateStudentDTO.password))
+                throw new InvalidDataException("New password is required.");
+            if (request.CreateStudentDTO.password.Length < MinimumPasswordLength)
+                throw new InvalidDataException($"New password must be at least {MinimumPasswordLength} characters long.");
+           
 
             var academicId = request.CreateStudentDTO.AcademicId;
 
@@ -61,7 +67,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
 
             };
 
-            user.Password = BCrypt.Net.BCrypt.HashPassword("12345678");
+            user.Password = BCrypt.Net.BCrypt.HashPassword(request.CreateStudentDTO.password);
 
          
             var student = new Student

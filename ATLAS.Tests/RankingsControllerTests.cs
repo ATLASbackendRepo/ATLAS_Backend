@@ -34,13 +34,13 @@ namespace ATLAS.Tests
         }
 
         [Fact]
-        public async Task GetMyRank_ReturnsForbid_WhenStudentIdMismatch()
+        public async Task GetMyRank_ReturnsNotFound_WhenNoEnrollmentsFound()
         {
             var controller = CreateControllerWithStudent(2);
 
             var result = await controller.GetMyRank( 1, CancellationToken.None);
 
-            Assert.IsType<ForbidResult>(result.Result);
+            Assert.IsType<NotFoundObjectResult>(result.Result);
         }
 
         [Fact]
@@ -49,13 +49,13 @@ namespace ATLAS.Tests
             var controller = CreateControllerWithStudent(1);
 
             var res1 = await controller.GetMyRank(
-               1,
+               0,
                 CancellationToken.None);
 
             Assert.IsType<BadRequestObjectResult>(res1.Result);
 
             var res2 = await controller.GetMyRank(
-                1,
+                -1,
                 CancellationToken.None);
 
             Assert.IsType<BadRequestObjectResult>(res2.Result);

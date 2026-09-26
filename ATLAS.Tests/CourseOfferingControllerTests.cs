@@ -60,7 +60,7 @@ namespace ATLAS.Tests
         }
 
         [Fact]
-        public async Task GetStudentMyCourses_ReturnsForbid_WhenDifferentStudentId()
+        public async Task GetStudentMyCourses_ReturnsNotFound_WhenNoCoursesFound()
         {
             var mediatorMock = new Mock<IMediator>();
 
@@ -70,7 +70,7 @@ namespace ATLAS.Tests
 
             var result = await controller.GetStudentMyCourses();
 
-            Assert.IsType<ForbidResult>(result.Result);
+            Assert.IsType<NotFoundObjectResult>(result.Result);
         }
 
    

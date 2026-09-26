@@ -25,5 +25,7 @@ namespace ATLASDomain.DTO.Student
         /// Institution Id.
         /// </summary>
         public int InstitutionId { get; set; }
+
+        public string password {get; set;} = string.Empty;
     }
 }

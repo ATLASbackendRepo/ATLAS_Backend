@@ -48,12 +48,11 @@ namespace ATLAS.Controllers.CourseOffering
         public async Task<ActionResult<IEnumerable<CourseOfferingDTO>>> GetStudentMyCourses()
         {
             var userId = GetCurrentUserId();
-
-           
             if (userId < 1)
             {
-                return BadRequest("Invalid Request.");
+                return Unauthorized();
             }
+
             var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Student.GetMyCourseQuery(userId));
             if (courses == null || !courses.Any())
             {
@@ -76,9 +75,7 @@ namespace ATLAS.Controllers.CourseOffering
         [EnableRateLimiting("CourseQueryPolicy")]
         public async Task<ActionResult<IEnumerable<CourseOfferingDTO>>> GetAdminStudentMyCourses([FromRoute] string AcdimicID)
         {
-            try
-            {
-                var userId = await GetCurrentUserId(AcdimicID);
+              var userId = await GetCurrentUserId(AcdimicID);
 
                 if (userId < 1)
                 {
@@ -91,27 +88,7 @@ namespace ATLAS.Controllers.CourseOffering
                     return NotFound($"No courses found for student ID {userId}.");
                 }
                 return Ok(courses);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                _logger?.LogWarning(ex, "Unauthorized access in GetAdminStudentMyCourses for AcdimicID {AcdimicID}", AcdimicID);
-                return Unauthorized(new { message = "Authentication is required to perform this operation." });
-            }
-            catch (ArgumentException ex)
-            {
-                _logger?.LogWarning(ex, "Bad request in GetAdminStudentMyCourses for AcdimicID {AcdimicID}", AcdimicID);
-                return BadRequest(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger?.LogInformation(ex, "User not found in GetAdminStudentMyCourses for AcdimicID {AcdimicID}", AcdimicID);
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Unexpected error in GetAdminStudentMyCourses for AcdimicID {AcdimicID}", AcdimicID);
-                return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.", detail: $"TraceId: {HttpContext?.TraceIdentifier}");
-            }
+            
         }
 
 
@@ -153,8 +130,7 @@ namespace ATLAS.Controllers.CourseOffering
         [EnableRateLimiting("CourseQueryPolicy")]
         public async Task<ActionResult<IEnumerable<DoctorCourseOfferingDTO>>> GetAdminStaffMyCourses([FromRoute] string AcdimicID)
         {
-            try
-            {
+            
                 var StaffId = await GetCurrentUserId(AcdimicID);
 
                 if (StaffId < 1)
@@ -167,27 +143,7 @@ namespace ATLAS.Controllers.CourseOffering
                     return NotFound($"No courses found for Staff ID {StaffId }.");
                 }
                 return Ok(courses);
-            }
-            catch (UnauthorizedAccessException ex)
-            {
-                _logger?.LogWarning(ex, "Unauthorized access in GetAdminStaffMyCourses for AcdimicID {AcdimicID}", AcdimicID);
-                return Unauthorized(new { message = "Authentication is required to perform this operation." });
-            }
-            catch (ArgumentException ex)
-            {
-                _logger?.LogWarning(ex, "Bad request in GetAdminStaffMyCourses for AcdimicID {AcdimicID}", AcdimicID);
-                return BadRequest(ex.Message);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                _logger?.LogInformation(ex, "User not found in GetAdminStaffMyCourses for AcdimicID {AcdimicID}", AcdimicID);
-                return NotFound(ex.Message);
-            }
-            catch (Exception ex)
-            {
-                _logger?.LogError(ex, "Unexpected error in GetAdminStaffMyCourses for AcdimicID {AcdimicID}", AcdimicID);
-                return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.", detail: $"TraceId: {HttpContext?.TraceIdentifier}");
-            }
+
         }
 
 
@@ -230,8 +186,7 @@ namespace ATLAS.Controllers.CourseOffering
         [EnableRateLimiting("CourseQueryPolicy")]
         public async Task<ActionResult<IEnumerable<int>>> GetDoctorIDs(int courseOfferingId)
         {
-            try
-            {
+            
                 var userId = GetCurrentUserId();
                 if (userId < 1 || courseOfferingId < 1)
                 {
@@ -243,15 +198,7 @@ namespace ATLAS.Controllers.CourseOffering
                     return NotFound($"No doctors found for CourseOfferingId {courseOfferingId}.");
                 }
                 return Ok(doctorIDs);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized(new { message = "Authentication is required to perform this operation." });
-            }
-            catch (Exception)
-            {
-                return Problem(statusCode: StatusCodes.Status500InternalServerError, title: "An unexpected error occurred.");
-            }
+   
         }
         /// <summary>
         /// Get Current User Id.
@@ -261,7 +208,7 @@ namespace ATLAS.Controllers.CourseOffering
             var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
             if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
             {
-                throw new UnauthorizedAccessException("User ID not found in token.");
+                return default;
             }
             return userId;
         }

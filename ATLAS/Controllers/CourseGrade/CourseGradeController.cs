@@ -98,7 +98,8 @@ namespace ATLASAPI.Controllers
             {
                 return BadRequest("Invalid grade data.");
             }
-
+           if(command.StudentDegree <0 || command.StudentDegree>40)
+               return BadRequest("Invalid grade data."); 
             if (!int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var userId))
                 return Unauthorized();
 
@@ -120,41 +121,6 @@ namespace ATLASAPI.Controllers
         }
 
 
-
-        //[HttpPost("assign-range")]
-        //[Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
-        //[ProducesResponseType(StatusCodes.Status200OK)]
-        //[ProducesResponseType(StatusCodes.Status400BadRequest)]
-        //[ProducesResponseType(StatusCodes.Status404NotFound)]
-        //public async Task<IActionResult> AssignGrades(
-        //   [FromBody] InsertGradeDTO gradeDTO)
-        //{
-        //    if (gradeDTO == null || gradeDTO.EnrollmentId <= 0 || gradeDTO.ModuleId <= 0)
-        //    {
-        //        return BadRequest("Invalid grade data.");
-        //    }
-
-        //    if (!int.TryParse(User.FindFirst(System.Security.Claims.ClaimTypes.NameIdentifier)?.Value, out var userId))
-        //        return Unauthorized();
-
-        //    if (!await _courseAuthorization.CanManageGradeAsync(User, gradeDTO.EnrollmentId, gradeDTO.ModuleId, HttpContext.RequestAborted))
-        //        return Forbid();
-
-        //    gradeDTO.UserId = userId;
-
-
-        //    var result = await _mediator.Send(new AssignCourseGradesRangeCommand(new List<InsertGradeDTO> { gradeDTO }));
-
-        //    if (result == false)
-        //        return NotFound("Failed to assign grades.");
-
-        //    return Ok(new
-        //    {
-        //        Success = true,
-        //        Message = "Grades assigned successfully."
-        //    });
-        //}
-
         /// <summary>
         /// Assign Grades Range.
         /// </summary>
@@ -167,8 +133,7 @@ namespace ATLASAPI.Controllers
             int modelId,
             CancellationToken cancellationToken)
                 {
-            try
-            {
+            
                 if (courseOfferingId <= 0 || modelId <= 0)
                 {
                     return BadRequest(
@@ -277,36 +242,9 @@ namespace ATLASAPI.Controllers
                     success = result,
                     message = "Course grades assigned successfully."
                 });
-            }
-            catch (OperationCanceledException)
-            {
-                return BadRequest("The upload was canceled.");
-            }
-            catch (InvalidDataException ex)
-            {
-                return BadRequest(new
-                {
-                    message = ex.Message
-                });
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new
-                {
-                    message = ex.Message
-                });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return Conflict(new
-                {
-                    message = ex.Message
-                });
-            }
-            catch (Exception)
-            {
-                return BadRequest("Invalid data.");
-            }
+           
+             
+           
         }
 
 
@@ -327,8 +265,7 @@ namespace ATLASAPI.Controllers
          [FromQuery] string format = "excel",
          CancellationToken cancellationToken = default)
         {
-            try
-            {
+           
                 if (courseOfferingId <= 0)
                     return BadRequest(new { message = "Course offering ID must be greater than zero." });
 
@@ -345,21 +282,7 @@ namespace ATLASAPI.Controllers
                     result.File,
                     result.ContentType,
                     result.FileName);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new
-                {
-                    message = ex.Message
-                });
-            }
-            catch (ArgumentException ex)
-            {
-                return BadRequest(new
-                {
-                    message = ex.Message
-                });
-            }
+         
         }
 
 

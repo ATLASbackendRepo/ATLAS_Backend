@@ -1,11 +1,6 @@
-using ATLAsBLL.Features.Students.Commands.CreateStudent;
-using ATLAsBLL.Features.Students.Commands.CreateStudentsRange;
-using ATLAsBLL.Features.Students.Commands.DeleteStudent;
-using ATLAsBLL.Features.Students.Commands.UpdateStudent;
 using ATLAsBLL.Features.Users.Commands.CreateUser;
 using ATLAsBLL.Features.Users.Commands.DeleteUser;
 using ATLAsBLL.Features.Users.Commands.UpdateUser;
-using ATLAsBLL.Services.Student.Queries.GetallStudent;
 using ATLAsBLL.Services.User.qeusies.GetallStaff;
 using ATLASDomain.DTO.Staff;
 using ATLASDomain.DTO.Student;
@@ -61,10 +56,8 @@ namespace ATLAS.Controllers.Staff
         /// <summary>
         /// Create Staff.
         /// </summary>
-        public async Task<ActionResult> CreateStaff([FromBody] Create_Update_StaffDto createStaffDTO)
+        public async Task<ActionResult> CreateStaff([FromBody] CreateStaffDto createStaffDTO)
         {
-            try
-            {
                 var staffId = await _mediator.Send(new CreateUserCommand(createStaffDTO));
                 if (staffId > 0)
                 {
@@ -74,15 +67,6 @@ namespace ATLAS.Controllers.Staff
                 {
                     return BadRequest("Failed to create staff.");
                 }
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound("One or more required entities not found.");
-            }
-            catch (Exception)
-            {
-                return BadRequest("An error occurred while creating the staff");
-            }
         }
 
 
@@ -96,8 +80,7 @@ namespace ATLAS.Controllers.Staff
         /// </summary>
         public async Task<ActionResult> updateStaff([FromBody] Create_Update_StaffDto UpdateStaffDTO)
         {
-            try
-            {
+            
                 var staff = await _mediator.Send(new UpdateUserCommand(UpdateStaffDTO));
                 if (staff)
                 {
@@ -107,15 +90,7 @@ namespace ATLAS.Controllers.Staff
                 {
                     return BadRequest("Failed to update staff.");
                 }
-            }
-            catch(KeyNotFoundException)
-            {
-                return NotFound("One or more required entities not found.");
-            }
-            catch (Exception)
-            {
-                return BadRequest("An error occurred while updating the staff");
-            }
+           
         }
 
         [HttpDelete("DeleteStaff")]
@@ -128,8 +103,7 @@ namespace ATLAS.Controllers.Staff
         /// </summary>
         public async Task<ActionResult> deleteStaff([FromQuery] string StaffCode)
         {
-            try
-            {
+            
                 var staff = await _mediator.Send(new DeleteUserCommand(StaffCode));
                 if (staff)
                 {
@@ -139,15 +113,7 @@ namespace ATLAS.Controllers.Staff
                 {
                     return BadRequest("Failed to delete staff.");
                 }
-            }
-            catch(KeyNotFoundException)
-            {
-                return NotFound("One or more required entities not found.");
-            }
-            catch (Exception)
-            {
-                return BadRequest("An error occurred while deleting the staff");
-            }
+          
         }
 
     }

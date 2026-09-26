@@ -47,11 +47,13 @@ public class RankingsController : ControllerBase
         if (semesterId < 1)
             return BadRequest("SemesterId must be greater than zero.");
 
-         var Userid= GetCurrentUserId();
+        var Userid = GetCurrentUserId();
+        if (Userid == null)
+            return Unauthorized();
 
         
         var result = await _mediator.Send(
-            new GetMySemesterRankQuery(Userid, semesterId),
+            new GetMySemesterRankQuery(Userid.Value, semesterId),
             cancellationToken);
 
         if (result is null)
@@ -102,12 +104,12 @@ public class RankingsController : ControllerBase
     /// <summary>
     /// Get Current User Id.
     /// </summary>
-    private int GetCurrentUserId()
+    private int? GetCurrentUserId()
     {
         var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
         if (userIdClaim == null || !int.TryParse(userIdClaim.Value, out int userId))
         {
-            throw new UnauthorizedAccessException("User ID not found in token.");
+            return null;
         }
         return userId;
     }
