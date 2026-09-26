@@ -3,9 +3,13 @@ bin/
 obj/
 **/bin/
 **/obj/
+*.user
+*.suo
 
 # Coverage output produced by "dotnet test --collect:XPlat Code Coverage"
 TestResults/
 
 .env
 *.env
+audit_med_low.txt
+
