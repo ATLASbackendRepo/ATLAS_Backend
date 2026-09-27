@@ -266,24 +266,32 @@ namespace ATLAS.Controllers.Authtenication
         public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
         {
             if (request is null ||
-                string.IsNullOrWhiteSpace(request.RefreshToken) ||
-                string.IsNullOrWhiteSpace(request.AcdimicID))
+                string.IsNullOrWhiteSpace(request.RefreshToken))
             {
-                return BadRequest("Refresh token and Academic ID are required.");
+                return BadRequest("A refresh token is required.");
             }
 
-            var user = await _mediator.Send(new GetUserByAcademicIdQuery(request.AcdimicID));
-               
+            // The account that is being signed out is always the caller. Taking
+            // the identity from the request body would let anyone holding a
+            // valid access token revoke somebody else's refresh-token family.
+            var userIdClaim = User.FindFirstValue(ClaimTypes.NameIdentifier);
 
-            if (user == null)
-                return Ok(); 
+            if (!int.TryParse(userIdClaim, out var callerUserId) ||
+                callerUserId <= 0)
+            {
+                return Unauthorized();
+            }
 
-            if (string.IsNullOrWhiteSpace(user.RefreshTokenHash))
+            var user = await _mediator.Send(new GetUserByIdQuery(callerUserId));
+
+            if (user == null || string.IsNullOrWhiteSpace(user.RefreshTokenHash))
                 return Ok();
 
+            // The token is only accepted when it really belongs to the
+            // signed-in account, so logout can never target another user.
             bool refreshValid = BCrypt.Net.BCrypt.Verify(request.RefreshToken, user.RefreshTokenHash);
             if (!refreshValid)
-                return Ok();
+                return BadRequest("The refresh token does not belong to the signed-in account.");
 
             await _mediator.Send(new RevokeRefreshTokenCommand(user.UserId));
             return Ok("Logged out successfully");
