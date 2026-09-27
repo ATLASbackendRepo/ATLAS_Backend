@@ -36,9 +36,10 @@ namespace ATLAsDCL.Repositories
         /// <summary>
         /// Mark All As Read Async.
         /// </summary>
-        public async Task MarkAllAsReadAsync(int userId)
+        /// <returns>The number of notifications that were actually marked.</returns>
+        public async Task<int> MarkAllAsReadAsync(int userId)
         {
-            await _dbSet.Where(n => n.RecipientUserID == userId && !n.IsRead)
+            return await _dbSet.Where(n => n.RecipientUserID == userId && !n.IsRead)
                 .ExecuteUpdateAsync(setters => setters.SetProperty(n => n.IsRead, true));
         }
 

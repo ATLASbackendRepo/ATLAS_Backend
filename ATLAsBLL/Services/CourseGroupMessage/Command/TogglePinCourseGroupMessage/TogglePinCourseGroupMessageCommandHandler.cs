@@ -33,6 +33,11 @@ public class TogglePinCourseGroupMessageCommandHandler : IRequestHandler<ToggleP
             throw new KeyNotFoundException($"Message with ID {request.MessageId} not found.");
         }
 
+        if (message.IsDeleted)
+        {
+            throw new InvalidDataException("A deleted message can no longer be pinned or unpinned.");
+        }
+
         // Authorization: only sender can toggle pin
         if (message.SenderUserID != request.RequestingUserId)
         {

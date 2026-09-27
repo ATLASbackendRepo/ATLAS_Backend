@@ -33,6 +33,11 @@ public class EditCourseGroupMessageCommandHandler : IRequestHandler<EditCourseGr
             throw new KeyNotFoundException($"Message with ID {request.MessageId} not found.");
         }
 
+        if (message.IsDeleted)
+        {
+            throw new InvalidDataException("A deleted message can no longer be edited.");
+        }
+
         // Authorization: only sender can edit
         if (message.SenderUserID != request.RequestingUserId)
         {

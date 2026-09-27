@@ -1,4 +1,5 @@
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 using ATLAsBLL.Exceptions;
 using ATLAsDCL.UnitOfWork;
 using ATLAS.Domain.Entities;
@@ -29,7 +30,7 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
     {
         var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId);
 
-        if (message == null)
+        if (message == null || message.IsDeleted)
         {
             throw new KeyNotFoundException($"Message with ID {request.MessageId} not found.");
         }
@@ -67,6 +68,18 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
         {
             throw new ForbiddenAccessException("Invalid user role.");
         }
+        // The read receipt is keyed by (MessageID, UserID), so marking the same
+        // message read twice is not an error: the caller's intent is already
+        // satisfied and a second insert would only raise a duplicate key (LOW-11).
+        var alreadyRead = await _unitOfWork.CourseGroupMessagesRead.AnyAsync(
+            receipt => receipt.MessageID == request.MessageId &&
+                       receipt.UserID == request.UserId);
+
+        if (alreadyRead)
+        {
+            return request.MessageId;
+        }
+
         // Write read receipt
         var readReceipt = new CourseGroupMessageRead
         {
@@ -76,7 +89,24 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
         };
 
         await _unitOfWork.CourseGroupMessagesRead.AddAsync(readReceipt );
-        await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            // A concurrent request inserted the receipt first, which is the same
+            // outcome this request wanted. Anything else is a real failure.
+            var persisted = await _unitOfWork.CourseGroupMessagesRead.AnyAsync(
+                receipt => receipt.MessageID == request.MessageId &&
+                           receipt.UserID == request.UserId);
+
+            if (!persisted)
+            {
+                throw;
+            }
+        }
 
         return request.MessageId;
     }

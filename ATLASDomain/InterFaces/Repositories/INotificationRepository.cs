@@ -14,6 +14,6 @@ namespace ATLASDomain.Interfaces.Repositories
         Task<IEnumerable<Notification>> GetUnreadForUserAsync(int userId);
         
         Task MarkAsReadAsync(int notificationId);
-        Task MarkAllAsReadAsync(int userId);
+        Task<int> MarkAllAsReadAsync(int userId);
     }
 }

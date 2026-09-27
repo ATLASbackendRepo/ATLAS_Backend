@@ -25,9 +25,9 @@ public class MarkAllNotificationsAsReadCommandHandler : IRequestHandler<MarkAllN
     /// </summary>
     public async Task<int> Handle(MarkAllNotificationsAsReadCommand request, CancellationToken cancellationToken)
     {
-        await _unitOfWork.Notifications.MarkAllAsReadAsync(request.UserId);
-        var count = await _unitOfWork.SaveChangesAsync(cancellationToken);
-
-        return count;
+        // The bulk update is executed immediately and reports how many rows it
+        // changed, so it is returned instead of the (always zero) number of
+        // entities the unit of work saved (LOW-11).
+        return await _unitOfWork.Notifications.MarkAllAsReadAsync(request.UserId);
     }
 }
