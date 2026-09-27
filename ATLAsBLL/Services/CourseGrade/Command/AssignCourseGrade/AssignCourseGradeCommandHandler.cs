@@ -38,6 +38,9 @@ namespace ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade
             if (enrollment.CourseOfferingID != module.CourseOfferingID)
                 throw new InvalidOperationException("The assessment module does not belong to the enrollment's course offering.");
 
+            if (await _unitOfWork.Semesters.IsGradingClosedForOfferingAsync(module.CourseOfferingID))
+                throw new InvalidOperationException("Grading is closed for this semester; grades can no longer be assigned.");
+
             if (request.StudentDegree < 0 || request.StudentDegree > module.MaxDegree)
                 throw new InvalidOperationException("Student degree cannot exceed the assessment module's maximum degree.");
 

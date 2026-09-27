@@ -3,6 +3,7 @@ using ATLAsBLL.Features.AssessmentModules.Commands.DeleteAssessmentModule;
 using ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule;
 using ATLAsBLL.Services.AssessmentModule.Qureies;
 using ATLASDomain.DTO.AssessmentModule;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -106,9 +107,23 @@ namespace ATLAS.Controllers.AssessmentModule
             {
                 return Unauthorized(new { message = "Authentication is required to perform this operation." });
             }
-            catch (ArgumentException)
+            catch (ValidationException validationException)
             {
-                return BadRequest(new { message = "The request is invalid." });
+                // A rejected request (for example MaxDegree outside the allowed
+                // range) is a client mistake, not a server fault (MED-07).
+                return BadRequest(new
+                {
+                    message = "The request is invalid.",
+                    errors = validationException.Errors
+                        .GroupBy(failure => failure.PropertyName)
+                        .ToDictionary(
+                            group => group.Key,
+                            group => group.Select(failure => failure.ErrorMessage).ToArray())
+                });
+            }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(new { message = exception.Message });
             }
             catch (Exception)
             {
@@ -142,9 +157,23 @@ namespace ATLAS.Controllers.AssessmentModule
             {
                 return NotFound(new { message = "The requested resource was not found." });
             }
-            catch (ArgumentException)
+            catch (ValidationException validationException)
             {
-                return BadRequest(new { message = "The request is invalid." });
+                // A rejected request (for example MaxDegree outside the allowed
+                // range) is a client mistake, not a server fault (MED-07).
+                return BadRequest(new
+                {
+                    message = "The request is invalid.",
+                    errors = validationException.Errors
+                        .GroupBy(failure => failure.PropertyName)
+                        .ToDictionary(
+                            group => group.Key,
+                            group => group.Select(failure => failure.ErrorMessage).ToArray())
+                });
+            }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(new { message = exception.Message });
             }
             catch (Exception)
             {

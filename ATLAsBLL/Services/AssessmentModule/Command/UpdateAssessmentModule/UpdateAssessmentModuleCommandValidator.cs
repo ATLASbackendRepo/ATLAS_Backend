@@ -17,7 +17,7 @@ namespace ATLAsBLL.Services.AssessmentModule.Command.UpdateAssessmentModule
             RuleFor(c => c.DTO.MaxDegree)
                 .NotEmpty().WithMessage("Max degree is required.")
                 .InclusiveBetween(AssessmentModuleEntity.MinimumMaxDegree, AssessmentModuleEntity.MaximumMaxDegree)
-                .WithMessage("Max degree must be a value between 1 and 100.");
+                .WithMessage($"Max degree must be a value between {AssessmentModuleEntity.MinimumMaxDegree} and {AssessmentModuleEntity.MaximumMaxDegree}.");
         }
     }
 }

@@ -26,6 +26,10 @@ namespace ATLAsDCL.Configuration
                 .IsRequired()
                 .HasMaxLength(50);
 
+            builder.Property(x => x.IsGradingClosed)
+                .IsRequired()
+                .HasDefaultValue(false);
+
             builder.HasIndex(x => new
             {
                 x.SemesterName,

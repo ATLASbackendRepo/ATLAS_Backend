@@ -100,6 +100,14 @@ public class AssignCourseGradesRangeCommandHandler
                     $"course offering {request.CourseOfferingID}.");
             }
 
+            // After the semester's grading is closed the import must not change
+            // any grade either, so the file is refused before it writes (MED-07).
+            if (await _unitOfWork.Semesters.IsGradingClosedForOfferingAsync(module.CourseOfferingID))
+            {
+                throw new InvalidOperationException(
+                    "Grading is closed for this semester; grades can no longer be imported.");
+            }
+
             foreach (var row in rows)
             {
                 if (row.Grade < 0 || row.Grade > module.MaxDegree)

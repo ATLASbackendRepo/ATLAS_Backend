@@ -655,6 +655,11 @@ namespace ATLAsDCL.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("IsGradingClosed")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
+
                     b.Property<string>("SemesterName")
                         .IsRequired()
                         .HasMaxLength(100)

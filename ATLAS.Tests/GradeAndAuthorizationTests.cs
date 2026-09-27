@@ -37,6 +37,48 @@ public class GradeAndAuthorizationTests
         Assert.Equal(10, grade.UpdatedBy);
     }
 
+    /// <summary>
+    /// MED-07: once the semester's grading is closed, a grade can no longer be
+    /// assigned and nothing is written.
+    /// </summary>
+    [Fact]
+    public async Task AssignGrade_IsRejectedWhenTheSemesterGradingIsClosed()
+    {
+        await using var context = TestDbContextFactory.Create();
+        context.Semesters.Add(new Semester
+        {
+            SemesterID = 1,
+            SemesterName = "Spring",
+            AcademicYear = "2024",
+            IsGradingClosed = true
+        });
+        SeedGradeData(context);
+        var unitOfWork = CreateUnitOfWork(context);
+        var handler = new AssignCourseGradeCommandHandler(unitOfWork);
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            handler.Handle(new AssignCourseGradeCommand(100, 200, 60, 9), CancellationToken.None));
+
+        Assert.Empty(context.CourseGrades);
+    }
+
+    /// <summary>
+    /// MED-07: an offering whose semester row is missing is treated as open
+    /// grading, so existing data keeps accepting grades.
+    /// </summary>
+    [Fact]
+    public async Task AssignGrade_IsAcceptedWhenTheSemesterRowIsMissing()
+    {
+        await using var context = TestDbContextFactory.Create();
+        SeedGradeData(context);
+        var unitOfWork = CreateUnitOfWork(context);
+        var handler = new AssignCourseGradeCommandHandler(unitOfWork);
+
+        await handler.Handle(new AssignCourseGradeCommand(100, 200, 60, 9), CancellationToken.None);
+
+        Assert.Single(context.CourseGrades);
+    }
+
     //[Fact]
     //public async Task BatchGradeAssignment_RejectsDuplicateEnrollmentModulePairs()
     //{

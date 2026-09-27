@@ -24,6 +24,7 @@ public class AssignCourseGradesRangeCommandHandlerTests : IDisposable
     private readonly Mock<IAssessmentModuleRepository> _modules = new();
     private readonly Mock<IEnrollmentRepository> _enrollments = new();
     private readonly Mock<ICourseGradeRepository> _grades = new();
+    private readonly Mock<ISemesterRepository> _semesters = new();
     private readonly List<string> _createdFiles = new();
 
     /// <summary>
@@ -45,13 +46,50 @@ public class AssignCourseGradesRangeCommandHandlerTests : IDisposable
             .Returns(_grades.Object);
 
         _unitOfWork
+            .SetupGet(work => work.Semesters)
+            .Returns(_semesters.Object);
+
+        _unitOfWork
             .Setup(work => work.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
+
+        // Grading is open unless a test says otherwise (MED-07).
+        _semesters
+            .Setup(repository => repository.IsGradingClosedForOfferingAsync(It.IsAny<int>()))
+            .ReturnsAsync(false);
 
         _grades
             .Setup(repository => repository.AddRangeAsync(
                 It.IsAny<List<CourseGrade>>()))
             .Returns(Task.CompletedTask);
+    }
+
+    /// <summary>
+    /// Once the semester's grading is closed the import must write nothing, and
+    /// the uploaded file is still removed.
+    /// </summary>
+    [Fact]
+    public async Task Handle_RejectsImportsWhenTheSemesterGradingIsClosed()
+    {
+        _semesters
+            .Setup(repository => repository.IsGradingClosedForOfferingAsync(CourseOfferingId))
+            .ReturnsAsync(true);
+
+        SetupModule(CourseOfferingId);
+        SetupEnrollments(("STU001", 42));
+        var path = CreateWorkbook(("STU001", 10m));
+
+        await Assert.ThrowsAsync<InvalidOperationException>(() =>
+            CreateHandler().Handle(
+                new AssignCourseGradesRangeCommand(
+                    path,
+                    CourseOfferingId,
+                    ModuleId,
+                    UserID: 3),
+                CancellationToken.None));
+
+        AssertNothingWasWritten();
+        Assert.False(File.Exists(path));
     }
 
     /// <summary>

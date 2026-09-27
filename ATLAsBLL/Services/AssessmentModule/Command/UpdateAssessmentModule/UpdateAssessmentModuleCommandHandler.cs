@@ -29,16 +29,36 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule
             var teachingAssistants = await _unitOfWork.CourseOfferingTAs.GetTAsByOfferingAsync(module.CourseOfferingID);
             if (!doctors.Contains(request.UserId) && !teachingAssistants.Any(ta => ta.TeacherAssistID == request.UserId))
                 throw new UnauthorizedAccessException("You are not assigned to this course offering.");
-            if (request.DTO.MaxDegree < ATLASDomain.Entities.AssessmentModule.MinimumMaxDegree || request.DTO.MaxDegree > ATLASDomain.Entities.AssessmentModule.MaximumMaxDegree)
+            if (request.DTO.MaxDegree < AssessmentModule.MinimumMaxDegree || request.DTO.MaxDegree > AssessmentModule.MaximumMaxDegree)
             {
-                throw new ArgumentException("MaxDegree must be a value between 0 and 100.");
+                throw new ArgumentException($"MaxDegree must be a value between {AssessmentModule.MinimumMaxDegree} and {AssessmentModule.MaximumMaxDegree}.");
             }
             if (string.IsNullOrWhiteSpace(request.DTO.ModuleName))
             {
                 throw new ArgumentException("ModuleName cannot be null or empty.");
             }
 
+            // Lowering MaxDegree below a grade that already exists would silently
+            // invalidate the recorded grade, so it is refused (MED-07).
+            var maxRecordedDegree = await _unitOfWork.AssessmentModules
+                .GetMaxDegreeByModuleAsync(module.ModuleID);
 
+            if (request.DTO.MaxDegree < maxRecordedDegree)
+            {
+                throw new ArgumentException(
+                    $"MaxDegree cannot be lowered to {request.DTO.MaxDegree} because a grade of {maxRecordedDegree} is already recorded for this module.");
+            }
+
+            // The modules of one offering compose a single course grade, so their
+            // max degrees may add up to at most 100 (MED-07).
+            var offeringTotal = await _unitOfWork.AssessmentModules
+                .GetTotalMaxDegreeByCourseOfferingAsync(module.CourseOfferingID);
+
+            if (offeringTotal - module.MaxDegree + request.DTO.MaxDegree > AssessmentModule.MaximumOfferingTotalMaxDegree)
+            {
+                throw new ArgumentException(
+                    $"The total max degree of all modules in a course offering cannot exceed {AssessmentModule.MaximumOfferingTotalMaxDegree}.");
+            }
 
             module.ModuleName = request.DTO.ModuleName;
             module.MaxDegree = request.DTO.MaxDegree;
