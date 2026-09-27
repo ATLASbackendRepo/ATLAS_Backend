@@ -160,6 +160,11 @@ namespace ATLAsDCL.Data
             {
                 entity.HasNoKey();
                 entity.ToView("vw_CourseDetails");
+
+                // The view exposes the decimal(5,2) columns of CourseGrades and
+                // AssessmentModules, so the properties must not be mapped as int.
+                entity.Property(x => x.studentdegree).HasPrecision(5, 2);
+                entity.Property(x => x.maxDegree).HasPrecision(5, 2);
             });
 
 

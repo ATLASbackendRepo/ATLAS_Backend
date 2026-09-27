@@ -833,14 +833,16 @@ namespace ATLAsDCL.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("maxDegree")
-                        .HasColumnType("int");
+                    b.Property<decimal>("maxDegree")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
 
                     b.Property<int>("studentId")
                         .HasColumnType("int");
 
-                    b.Property<int>("studentdegree")
-                        .HasColumnType("int");
+                    b.Property<decimal>("studentdegree")
+                        .HasPrecision(5, 2)
+                        .HasColumnType("decimal(5,2)");
 
                     b.ToTable((string)null);
 

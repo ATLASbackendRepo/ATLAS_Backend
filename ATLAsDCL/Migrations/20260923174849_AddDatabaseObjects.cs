@@ -20,8 +20,12 @@ namespace ATLAsDCL.Migrations
             // earned degrees and a dense rank inside the student's academic level.
             // Consumed by EnrollmentRepository.GetStudentSemesterRankAsync and
             // GetTopRankedStudentsInSemesterAsync (SemesterStudentRankingView).
+            //
+            // Wrapped in EXEC(...) because a CREATE/ALTER of a view or procedure
+            // must start its own batch, and the generated deployment script puts
+            // every statement inside an IF NOT EXISTS history check.
             migrationBuilder.Sql("""
-                CREATE OR ALTER VIEW dbo.vw_SemesterStudentRanking
+                EXEC(N'CREATE OR ALTER VIEW dbo.vw_SemesterStudentRanking
                 AS
                 WITH StudentTotals AS
                 (
@@ -62,13 +66,14 @@ namespace ATLAsDCL.Migrations
                         PARTITION BY SemesterID, AcademicLevel
                         ORDER BY TotalDegree DESC) AS bigint) AS [Rank]
                 FROM StudentTotals;
+                ');
                 """);
 
             // Per-module grade read model for a course offering.
             // Consumed by StudentRepository.GetAllStudentWithModeAsync and
             // GetStudentWithModeAsync (StudentGradeModelView).
             migrationBuilder.Sql("""
-                CREATE OR ALTER VIEW dbo.vw_StudentGradeMode
+                EXEC(N'CREATE OR ALTER VIEW dbo.vw_StudentGradeMode
                 AS
                 SELECT
                     am.ModuleID          AS ModuleID,
@@ -86,13 +91,14 @@ namespace ATLAsDCL.Migrations
                     ON u.UserId = s.UserId
                 INNER JOIN dbo.AssessmentModules am
                     ON am.ModuleID = cg.ModuleID;
+                ');
                 """);
 
             // Student-facing course details read model.
             // Consumed by CourseOfferingRepository.GetDetailsCourseAsync and
             // GetMyCourseDetailsAsync (CourseDetailsView).
             migrationBuilder.Sql("""
-                CREATE OR ALTER VIEW dbo.vw_CourseDetails
+                EXEC(N'CREATE OR ALTER VIEW dbo.vw_CourseDetails
                 AS
                 SELECT
                     s.StudentId          AS studentId,
@@ -114,13 +120,15 @@ namespace ATLAsDCL.Migrations
                     ON co.CourseOfferingID = am.CourseOfferingID
                 INNER JOIN dbo.Courses c
                     ON c.CourseID = co.CourseID;
+                ');
                 """);
 
             // Course analysis read model. Returns three result sets consumed by
             // CourseOfferingRepository.GetCourseAnalysisAsync through Dapper:
             // module averages, grading progress and the degree distribution.
+            // EXEC wrapper: CREATE PROCEDURE must start its own batch (see above).
             migrationBuilder.Sql("""
-                CREATE OR ALTER PROCEDURE dbo.sp_GetCourseAnalysis
+                EXEC(N'CREATE OR ALTER PROCEDURE dbo.sp_GetCourseAnalysis
                     @CourseOfferingID INT
                 AS
                 BEGIN
@@ -172,6 +180,7 @@ namespace ATLAsDCL.Migrations
                         AVG(CAST(TotalDegree AS float)) AS ClassAvg
                     FROM StudentTotals;
                 END
+                ');
                 """);
 
             // Safety net for inserts that explicitly supply NULL/'' StudentCode:
