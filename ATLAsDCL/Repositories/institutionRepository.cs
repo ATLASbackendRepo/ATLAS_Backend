@@ -23,32 +23,19 @@ namespace ATLAsDCL.Repositories
         }
         /// <summary>
         /// Get Institution With Name Async.
+        /// The lookup is read-only: a name that does not exist is reported as
+        /// 0 so the caller can reject the row instead of silently creating an
+        /// institution from a typo (MED-14).
         /// </summary>
         public async Task<int> GetInstitutionWithNameAsync(string institutionName)
         {
-           
             var institutionId = await _context.Institutions
                 .AsNoTracking()
                 .Where(i => i.name == institutionName)
                 .Select(i => (int?)i.InstitutionID)
                 .FirstOrDefaultAsync();
 
-            if (institutionId.HasValue)
-            {
-                return  institutionId.Value;
-            }
-
-           
-            var newInstitution = new Institution
-            {
-                name = institutionName
-            };
-
-            _context.Institutions.Add(newInstitution);
-            await _context.SaveChangesAsync();
-
-            
-            return newInstitution.InstitutionID;
+            return institutionId ?? 0;
         }
    
 

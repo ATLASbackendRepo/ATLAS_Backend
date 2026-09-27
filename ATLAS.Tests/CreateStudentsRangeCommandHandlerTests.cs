@@ -129,6 +129,58 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
     }
 
     /// <summary>
+    /// MED-14: a row that names an institution the lookup does not know is
+    /// rejected before anything is written; the lookup never creates the
+    /// institution from the typo.
+    /// </summary>
+    [Fact]
+    public async Task Handle_RejectsRowsWithAnUnknownInstitution()
+    {
+        _institutions
+            .Setup(repository => repository.GetInstitutionWithNameAsync("Typo University"))
+            .ReturnsAsync(0);
+
+        var path = CreateWorkbookWithNames("Typo University", DepartmentName, ("STU001", "One"));
+
+        await Assert.ThrowsAsync<InvalidDataException>(() =>
+            CreateHandler().Handle(
+                new CreateStudentsRangeCommand(path),
+                CancellationToken.None));
+
+        Assert.Empty(_writtenStudents);
+        _unitOfWork.Verify(
+            work => work.BeginTransactionAsync(It.IsAny<CancellationToken>()),
+            Times.Never);
+        Assert.False(File.Exists(path));
+    }
+
+    /// <summary>
+    /// MED-14: a row that names a department the lookup does not know for the
+    /// resolved institution is rejected before anything is written.
+    /// </summary>
+    [Fact]
+    public async Task Handle_RejectsRowsWithAnUnknownDepartment()
+    {
+        _departments
+            .Setup(repository => repository.GetDepartmentWithnameAsync("Typo Department", 4))
+            .ReturnsAsync(0);
+
+        var path = CreateWorkbookWithNames(InstitutionName, "Typo Department", ("STU001", "One"));
+
+        var exception = await Assert.ThrowsAsync<InvalidDataException>(() =>
+            CreateHandler().Handle(
+                new CreateStudentsRangeCommand(path),
+                CancellationToken.None));
+
+        Assert.Contains("Typo Department", exception.Message);
+        Assert.Empty(_writtenStudents);
+        _unitOfWork.Verify(
+            work => work.BeginTransactionAsync(It.IsAny<CancellationToken>()),
+            Times.Never);
+        Assert.False(File.Exists(path));
+    }
+
+    /// <summary>
     /// A valid file gives every account its own password hash and is written
     /// with two SaveChanges calls instead of one per student.
     /// </summary>
@@ -299,6 +351,20 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
     /// <param name="rows">Academic number and name of every data row.</param>
     /// <returns>Path of the generated file.</returns>
     private string CreateWorkbook(params (string AcademicNumber, string FullName)[] rows)
+        => CreateWorkbookWithNames(InstitutionName, DepartmentName, rows);
+
+    /// <summary>
+    /// Builds a workbook whose rows carry the given institution and department
+    /// names, so a row can be rejected when a lookup does not know them.
+    /// </summary>
+    /// <param name="institutionName">Institution name written into every row.</param>
+    /// <param name="departmentName">Department name written into every row.</param>
+    /// <param name="rows">Academic number and name of every data row.</param>
+    /// <returns>Path of the generated file.</returns>
+    private string CreateWorkbookWithNames(
+        string institutionName,
+        string departmentName,
+        params (string AcademicNumber, string FullName)[] rows)
     {
         var path = Path.Combine(Path.GetTempPath(), $"atlas-student-import-{Guid.NewGuid():N}.xlsx");
         _createdFiles.Add(path);
@@ -317,8 +383,8 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
             {
                 var row = index + 2;
 
-                sheet.Cell(row, 1).Value = InstitutionName;
-                sheet.Cell(row, 2).Value = DepartmentName;
+                sheet.Cell(row, 1).Value = institutionName;
+                sheet.Cell(row, 2).Value = departmentName;
                 sheet.Cell(row, 3).Value = rows[index].FullName;
                 sheet.Cell(row, 4).Value = "Level 1";
                 sheet.Cell(row, 5).Value = rows[index].AcademicNumber;

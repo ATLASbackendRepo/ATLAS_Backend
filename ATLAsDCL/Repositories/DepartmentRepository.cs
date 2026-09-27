@@ -40,6 +40,9 @@ public class DepartmentRepository
 
     /// <summary>
     /// Get Department Withname Async.
+    /// The lookup is read-only: a name that does not exist for the institution
+    /// is reported as 0 so the caller can reject the row instead of silently
+    /// creating a department from a typo (MED-14).
     /// </summary>
     public async Task<int> GetDepartmentWithnameAsync(string departmentName, int institutionId)
     {
@@ -49,19 +52,7 @@ public class DepartmentRepository
             .Select(d => (int?)d.DepartmentId)
             .FirstOrDefaultAsync();
 
-        if (departmentId.HasValue)
-        {
-            return departmentId.Value;
-        }
-
-       var newDepartment = new Department
-       {
-           D_Name = departmentName,
-           InstitutionID = institutionId
-       };
-        _context.Departments.Add(newDepartment);
-        await _context.SaveChangesAsync();
-        return newDepartment.DepartmentId;
+        return departmentId ?? 0;
     }
 
     /// <summary>
