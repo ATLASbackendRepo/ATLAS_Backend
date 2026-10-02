@@ -32,8 +32,13 @@ builder.Host.UseSerilog((context, configuration) =>
     configuration
         .ReadFrom.Configuration(context.Configuration)
         .Enrich.FromLogContext()
-        .Enrich.WithProperty("Application", "ATLAS")
-        .WriteTo.Console();
+        .Enrich.WithProperty("Application", "ATLAS");
+});
+
+builder.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
+                               Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
 });
 
 // ======================================================
@@ -904,6 +909,17 @@ if (app.Environment.IsDevelopment())
 // First in the pipeline so every failure raised further down is translated
 // into one consistent problem response.
 app.UseExceptionHandler();
+
+app.UseForwardedHeaders();
+
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers.Remove("Server");
+    context.Response.Headers.Remove("X-Powered-By");
+    await next();
+});
 
 app.UseHttpsRedirection();
 
