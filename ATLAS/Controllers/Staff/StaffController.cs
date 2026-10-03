@@ -32,7 +32,6 @@ namespace ATLAS.Controllers.Staff
         [HttpGet("AllStaff", Name = "GetAllStaff")]
         [Authorize(Roles = "Admin,SAdmin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [EnableRateLimiting("AdminGetAllPolicy")]
         /// <summary>
         /// Get All Student.
@@ -41,16 +40,18 @@ namespace ATLAS.Controllers.Staff
         {
 
             var Staff = await _mediator.Send(new GetallStaff(role, staffFilter));
-            if (Staff == null || (Staff.Count() == 0))
-            {
-                return NotFound("No staff found.");
-            }
-            return Ok(Staff);
+
+            // LOW-07: an empty result set is a successful query and returns 200
+            // with an empty array. The 404 here meant a client could not tell
+            // "this role has no staff" apart from "the endpoint is gone", and the
+            // role is required, so the common case of filtering to an empty role
+            // was reported as a missing resource.
+            return Ok(Staff ?? new List<StaffDto>());
         }
 
         [HttpPost("StaffStudent")]
         [Authorize(Roles = "SAdmin")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
         /// <summary>
@@ -61,7 +62,8 @@ namespace ATLAS.Controllers.Staff
                 var staffId = await _mediator.Send(new CreateUserCommand(createStaffDTO));
                 if (staffId > 0)
                 {
-                    return Ok(new { message = "Staff created successfully.", StaffId = staffId });
+                    // LOW-07: creating a staff member is a 201, not a 200.
+                    return StatusCode(StatusCodes.Status201Created, new { message = "Staff created successfully.", StaffId = staffId });
                 }
                 else
                 {

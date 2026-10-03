@@ -116,7 +116,7 @@ namespace ATLAS.Controllers.Student
 
         [HttpPost("CreateStudent")]
         [Authorize(Roles = "SAdmin")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
         /// <summary>
@@ -127,7 +127,8 @@ namespace ATLAS.Controllers.Student
                  var studentId = await _mediator.Send(new CreateStudentCommand(createStudentDTO));
             if(studentId > 0)
             {
-                return Ok(new { message = "Student created successfully.", StudentId = studentId });
+                // LOW-07: creating a student is a 201, not a 200.
+                return StatusCode(StatusCodes.Status201Created, new { message = "Student created successfully.", StudentId = studentId });
             }
             else
             {

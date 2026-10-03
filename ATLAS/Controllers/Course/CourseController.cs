@@ -29,7 +29,7 @@ namespace ATLAS.Controllers.Course
         /// </summary>
         [HttpPost("CreateCourse")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
         public async Task<IActionResult> CreateCourse([FromBody] CreateCourseDTO createCourseDTO)
@@ -43,7 +43,9 @@ namespace ATLAS.Controllers.Course
                     {
                         return BadRequest("Failed to create Course.");
                     }
-                    return Ok("Course created successfully.");
+                    // LOW-07: creating a resource is a 201, not a 200. The body is
+                    // unchanged so existing clients keep parsing it the same way.
+                    return StatusCode(StatusCodes.Status201Created, $"Course created successfully. Id: {CourseID}");
                 }
                 return BadRequest();
             }
@@ -122,12 +124,12 @@ namespace ATLAS.Controllers.Course
         public async Task<IActionResult> GetCourses([FromQuery] string? Coursename)
         {
             var departments = await _mediator.Send(new GetAllCourseQuery(Coursename));
-            if (departments == null || !departments.Any())
-            {
-                return NotFound("No departments found.");
-            }
 
-            return Ok(departments);
+            // LOW-07: an empty result is a successful query and returns 200 with
+            // an empty array. The message here also said "No departments found",
+            // which was a copy-paste from the department controller and actively
+            // misled anyone debugging a course lookup.
+            return Ok(departments ?? new List<CourseDTO>());
 
 
         }

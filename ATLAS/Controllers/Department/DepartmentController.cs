@@ -2,6 +2,7 @@ using ATLAsBLL.Features.Department.Comand.CreateDepartment;
 using ATLAsBLL.Features.Department.Comand.DeleteDepartment;
 using ATLAsBLL.Features.Department.Comand.UpdateDepartment;
 using ATLAsBLL.Services.Department.Query;
+using ATLASDomain.DTO.Department;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -28,7 +29,7 @@ namespace ATLAS.Controllers.Department
         /// </summary>
         [HttpPost("CreateDepartment")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
         public async Task<IActionResult> CreateDepartment([FromBody] string departmentName, int institutionId)
@@ -40,7 +41,8 @@ namespace ATLAS.Controllers.Department
                 {
                     return BadRequest("Failed to create department.");
                 }
-                return Ok("Department created successfully.");
+                // LOW-07: creating a resource is a 201, not a 200.
+                return StatusCode(StatusCodes.Status201Created, $"Department created successfully. Id: {departmentId}");
             }
             return BadRequest();
         }
@@ -107,12 +109,13 @@ namespace ATLAS.Controllers.Department
         public async Task<IActionResult> GetDepartments([FromQuery] string? departmentName)
         {
             var departments = await _mediator.Send(new GetAllDepartment(departmentName));
-            if (departments == null || !departments.Any())
-            {
-                return NotFound("No departments found.");
-            }
 
-            return Ok(departments);
+            // LOW-07: an empty result is a successful query, not a missing
+            // resource. Returning 404 here meant a client could not distinguish
+            // "this filter matched nothing" from "this endpoint does not exist",
+            // and every caller had to special-case it. An empty list returns 200
+            // with [] and no special handling.
+            return Ok(departments ?? new List<DepartmentDTO>());
 
 
         }

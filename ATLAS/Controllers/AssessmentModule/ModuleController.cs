@@ -90,7 +90,7 @@ namespace ATLAS.Controllers.AssessmentModule
         /// </summary>
         [HttpPost("CreateAssessmentModule")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize(Roles = "Doctor,TeachingAssistant")]
         [EnableRateLimiting("CourseGradeReadPolicy")]
@@ -101,7 +101,9 @@ namespace ATLAS.Controllers.AssessmentModule
                 var userId = GetCurrentUserId();
                 var command = new CreateAssessmentModuleCommand(createModeDTO , userId);
                 var moduleId = await _mediator.Send(command, cancellationToken);
-                return Ok(moduleId);
+                // LOW-07: creating an assessment module is a 201, not a 200. The
+                // created id is returned in the body as before.
+                return StatusCode(StatusCodes.Status201Created, moduleId);
             }
             catch (UnauthorizedAccessException)
             {

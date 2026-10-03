@@ -32,7 +32,7 @@ namespace ATLAS.Controllers.Enrollment
         /// Create Enrollment.
         /// </summary>
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
        
@@ -60,7 +60,8 @@ namespace ATLAS.Controllers.Enrollment
                         "The student is already enrolled in this course offering.");
                 }
 
-                return Ok("Enrollment created successfully.");
+                // LOW-07: creating an enrollment is a 201, not a 200.
+                return StatusCode(StatusCodes.Status201Created, "Enrollment created successfully.");
             
         }
 
@@ -68,7 +69,7 @@ namespace ATLAS.Controllers.Enrollment
         /// Create Range Enrollment.
         /// </summary>
         [HttpPost("range")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [EnableRateLimiting("AdminCreateRangePolicy")]
@@ -91,7 +92,9 @@ namespace ATLAS.Controllers.Enrollment
                         "No student matched the enrollment filter, or they are already enrolled.");
                 }
 
-                return Ok("Enrollments range created successfully.");
+                // LOW-07: bulk creation still creates resources, so it returns a
+                // 201 with no single Location to point at.
+                return StatusCode(StatusCodes.Status201Created, "Enrollments range created successfully.");
             
         }
        /// <summary>
