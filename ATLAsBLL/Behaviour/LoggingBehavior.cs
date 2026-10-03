@@ -55,9 +55,20 @@ namespace ATLAsBLL.Behaviors
             {
                 stopwatch.Stop();
 
-                _logger.LogError(
-                    ex,
-                    "Error handling {RequestName} after {ElapsedMilliseconds} ms",
+                // MED-10: this used to log the exception at Error and rethrow,
+                // which produced one entry here, one in UnhandledExceptionBehavior,
+                // one in TransactionBehavior and one in the global handler - four
+                // copies of the same stack trace for a single failure. That makes
+                // the real error rate unreadable, because every occurrence is
+                // counted four times.
+                //
+                // The exception is deliberately NOT logged here. The global
+                // exception handler is the single place that records a failure,
+                // and it knows the request method and path. This behavior reports
+                // only timing, which the handler does not have.
+                _logger.LogInformation(
+                    "Failed to handle {RequestName} after {ElapsedMilliseconds} ms. " +
+                    "The global exception handler records the failure.",
                     requestName,
                     stopwatch.ElapsedMilliseconds);
 
