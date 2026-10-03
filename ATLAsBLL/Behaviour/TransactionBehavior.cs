@@ -3,7 +3,7 @@ using Microsoft.Extensions.Logging;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using ATLAsDCL.UnitOfWork; // تأكد من وجود آلية الـ Transaction في الـ Unit of Work عندك
+using ATLAsDCL.UnitOfWork;
 
 namespace ATLAsBLL.Behaviors
 {
@@ -21,52 +21,56 @@ namespace ATLAsBLL.Behaviors
         /// _logger.
         /// </summary>
         private readonly ILogger<TransactionBehavior<TRequest, TResponse>> _logger;
-
         public TransactionBehavior(IUnitOfWork unitOfWork, ILogger<TransactionBehavior<TRequest, TResponse>> logger)
         {
             _unitOfWork = unitOfWork;
             _logger = logger;
         }
-
         /// <summary>
         /// Handle.
         /// </summary>
         public async Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken cancellationToken)
         {
-         
             if (request is IQuery<TResponse>)
                 return await next();
-
             // A self-managed command opens its own transaction after the expensive
             // preparation work, so the behavior must not wrap the handler.
             if (request is ISelfManagedTransactionCommand<TResponse>)
                 return await next();
-
-            if (request is not ICommand<TResponse>)
+            // MED-05: a request declared as a bare IRequest but marked with
+            // IWriteCommand is a write too, and must still be wrapped. Several
+            // profile updates, assessment-module changes and password changes used
+            // to commit outside any transaction for exactly this reason. Anything
+            // that is neither a query nor one of these two is passed through.
+            if (request is not ICommand<TResponse> && request is not IWriteCommand)
                 return await next();
-
-   
             var requestName = typeof(TRequest).Name;
             _logger.LogInformation("--> Opening transaction for {RequestName}", requestName);
-
             try
             {
                 // بدء الـ Transaction من الـ Unit of Work أو الـ DbContext مباشرة
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
-
                 var response = await next();
-
                 // لو الـ Handler خلص بدون أي Exceptions، بنعمل Commit أوتوماتيك
                 await _unitOfWork.CommitTransactionAsync(cancellationToken);
                 _logger.LogInformation("--> Transaction committed successfully for {RequestName}", requestName);
-
                 return response;
             }
             catch (Exception ex)
             {
                 // في حالة حدوث أي خطأ، بنلغي كل العمليات اللي تمت ونرجع الداتابيز لحالتها السابقة فوراً
                 await _unitOfWork.RollbackTransactionAsync(cancellationToken);
-                _logger.LogError(ex, "X--> Transaction rolled back due to an error in {RequestName}", requestName);
+
+                // MED-10: the rollback itself is worth recording, because a failing
+                // rollback is a genuinely different problem from a failing command.
+                // The exception is not logged here on purpose: the global exception
+                // handler already records it, and logging it again here was one of
+                // the four copies of a single failure.
+                _logger.LogWarning(
+                    "Transaction rolled back for {RequestName}: {Reason}",
+                    requestName,
+                    ex.Message);
+
                 throw;
             }
         }
