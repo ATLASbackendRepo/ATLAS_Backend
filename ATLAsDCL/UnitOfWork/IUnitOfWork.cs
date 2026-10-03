@@ -42,6 +42,11 @@ public interface IUnitOfWork : IDisposable
 
     IGradeAppealRequestRepository GradeAppealRequests { get; }
 
+    /// <summary>
+    /// Append-only history of grade changes (MED-06).
+    /// </summary>
+    ICourseGradeHistoryRepository CourseGradeHistory { get; }
+
     IinstitutionRepository Institutions { get; }
 
     Task<int> SaveChangesAsync(CancellationToken cancellationToken = default);

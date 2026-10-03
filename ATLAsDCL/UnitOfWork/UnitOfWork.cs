@@ -267,4 +267,25 @@ public sealed class UnitOfWork : IUnitOfWork
             return _institution;
         }
     }
+
+    /// <summary>
+    /// _course Grade History (MED-06).
+    /// </summary>
+    private ICourseGradeHistoryRepository? _courseGradeHistory;
+
+    /// <summary>
+    /// Append-only trail of every change made to a grade. The grade handler writes
+    /// the old and the new value here on every accepted write, so an overwrite is
+    /// always attributable even when it was legitimate.
+    /// </summary>
+    public ICourseGradeHistoryRepository CourseGradeHistory
+    {
+        get
+        {
+            _courseGradeHistory ??=
+                new CourseGradeHistoryRepository(_context);
+
+            return _courseGradeHistory;
+        }
+    }
 }

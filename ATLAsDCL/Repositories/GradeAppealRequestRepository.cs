@@ -158,6 +158,17 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
         if (request is null)
             return false;
 
+        // MED-08: the status used to be written straight from the request body, so
+        // any value could replace any other one. That let a final appeal be reopened
+        // (Closed to Approved) and let a not-yet-reviewed appeal jump straight to a
+        // decision. The appeal is a state machine, so a transition that is not part
+        // of it is refused rather than applied.
+        if (!GradeAppealStatusTransitions.IsAllowed(request.Status, dto.Status))
+        {
+            throw new InvalidOperationException(
+                $"A grade appeal cannot move from {request.Status} to {dto.Status}.");
+        }
+
         request.Status = dto.Status;
         request.DoctorResponse = dto.DoctorResponse;
 

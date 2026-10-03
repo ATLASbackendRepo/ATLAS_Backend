@@ -81,6 +81,12 @@ namespace ATLAsDCL.Data
         /// Course Grades.
         /// </summary>
         public DbSet<CourseGrade> CourseGrades { get; set; }
+
+        /// <summary>
+        /// Course Grade History. Append-only trail of every accepted grade change
+        /// (MED-06).
+        /// </summary>
+        public DbSet<CourseGradeHistory> CourseGradeHistory { get; set; }
         /// <summary>
         /// Attendance Sessions.
         /// </summary>
