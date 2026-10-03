@@ -32,7 +32,7 @@ namespace ATLAsBLL.Services.profile.Staff.command
             updateStaffProfileInfoCommand request,
             CancellationToken cancellationToken)
         {
-            var profile = await _unitOfWork.staffProfile.GetByUserIdAsync(request.UserId);
+            var profile = await _unitOfWork.StaffProfile.GetByUserIdAsync(request.UserId);
 
             if (profile == null || profile.User == null || request.StaffProfileUpdateDTO.FullName
                 

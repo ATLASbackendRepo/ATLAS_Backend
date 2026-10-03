@@ -31,8 +31,12 @@ public interface IUnitOfWork : IDisposable
 
     IStudentRepository Students { get; }
 
- 
-    IStaffProfileRepository staffProfile { get; }
+
+    /// <summary>
+    /// Staff Profile. LOW-12: the lowercase staffProfile alias is gone; this is
+    /// the single name, so callers cannot drift between two spellings.
+    /// </summary>
+    IStaffProfileRepository StaffProfile { get; }
 
     IStudentProfileRepository StudentProfile { get; }
     IUserRepository Users { get; }

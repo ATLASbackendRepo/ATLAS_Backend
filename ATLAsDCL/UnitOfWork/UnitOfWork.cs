@@ -211,15 +211,32 @@ public sealed class UnitOfWork : IUnitOfWork
     /// <summary>
     /// Dispose.
     /// </summary>
+    /// <remarks>
+    /// LOW-12: this used to call <c>_context.Dispose()</c> as well as disposing
+    /// the transaction. The DbContext is registered with the DI container, which
+    /// already owns its lifetime and disposes it when the scope ends. Disposing it
+    /// a second time here is a double dispose: a second scope in the same request
+    /// - or anything that reuses the context after the unit of work is gone - then
+    /// meets an already-disposed object.
+    ///
+    /// The unit of work owns only what it created itself, which is the
+    /// transaction. The context belongs to the container, so the container is left
+    /// to dispose it.
+    /// </remarks>
     public void Dispose()
     {
-        _currentTransaction?.Dispose();
-        _context.Dispose();
+        // Only the transaction is disposed here, and only if it is still open.
+        // CommitTransactionAsync and RollbackTransactionAsync already dispose it
+        // as part of their own cleanup, so this is the path taken when a command
+        // failed without either being reached.
+        if (_currentTransaction != null)
+        {
+            _currentTransaction.Dispose();
+            _currentTransaction = null;
+        }
+
+        GC.SuppressFinalize(this);
     }
-    /// <summary>
-    /// staff Profile.
-    /// </summary>
-    public IStaffProfileRepository staffProfile => StaffProfile;
 
     /// <summary>
     /// _course Group Messages Read.

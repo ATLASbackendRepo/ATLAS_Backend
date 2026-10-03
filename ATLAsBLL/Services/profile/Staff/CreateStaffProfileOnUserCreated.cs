@@ -39,7 +39,7 @@ namespace ATLAsBLL.Services.profile.Staff
                 CreatedAt = DateTime.UtcNow
             };
 
-            await _unitOfWork.staffProfile.AddAsync(staffProfile);
+            await _unitOfWork.StaffProfile.AddAsync(staffProfile);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }
