@@ -14,5 +14,5 @@ namespace ATLAsBLL.Features.Enrollments.Commands.CreateEnrollment
     public record CreateEnrollmentCommand(
         string AcdimicID,
         BulkCreateEnrollmentDTO BulkCreateEnrollmentDTO1,
-        int CreatedByUserId) : ICommand<bool>;
+        int CreatedByUserId) : ICommand<bool>, IWriteCommand;
 }

@@ -6,5 +6,5 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.DeleteAssessmentModule
     /// <summary>
     /// Delete Assessment Module Command.
     /// </summary>
-    public record DeleteAssessmentModuleCommand(int ModuleId, int UserId) : IRequest<bool>;
+    public record DeleteAssessmentModuleCommand(int ModuleId, int UserId) : ICommand<bool>, IWriteCommand;
 }

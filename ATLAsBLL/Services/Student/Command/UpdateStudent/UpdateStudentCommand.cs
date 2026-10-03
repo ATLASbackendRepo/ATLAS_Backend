@@ -7,7 +7,6 @@ namespace ATLAsBLL.Features.Students.Commands.UpdateStudent
     /// Update Student Command.
     /// </summary>
     public record UpdateStudentCommand(
-
        UpdateStudentDto UpdateStudentDto
-    ) : ICommand<bool>;
+    ) : ICommand<bool>, IWriteCommand;
 }

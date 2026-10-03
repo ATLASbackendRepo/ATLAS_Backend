@@ -8,5 +8,5 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
     /// </summary>
     public record CreateStudentCommand(
        CreateStudentDTO CreateStudentDTO
-    ) : ICommand<int>; 
+    ) : ICommand<int>, IWriteCommand; 
 }

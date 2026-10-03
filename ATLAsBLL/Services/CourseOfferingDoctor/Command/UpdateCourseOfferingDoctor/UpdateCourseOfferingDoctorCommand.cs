@@ -5,5 +5,5 @@ namespace ATLAsBLL.Features.CourseOfferingDoctors.Commands.UpdateCourseOfferingD
     /// <summary>
     /// Update Course Offering Doctor Command.
     /// </summary>
-    public record UpdateCourseOfferingDoctorCommand(int CourseOfferingDoctorId, int NewDoctorId) : ICommand<bool>;
+    public record UpdateCourseOfferingDoctorCommand(int CourseOfferingDoctorId, int NewDoctorId) : ICommand<bool>, IWriteCommand;
 }

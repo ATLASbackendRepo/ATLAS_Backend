@@ -2,7 +2,6 @@ using ATLASDomain.Entities;
 using MediatR;
 using ATLASDomain.DTO.Staff;
 
-
 namespace ATLAsBLL.Features.Users.Commands.CreateUser
 {
     /// <summary>
@@ -10,5 +9,5 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUser
     /// </summary>
     public record CreateUserCommand(
        CreateStaffDto create_StaffDto
-    ) : ICommand<int>;
+    ) : ICommand<int>, IWriteCommand;
 }
