@@ -50,7 +50,20 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
             SigningKey = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))
         };
         context.AttendanceSessions.Add(session);
-        await context.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            await context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            // LOW-09: the filtered unique index caught the race that the check
+            // above cannot. Without this the losing instructor would receive a 500
+            // for what is really a conflict they can act on - they already have a
+            // session running for this offering.
+            throw new AttendanceConflictException("An attendance session is already active for this course offering.");
+        }
+
         return ToDto(session, 0);
     }
 
@@ -87,7 +100,20 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
         ExpireIfNeeded(session, now);
         if (session.Status != AttendanceSessionStatus.Active) throw new AttendanceValidationException("This attendance session is closed.");
         var currentSlot = new DateTimeOffset(now).ToUnixTimeSeconds() / RotationSeconds;
-        if (parsed.Value.Slot != currentSlot || !CryptographicOperations.FixedTimeEquals(
+
+        // LOW-09: the code only accepted the current slot, so a code displayed at
+        // the very end of its five-second window was rejected while the student was
+        // still looking at it. The HMAC binds the slot into the signature, so
+        // accepting the previous slot cannot be forged - it only widens the window
+        // by one rotation, and only for a code this server issued moments earlier.
+        // Without the grace period the scan has to be retried, which is exactly what
+        // students do when the app tells them "this QR code has expired" while the
+        // code is still on the screen.
+        var previousSlot = currentSlot - 1;
+        var slotIsAcceptable = parsed.Value.Slot == currentSlot ||
+                               parsed.Value.Slot == previousSlot;
+
+        if (!slotIsAcceptable || !CryptographicOperations.FixedTimeEquals(
                 Encoding.UTF8.GetBytes(parsed.Value.Signature), Encoding.UTF8.GetBytes(Sign(session, parsed.Value.Slot))))
             throw new AttendanceValidationException("This QR code has expired. Scan the currently displayed code.");
 
