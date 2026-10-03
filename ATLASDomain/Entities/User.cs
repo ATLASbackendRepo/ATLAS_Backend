@@ -121,4 +121,12 @@ public class User
     /// Refresh Token Revoked At.
     /// </summary>
     public DateTime? RefreshTokenRevokedAt { get; set; }
+
+    /// <summary>
+    /// Security stamp. A random value that is embedded in every access token and
+    /// re-checked on each request (MED-01). Bumping it invalidates all tokens
+    /// that were issued before, which is what makes logout, deactivation and a
+    /// role change take effect immediately instead of after the token expires.
+    /// </summary>
+    public Guid SecurityStamp { get; set; } = Guid.NewGuid();
 }

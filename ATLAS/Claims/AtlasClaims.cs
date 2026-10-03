@@ -23,4 +23,21 @@ public static class AtlasClaims
     /// <c>Users.MustChangePassword</c> is set.
     /// </summary>
     public const string PasswordChangeOnly = "pwd_change_only";
+
+    /// <summary>
+    /// Security stamp of the account the token was issued for (MED-01). The
+    /// value is compared against <c>Users.SecurityStamp</c> on every request,
+    /// so bumping the stamp invalidates every token issued before it.
+    /// </summary>
+    public const string SecurityStamp = "security_stamp";
+
+    /// <summary>
+    /// Institution the authenticated account belongs to (MED-16).
+    /// </summary>
+    /// <remarks>
+    /// Admins and super-admins are scoped to a single institution, so this
+    /// claim is what keeps them inside their own tenant. SAdmin is the only
+    /// role that is not scoped and is allowed to see every institution.
+    /// </remarks>
+    public const string InstitutionId = "institution_id";
 }

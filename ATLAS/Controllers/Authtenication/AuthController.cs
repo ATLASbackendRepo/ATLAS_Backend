@@ -131,7 +131,19 @@ namespace ATLAS.Controllers.Authtenication
                         new Claim(ClaimTypes.NameIdentifier, User.UserId.ToString()),
                         new Claim(ClaimTypes.Name, User.FullName),
                         new Claim(ClaimTypes.Role,User.Role.ToString() ),
-                        new Claim("AcademicId", User.AcademicId)
+                        new Claim("AcademicId", User.AcademicId),
+
+                        // MED-01: the stamp is compared against the stored value on
+                        // every request. Logging out, deactivating the account or
+                        // changing its role rotates the stamp, which invalidates this
+                        // token immediately instead of leaving it usable until it
+                        // expires.
+                        new Claim(AtlasClaims.SecurityStamp, User.SecurityStamp.ToString()),
+
+                        // MED-16: carries the institution the account belongs to so
+                        // tenant-scoped queries and authorization can use it.
+                        new Claim(AtlasClaims.InstitutionId,
+                            User.InstitutionID.ToString())
                     };
             
 
@@ -157,9 +169,11 @@ namespace ATLAS.Controllers.Authtenication
 
             var refreshToken = GenerateRefreshToken();
 
-            User.RefreshTokenHash = BCrypt.Net.BCrypt.HashPassword(refreshToken);
-            User.RefreshTokenExpiresAt = DateTime.UtcNow.AddDays(7);
-            User.RefreshTokenRevokedAt = null;
+            // MED-02: the login path must not also write the hash here. Doing it
+            // in the controller and again in the handler hashed the token twice and
+            // the second write clobbered the value the handler had just stored, which
+            // is what destroyed reuse detection. SaveRefreshTokenCommand is the
+            // single writer for this row.
             await _mediator.Send(
                 new SaveRefreshTokenCommand(
                     User.UserId,
@@ -219,14 +233,44 @@ namespace ATLAS.Controllers.Authtenication
                 return Unauthorized();
             }
 
-            
+            // MED-02: rotate with a compare-and-swap on the hash this request was
+            // issued against. Two concurrent refreshes carrying the same token both
+            // pass the checks above, but only one of them can match the stored hash
+            // inside the UPDATE, so only one caller receives a usable token pair.
+            var newRefreshToken = GenerateRefreshToken();
+
+            var rotation = await _mediator.Send(new RotateRefreshTokenCommand(
+                User.UserId,
+                // The hash observed a moment ago. Capping the rotation on this exact
+                // value is what turns a read-then-write into an atomic swap.
+                User.RefreshTokenHash!,
+                newRefreshToken));
+
+            if (!rotation.Succeeded)
+            {
+                // The token was rotated away between the read above and the write.
+                // Somebody is replaying a spent token, so the entire family is
+                // treated as compromised rather than merely expired.
+                await _mediator.Send(new RevokeRefreshTokenCommand(User.UserId));
+                return Unauthorized();
+            }
 
             var claims = new[]
                      {
                         new Claim(ClaimTypes.NameIdentifier, User.UserId.ToString()),
                         new Claim(ClaimTypes.Name, User.FullName),
                         new Claim(ClaimTypes.Role,User.Role.ToString() ),
-                        new Claim("AcademicId", User.AcademicId)
+                        new Claim("AcademicId", User.AcademicId),
+
+                        // MED-01: the refreshed token carries the stamp the account
+                        // holds right now, so it stays valid across a refresh and is
+                        // invalidated the moment the stamp is rotated.
+                        new Claim(AtlasClaims.SecurityStamp, User.SecurityStamp.ToString()),
+
+                        // MED-16: keeps the tenant claim present on refreshed tokens
+                        // as well, so it cannot be lost by refreshing.
+                        new Claim(AtlasClaims.InstitutionId,
+                            User.InstitutionID.ToString())
                     };
 
 
@@ -245,11 +289,13 @@ namespace ATLAS.Controllers.Authtenication
                     _jwtOptions.ExpiryMinutes),
                 signingCredentials: creds1
             );
-            var newAccessToken = new JwtSecurityTokenHandler().WriteToken(token);
 
-            
-            var newRefreshToken = GenerateRefreshToken();
-            await _mediator.Send(new SaveRefreshTokenCommand(User.UserId, newRefreshToken));
+            // The outbound claim map is cleared for the same reason as at login:
+            // the framework rewrites long URIs into XML element names by default,
+            // which would corrupt the security stamp and the institution claim.
+            var tokenHandler = new JwtSecurityTokenHandler();
+            tokenHandler.OutboundClaimTypeMap.Clear();
+            var newAccessToken = tokenHandler.WriteToken(token);
 
             return Ok(new TokenResponse
             {

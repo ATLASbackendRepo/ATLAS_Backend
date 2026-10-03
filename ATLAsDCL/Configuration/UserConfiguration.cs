@@ -32,6 +32,13 @@ builder.Property(u => u.PreviousRefreshTokenHash)
             builder.Property(u => u.CreatedAt)
                 .HasDefaultValueSql("GETDATE()");
 
+            // MED-01: the stamp travels in the access token and is compared on
+            // every request. Existing rows are backfilled with a distinct value
+            // so no account shares a stamp after the migration.
+            builder.Property(u => u.SecurityStamp)
+                .IsRequired()
+                .HasDefaultValueSql("NEWID()");
+
             builder.Property(u => u.Role)
           .HasConversion<string>()
           .HasMaxLength(50)

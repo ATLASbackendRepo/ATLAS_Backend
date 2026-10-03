@@ -1,5 +1,6 @@
 using ATLAS;
 using ATLAS.Controllers.Authtenication;
+using ATLAsBLL.Services.Auth;
 using ATLAsBLL.Services.Auth.Queries;
 using ATLASDomain.DTO.Login;
 using ATLASDomain.Entities;
@@ -34,6 +35,12 @@ public class AuthenticationAndAuthorizationTests
 
         services.AddSingleton<IRequestHandler<GetUserByAcademicIdQuery, User?>>(
             new StudentLookupHandler(user));
+
+        // The login path persists the refresh token through this command, so the
+        // fake mediator needs a handler for it. Registering a no-op is enough: this
+        // test asserts on the claims of the issued token, not on what was stored.
+        services.AddSingleton<IRequestHandler<SaveRefreshTokenCommand, bool>>(
+            new NoOpSaveRefreshTokenHandler());
 
         using var provider = services.BuildServiceProvider();
 
@@ -135,6 +142,17 @@ public class AuthenticationAndAuthorizationTests
 
         // Assert
         Assert.IsType<BadRequestObjectResult>(result);
+    }
+
+    private sealed class NoOpSaveRefreshTokenHandler
+        : IRequestHandler<SaveRefreshTokenCommand, bool>
+    {
+        public Task<bool> Handle(
+            SaveRefreshTokenCommand request,
+            CancellationToken cancellationToken)
+        {
+            return Task.FromResult(true);
+        }
     }
 
     private sealed class StudentLookupHandler
