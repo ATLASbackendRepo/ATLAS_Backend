@@ -31,7 +31,10 @@ namespace ATLAS.Controllers.Instution
         [HttpPost("CreateInstutoin")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [Authorize(Roles = "SAdmin,Admin")]
+        // MED-16: creating, renaming or deleting an institution is a cross-tenant
+        // action. A tenant-scoped Admin must not be able to reach another
+        // institution's own record, so these three endpoints are SAdmin-only.
+        [Authorize(Roles = "SAdmin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
  
         public async Task<IActionResult> CreateInstutoin([FromBody] CreateInstitutionDto institutionDto)
@@ -55,7 +58,10 @@ namespace ATLAS.Controllers.Instution
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [Authorize(Roles = "SAdmin,Admin")]
+        // MED-16: creating, renaming or deleting an institution is a cross-tenant
+        // action. A tenant-scoped Admin must not be able to reach another
+        // institution's own record, so these three endpoints are SAdmin-only.
+        [Authorize(Roles = "SAdmin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
 
         public async Task<IActionResult> UpdateInstutoin([FromBody] UpdateInstitutionDto Dto)
@@ -85,7 +91,10 @@ namespace ATLAS.Controllers.Instution
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
-        [Authorize(Roles = "SAdmin,Admin")]
+        // MED-16: creating, renaming or deleting an institution is a cross-tenant
+        // action. A tenant-scoped Admin must not be able to reach another
+        // institution's own record, so these three endpoints are SAdmin-only.
+        [Authorize(Roles = "SAdmin")]
         [EnableRateLimiting("AdminSoftDeletePolicy")]
 
         public async Task<IActionResult> DeleteInstutoin(int InstutionID)

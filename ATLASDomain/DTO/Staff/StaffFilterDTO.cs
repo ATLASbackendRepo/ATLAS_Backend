@@ -5,7 +5,11 @@ namespace ATLASDomain.DTO.Staff
     /// <summary>
     /// Staff Filter DTO.
     /// </summary>
-    public class StaffFilterDTO
+    /// <remarks>
+    /// Inherits paging from <see cref="PagedFilter"/>, so the staff list can no
+    /// longer be requested without a bounded page size (MED-12).
+    /// </remarks>
+    public class StaffFilterDTO : PagedFilter
     {
         /// <summary>
         /// Search.
@@ -20,7 +24,6 @@ namespace ATLASDomain.DTO.Staff
         /// </summary>
         public int? Level { get; set; }
 
-      
         /// <summary>
         /// Status.
         /// </summary>

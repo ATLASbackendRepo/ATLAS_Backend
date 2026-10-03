@@ -57,6 +57,13 @@ public class StudentRepository
             students = students.Where(s => s.IsActive == fillter.Status.Value);
          }
 
+
+        // MED-12: this list is now bounded. Without the Skip/Take below the query
+        // materialised the entire Students table, so one request could return every
+        // row the system holds. The page size is clamped by PagedFilter.Normalize,
+        // so a client cannot ask for an unbounded page by sending a huge number.
+        var (pageNumber, pageSize) = fillter.Normalize();
+
          var studentDtos = await students
             .Select(s => new StudentDTO
             {
@@ -67,6 +74,11 @@ public class StudentRepository
                 Departmentname = s.Department != null ? s.Department.D_Name ?? string.Empty : string.Empty,
                 IsActive = s.IsActive
             })
+            // A stable sort is required for paging to be correct: without a
+            // deterministic order, rows can repeat or vanish between pages.
+            .OrderBy(s => s.StudentCode)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
         return studentDtos;
     }
