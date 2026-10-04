@@ -9,11 +9,11 @@ using System.Security.Claims;
 
 namespace ATLAS.API.Controllers;
 
-[ApiController]
-[Route("api/semesters/{semesterId:int}/rankings")]
 /// <summary>
 /// Rankings Controller.
 /// </summary>
+[ApiController]
+[Route("api/semesters/{semesterId:int}/rankings")]
 public class RankingsController : ControllerBase
 {
     /// <summary>
@@ -28,6 +28,7 @@ public class RankingsController : ControllerBase
 
     /// <summary>
     /// GET /api/semesters/3/rankings/me?studentId=12
+    /// Get My Rank.
     /// </summary>
     [HttpGet("me")]
     [ProducesResponseType(typeof(MyRankDto), StatusCodes.Status200OK)]
@@ -35,9 +36,6 @@ public class RankingsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
     [Authorize(Roles = "Student")]
     [EnableRateLimiting("RankingsPolicy")]
-    /// <summary>
-    /// Get My Rank.
-    /// </summary>
     public async Task<ActionResult<MyRankDto>> GetMyRank(
     int semesterId, 
     CancellationToken cancellationToken)
@@ -66,6 +64,7 @@ public class RankingsController : ControllerBase
     /// <summary>
     /// GET /api/semesters/3/rankings/top/3
     /// GET /api/semesters/3/rankings/top/10
+    /// Get Top Ranked.
     /// </summary>
     [HttpGet("top/{count:int}")]
     [ProducesResponseType(typeof(List<TopRankedStudentDto>), StatusCodes.Status200OK)]
@@ -73,9 +72,6 @@ public class RankingsController : ControllerBase
     [ProducesResponseType(typeof(List<TopRankedStudentDto>), StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Student")]
     [EnableRateLimiting("RankingsPolicy")]
-    /// <summary>
-    /// Get Top Ranked.
-    /// </summary>
     public async Task<ActionResult<List<TopRankedStudentDto>>> GetTopRanked(   // forget level (int)
         int semesterId,
         int AcademicLevel,

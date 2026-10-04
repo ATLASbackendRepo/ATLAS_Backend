@@ -11,11 +11,11 @@ using System.Security.Claims;
 
 namespace ATLAS.Controllers.Requests;
 
-    [ApiController]
-[Route("api/Request")]
 /// <summary>
 /// Request Controller.
 /// </summary>
+    [ApiController]
+[Route("api/Request")]
 public class RequestController : ControllerBase
 {
     /// <summary>
@@ -58,15 +58,15 @@ public class RequestController : ControllerBase
     }
 
 
+    /// <summary>
+    /// Update.
+    /// </summary>
     [HttpPatch("{requestId:int}")]
     [ProducesResponseType(StatusCodes.Status204NoContent)]
     [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     [Authorize(Roles = "Doctor")]
     [EnableRateLimiting("RequestWritePolicy")]
-    /// <summary>
-    /// Update.
-    /// </summary>
     public async Task<IActionResult> Update(
         int requestId,
         [FromBody] UpdateGradeAppealRequestDto dto,

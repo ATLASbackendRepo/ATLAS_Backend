@@ -9,6 +9,12 @@ namespace ATLASDomain.Interfaces.Repositories;
 /// </summary>
 public interface IAssessmentModuleRepository : IGenericRepository<AssessmentModule>
 {
+    /// <summary>
+    /// Gets the assessment modules of a course offering together with their
+    /// display data, ordered for presentation.
+    /// </summary>
+    /// <param name="courseOfferingId">Course offering identifier.</param>
+    /// <returns>The modules of the offering.</returns>
     Task<IEnumerable<AssessmentModelDisplayDTO>> GetModulesByCourseOfferingAsync(int courseOfferingId);
 
     /// <summary>

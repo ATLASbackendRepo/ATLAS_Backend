@@ -8,15 +8,15 @@ namespace ATLASDomain.DTO.Request;
 /// </summary>
 public class UpdateGradeAppealRequestDto
 {
-    [Required]
     /// <summary>
     /// Status.
     /// </summary>
+    [Required]
     public enGradeAppealStatus Status { get; set; }
 
-    [MaxLength(2000)]
     /// <summary>
     /// Doctor Response.
     /// </summary>
+    [MaxLength(2000)]
     public string? DoctorResponse { get; set; }
 }

@@ -9,13 +9,45 @@ namespace ATLASDomain.Interfaces.Repositories;
 /// </summary>
 public interface IUserRepository : IGenericRepository<User>
 {
+    /// <summary>
+    /// Gets a user by username.
+    /// </summary>
+    /// <param name="userName">Username to match.</param>
+    /// <returns>The user, or null when no account has that username.</returns>
     Task<User?> GetByUserNameAsync(string userName);
+    /// <summary>
+    /// Gets a user by identifier.
+    /// </summary>
+    /// <param name="userId">User identifier.</param>
+    /// <returns>The user, or null when it does not exist.</returns>
     Task<User?> GetByUserIdAsync(int userId);
+    /// <summary>
+    /// Gets a filtered, paged list of the staff accounts holding a given role.
+    /// </summary>
+    /// <param name="role">Role to filter on.</param>
+    /// <param name="filter">Paging and filtering criteria.</param>
+    /// <returns>The matching staff accounts.</returns>
      Task<IEnumerable<StaffDto>> GetAllStaffAsync(enUserRole role, StaffFilterDTO filter);
 
+    /// <summary>
+    /// Gets the user account behind an academic number.
+    /// </summary>
+    /// <param name="academicID">Academic number.</param>
+    /// <returns>The user, or null when no account has that number.</returns>
     Task<User?> GetUserByAcademicIDAsync(string academicID);
+    /// <summary>
+    /// Checks whether a username is already taken.
+    /// </summary>
+    /// <param name="userName">Username to test.</param>
+    /// <returns>True when an account already uses that username.</returns>
     Task<bool> UserNameExistsAsync(string userName);
 
+    /// <summary>
+    /// Gets the user id behind an academic number.
+    /// </summary>
+    /// <param name="AcdimicID">Academic number.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The user id, or null when no account has that number.</returns>
     Task<int?> GetUserIdByAcdimicId(string AcdimicID, CancellationToken cancellationToken);
 
     /// <summary>

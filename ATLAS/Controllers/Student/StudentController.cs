@@ -19,11 +19,11 @@ using System.Threading.Tasks;
 
 namespace ATLAS.Controllers.Student
 {
-    [Route("api/Students")]
-    [ApiController]
     /// <summary>
     /// Student Controller.
     /// </summary>
+    [Route("api/Students")]
+    [ApiController]
     public class StudentController : ControllerBase
     {
         /// <summary>
@@ -41,14 +41,14 @@ namespace ATLAS.Controllers.Student
             _courseAuthorization = courseAuthorization;
         }
 
+        /// <summary>
+        /// Get All Student.
+        /// </summary>
         [HttpGet("All", Name = "GetAllStudent")]
         [Authorize(Roles = "Admin,SAdmin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [EnableRateLimiting("AdminGetAllPolicy")]
-        /// <summary>
-        /// Get All Student.
-        /// </summary>
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetAllStudent([FromQuery] StudentFilterDTO studentFilter)
         {
 
@@ -61,14 +61,14 @@ namespace ATLAS.Controllers.Student
         }
 
 
+        /// <summary>
+        /// Create Students.
+        /// </summary>
         [HttpPost("upload")]
         [Authorize(Roles = "SAdmin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminCreateRangePolicy")]
-        /// <summary>
-        /// Create Students.
-        /// </summary>
         public async Task<ActionResult> CreateStudents(IFormFile file)
         {
             // No blanket try/catch here: a rejected file must report why, so
@@ -114,14 +114,14 @@ namespace ATLAS.Controllers.Student
             });
         }
 
+        /// <summary>
+        /// Create Student.
+        /// </summary>
         [HttpPost("CreateStudent")]
         [Authorize(Roles = "SAdmin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
-        /// <summary>
-        /// Create Student.
-        /// </summary>
         public async Task<ActionResult> CreateStudent([FromBody] CreateStudentDTO createStudentDTO)
         {
                  var studentId = await _mediator.Send(new CreateStudentCommand(createStudentDTO));
@@ -136,14 +136,14 @@ namespace ATLAS.Controllers.Student
             }
 
         }
+        /// <summary>
+        /// update Student.
+        /// </summary>
         [HttpPut("UpdateStudent")]
         [Authorize(Roles = "SAdmin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
-        /// <summary>
-        /// update Student.
-        /// </summary>
         public async Task<ActionResult> updateStudent([FromBody] UpdateStudentDto UpdateStudentDTO)
         {
                  var student = await _mediator.Send(new UpdateStudentCommand( UpdateStudentDTO));
@@ -157,14 +157,14 @@ namespace ATLAS.Controllers.Student
             }
 
         }
+        /// <summary>
+        /// delete Student.
+        /// </summary>
         [HttpDelete("DeleteStudent")]
         [Authorize(Roles = "SAdmin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminSoftDeletePolicy")]
-        /// <summary>
-        /// delete Student.
-        /// </summary>
         public async Task<ActionResult> deleteStudent([FromQuery] string StudentCode)
         {
                  var student = await _mediator.Send(new DeleteStudentCommand(StudentCode));
@@ -268,15 +268,15 @@ namespace ATLAS.Controllers.Student
         //}
 
 
+        /// <summary>
+        /// Get My Grade.
+        /// </summary>
         [HttpGet("MyGrade", Name = "GetMyGrade")]
         [Authorize(Roles = "Student")]
         [ProducesResponseType(typeof(StudentGradeDto), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        /// <summary>
-        /// Get My Grade.
-        /// </summary>
         public async Task<ActionResult<StudentGradeDto>> GetMyGrade(int courseOfferingId, int moduleId, CancellationToken cancellationToken)
         {
             if (courseOfferingId < 1 || moduleId < 1)

@@ -11,6 +11,11 @@ using System.Threading.Tasks;
 /// </summary>
 public interface IStaffProfileRepository : IGenericRepository<StaffProfile>
 {
+    /// <summary>
+    /// Gets the staff profile belonging to a user.
+    /// </summary>
+    /// <param name="userId">User identifier.</param>
+    /// <returns>The staff profile, or null when the user has none.</returns>
     Task<StaffProfile?> GetByUserIdAsync(int userId);
  
 }

@@ -12,11 +12,11 @@ using System.Threading.Tasks;
 
 namespace ATLAS.API.Controllers.Profile
 {
-    [ApiController]
-    [Route("api/[controller]")]
     /// <summary>
     /// Profiles Controller.
     /// </summary>
+    [ApiController]
+    [Route("api/[controller]")]
     public class ProfilesController : ControllerBase
     {
         /// <summary>
@@ -29,16 +29,14 @@ namespace ATLAS.API.Controllers.Profile
             _mediator = mediator;
         }
 
+        /// <summary>
+        /// Get By User Id.
+        /// </summary>
         [HttpGet("STaffProfile")]
         [ProducesResponseType(typeof(StaffProfileResponseDto), 200)]
         [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
         [Authorize(Roles = "Doctor,TeachingAssistant")]
         [EnableRateLimiting("ProfileReadPolicy")]
-
-
-        /// <summary>
-        /// Get By User Id.
-        /// </summary>
         public async Task<ActionResult<StaffProfileResponseDto>> GetByUserId()
 
         {
@@ -54,16 +52,15 @@ namespace ATLAS.API.Controllers.Profile
 
   
 
-            [HttpPut("UpdateStaffProfile")]
-      
-            [ProducesResponseType(StatusCodes.Status200OK)]
-            [ProducesResponseType(StatusCodes.Status400BadRequest)]
-            [ProducesResponseType(StatusCodes.Status404NotFound)]
-        [Authorize(Roles = "Doctor,TeachingAssistant")]
-        [EnableRateLimiting("ProfileUpdatePolicy")]
         /// <summary>
         /// Update Profile.
         /// </summary>
+        [HttpPut("UpdateStaffProfile")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Doctor,TeachingAssistant")]
+        [EnableRateLimiting("ProfileUpdatePolicy")]
         public async Task<IActionResult> UpdateProfile([FromBody] StaffProfileUpdateDTO dto)
             {
                 var userId = GetCurrentUserId();
@@ -78,15 +75,14 @@ namespace ATLAS.API.Controllers.Profile
             }
 
        
+        /// <summary>
+        /// Get Student Profile By User Id.
+        /// </summary>
         [HttpGet("STudentProfile")]
         [ProducesResponseType(typeof(StaffProfileResponseDto), 200)]
         [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
         [Authorize(Roles = "Student")]
         [EnableRateLimiting("ProfileReadPolicy")]
-
-        /// <summary>
-        /// Get Student Profile By User Id.
-        /// </summary>
         public async Task<ActionResult<StaffProfileResponseDto>> GetStudentProfileByUserId()
 
         {
@@ -102,16 +98,15 @@ namespace ATLAS.API.Controllers.Profile
 
   
 
-            [HttpPut("UpdateStudentProfile")]
-            
-            [ProducesResponseType(StatusCodes.Status200OK)]
-            [ProducesResponseType(StatusCodes.Status400BadRequest)]
-            [ProducesResponseType(StatusCodes.Status404NotFound)]
-            [Authorize(Roles = "Student")]
-           [EnableRateLimiting("ProfileUpdatePolicy")]
         /// <summary>
         /// Update Student Profile.
         /// </summary>
+        [HttpPut("UpdateStudentProfile")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [Authorize(Roles = "Student")]
+        [EnableRateLimiting("ProfileUpdatePolicy")]
         public async Task<IActionResult> UpdateStudentProfile([FromBody] StudentUpdateProfileInfoDTO dto)
             {
                 var userId = GetCurrentUserId();
