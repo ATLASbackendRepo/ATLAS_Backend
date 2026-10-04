@@ -22,7 +22,7 @@ public sealed class RevokeRefreshTokenCommandHandler(IUnitOfWork unitOfWork)
     /// </summary>
     public async Task<bool> Handle(RevokeRefreshTokenCommand request, CancellationToken cancellationToken)
     {
-        var user = await unitOfWork.Users.GetByIdAsync(request.UserId)
+        var user = await unitOfWork.Users.GetByIdAsync(request.UserId, cancellationToken)
             ?? throw new KeyNotFoundException("User not found.");
 
         user.RefreshTokenRevokedAt = DateTime.UtcNow;

@@ -11,8 +11,9 @@ public interface ICourseOfferingDoctorRepository
     /// Gets the doctor user ids assigned to a course offering.
     /// </summary>
     /// <param name="offeringId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The assigned doctor user ids.</returns>
-    Task<IEnumerable<int>> GetDoctorsByOfferingAsync(int offeringId);
+    Task<IEnumerable<int>> GetDoctorsByOfferingAsync(int offeringId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the doctor user ids of a course offering. Equivalent to
@@ -20,6 +21,7 @@ public interface ICourseOfferingDoctorRepository
     /// course offering explicitly.
     /// </summary>
     /// <param name="offeringId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The assigned doctor user ids.</returns>
-    Task<IEnumerable<int>> GetDoctorIdsByCourseOfferingIdAsync(int offeringId);
+    Task<IEnumerable<int>> GetDoctorIdsByCourseOfferingIdAsync(int offeringId, CancellationToken cancellationToken = default);
 }

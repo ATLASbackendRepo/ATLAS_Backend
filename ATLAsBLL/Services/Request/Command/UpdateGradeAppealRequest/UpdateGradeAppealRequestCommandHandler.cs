@@ -41,7 +41,7 @@ namespace ATLAsBLL.Services.Request.Command.UpdateGradeAppealRequest
             return await _unitofwork.GradeAppealRequests.UpdateAsync(
                 command.RequestId,
                 command.DoctorUserId,
-                command.Request);
+                command.Request, cancellationToken);
         }
     }
 }

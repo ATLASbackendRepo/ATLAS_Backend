@@ -49,10 +49,10 @@ namespace ATLAS.Controllers.Student
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [EnableRateLimiting("AdminGetAllPolicy")]
-        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetAllStudent([FromQuery] StudentFilterDTO studentFilter)
+        public async Task<ActionResult<IEnumerable<StudentDTO>>> GetAllStudent([FromQuery] StudentFilterDTO studentFilter, CancellationToken cancellationToken = default)
         {
 
-            var Students = await _mediator.Send(new GetAllStudentsQuery(studentFilter));
+            var Students = await _mediator.Send(new GetAllStudentsQuery(studentFilter), cancellationToken);
             if (Students == null || (Students.Count() == 0))
             {
                 return NotFound("No students found.");
@@ -69,7 +69,7 @@ namespace ATLAS.Controllers.Student
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminCreateRangePolicy")]
-        public async Task<ActionResult> CreateStudents(IFormFile file)
+        public async Task<ActionResult> CreateStudents(IFormFile file, CancellationToken cancellationToken = default)
         {
             // No blanket try/catch here: a rejected file must report why, so
             // InvalidDataException from the handler becomes a 400 through the
@@ -102,7 +102,7 @@ namespace ATLAS.Controllers.Student
                 await file.CopyToAsync(stream);
             }
 
-            bool insertSecessfully = await _mediator.Send(new CreateStudentsRangeCommand(filePath));
+            bool insertSecessfully = await _mediator.Send(new CreateStudentsRangeCommand(filePath), cancellationToken);
 
             return Ok(new
             {
@@ -122,9 +122,9 @@ namespace ATLAS.Controllers.Student
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
-        public async Task<ActionResult> CreateStudent([FromBody] CreateStudentDTO createStudentDTO)
+        public async Task<ActionResult> CreateStudent([FromBody] CreateStudentDTO createStudentDTO, CancellationToken cancellationToken = default)
         {
-                 var studentId = await _mediator.Send(new CreateStudentCommand(createStudentDTO));
+                 var studentId = await _mediator.Send(new CreateStudentCommand(createStudentDTO), cancellationToken);
             if(studentId > 0)
             {
                 // LOW-07: creating a student is a 201, not a 200.
@@ -144,9 +144,9 @@ namespace ATLAS.Controllers.Student
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
-        public async Task<ActionResult> updateStudent([FromBody] UpdateStudentDto UpdateStudentDTO)
+        public async Task<ActionResult> updateStudent([FromBody] UpdateStudentDto UpdateStudentDTO, CancellationToken cancellationToken = default)
         {
-                 var student = await _mediator.Send(new UpdateStudentCommand( UpdateStudentDTO));
+                 var student = await _mediator.Send(new UpdateStudentCommand( UpdateStudentDTO), cancellationToken);
             if(  student )
             {
                 return Ok(new { message = "Student updated successfully." });
@@ -165,9 +165,9 @@ namespace ATLAS.Controllers.Student
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminSoftDeletePolicy")]
-        public async Task<ActionResult> deleteStudent([FromQuery] string StudentCode)
+        public async Task<ActionResult> deleteStudent([FromQuery] string StudentCode, CancellationToken cancellationToken = default)
         {
-                 var student = await _mediator.Send(new DeleteStudentCommand(StudentCode));
+                 var student = await _mediator.Send(new DeleteStudentCommand(StudentCode), cancellationToken);
             if(  student )
             {
                 return Ok(new { message = "Student deleted successfully." });
@@ -208,7 +208,7 @@ namespace ATLAS.Controllers.Student
         //        return BadRequest("Invalid level.");
         //    }
 
-        //    var Students = await _mediator.Send(new GetStudentsByLevelQuery(level));
+        //    var Students = await _mediator.Send(new GetStudentsByLevelQuery(level), cancellationToken);
         //    if (Students == null || (Students.Count() == 0))
         //    {
         //        return NotFound("No students found.");
@@ -233,7 +233,7 @@ namespace ATLAS.Controllers.Student
         //    if (!await _courseAuthorization.CanAccessOfferingAsync(User, CourseOffringID, HttpContext.RequestAborted))
         //        return Forbid();
 
-        //    var Students = await _mediator.Send(new GetStudentsByOferringCouresQuery(CourseOffringID));
+        //    var Students = await _mediator.Send(new GetStudentsByOferringCouresQuery(CourseOffringID), cancellationToken);
            
         //    if (Students == null || (Students.Count() == 0))
         //    {
@@ -258,7 +258,7 @@ namespace ATLAS.Controllers.Student
         //    if (!await _courseAuthorization.CanAccessOfferingAsync(User, CourseOffringID, HttpContext.RequestAborted))
         //        return Forbid();
 
-        //    var Students = await _mediator.Send(new GetStudentWithModequery(CourseOffringID, modelId));
+        //    var Students = await _mediator.Send(new GetStudentWithModequery(CourseOffringID, modelId), cancellationToken);
            
         //    if (Students == null || (Students.Count() == 0))
         //    {

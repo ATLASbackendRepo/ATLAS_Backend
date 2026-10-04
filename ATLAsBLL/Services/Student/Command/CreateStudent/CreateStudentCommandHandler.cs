@@ -46,7 +46,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
             // The academic id is the login identity; a second account reusing it
             // would make logins and imports resolve to an arbitrary row.
             var academicIdTaken = await _unitOfWork.Users
-                .AnyAsync(existing => existing.AcademicId == academicId);
+                .AnyAsync(existing => existing.AcademicId == academicId, cancellationToken);
 
             if (academicIdTaken)
             {
@@ -81,7 +81,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
             };
 
            
-            await _unitOfWork.Students.AddAsync(student);
+            await _unitOfWork.Students.AddAsync(student, cancellationToken);
 
             
             await _unitOfWork.SaveChangesAsync(cancellationToken);

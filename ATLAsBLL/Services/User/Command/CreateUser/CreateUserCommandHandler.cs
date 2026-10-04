@@ -43,7 +43,7 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUser
             // The academic id is the login identity; a second account reusing it
             // would make logins and imports resolve to an arbitrary row.
             var academicIdTaken = await _unitOfWork.Users
-                .AnyAsync(existing => existing.AcademicId == academicId);
+                .AnyAsync(existing => existing.AcademicId == academicId, cancellationToken);
 
             if (academicIdTaken)
             {
@@ -77,7 +77,7 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUser
 
                 user.Password = BCrypt.Net.BCrypt.HashPassword(initialPassword);
 
-                await _unitOfWork.Users.AddAsync(user);
+                await _unitOfWork.Users.AddAsync(user, cancellationToken);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
 
      

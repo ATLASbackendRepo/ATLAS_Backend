@@ -30,7 +30,7 @@ namespace ATLAsBLL.Services.User.qeusies.GetallStaff
         {
             if (request== null)
                 throw new ArgumentException("Invalid role. Only Staff role is allowed.", nameof(request.role));
-            var staffList = await _uintofwork.Users.GetAllStaffAsync(request.role, request.filter);
+            var staffList = await _uintofwork.Users.GetAllStaffAsync(request.role, request.filter, cancellationToken);
             return staffList;
         }
     }

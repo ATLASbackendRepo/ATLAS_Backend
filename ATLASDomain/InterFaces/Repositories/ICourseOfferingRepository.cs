@@ -14,58 +14,66 @@ public interface ICourseOfferingRepository : IGenericRepository<CourseOffering>
     /// Gets a single course offering with the details needed to display it.
     /// </summary>
     /// <param name="offeringId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The offering, or null when it does not exist.</returns>
-    Task<CourseOffering?> GetOfferingDetailsAsync(int offeringId);
+    Task<CourseOffering?> GetOfferingDetailsAsync(int offeringId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets every course offering that belongs to a semester.
     /// </summary>
     /// <param name="semesterId">Semester identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The offerings of that semester.</returns>
-    Task<IEnumerable<CourseOffering>> GetBySemesterAsync(int semesterId);
+    Task<IEnumerable<CourseOffering>> GetBySemesterAsync(int semesterId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets every course offering of a course, across all semesters.
     /// </summary>
     /// <param name="courseId">Course identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The offerings of that course.</returns>
-    Task<IEnumerable<CourseOffering>> GetByCourseAsync(int courseId);
+    Task<IEnumerable<CourseOffering>> GetByCourseAsync(int courseId, CancellationToken cancellationToken = default);
     /// <summary>
     /// Gets the offerings a staff member teaches, shaped for the staff "my
     /// courses" screen.
     /// </summary>
     /// <param name="staffId">Staff user identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The offerings the staff member teaches.</returns>
-    Task<IEnumerable<DoctorCourseOfferingDTO>> GetStaffMyCourseAsync(int staffId);
+    Task<IEnumerable<DoctorCourseOfferingDTO>> GetStaffMyCourseAsync(int staffId, CancellationToken cancellationToken = default);
     /// <summary>
     /// Gets the offerings a student is enrolled in, shaped for the student "my
     /// courses" screen.
     /// </summary>
     /// <param name="id">Student user identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The offerings the student is enrolled in.</returns>
-    Task<IEnumerable<CourseOfferingDTO>> GetMyCourseAsync(int id);
+    Task<IEnumerable<CourseOfferingDTO>> GetMyCourseAsync(int id, CancellationToken cancellationToken = default);
     /// <summary>
     /// Gets a course offering by its identifier.
     /// </summary>
     /// <param name="id">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The offering, or null when it does not exist.</returns>
-    Task<CourseOffering?> GetCourseOFferingByID(int id);
+    Task<CourseOffering?> GetCourseOFferingByID(int id, CancellationToken cancellationToken = default);
     /// <summary>
     /// Gets the detailed view of an offering for one student, including the
     /// modules and the grades that student has received.
     /// </summary>
     /// <param name="courseofferingId">Course offering identifier.</param>
     /// <param name="studentID">Student user identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The offering details for that student.</returns>
-    Task<IEnumerable<CourseofferingDetailsDTO>> GetMyCourseDetailsAsync(int courseofferingId , int studentID   );
+    Task<IEnumerable<CourseofferingDetailsDTO>> GetMyCourseDetailsAsync(int courseofferingId , int studentID   , CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the detailed view of an offering used by staff.
     /// </summary>
     /// <param name="courseOfferingId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The offering details.</returns>
     Task<IEnumerable<CourseofferingDetailsDTO>> GetDetailsCourseAsync(
-        int courseOfferingId);
+        int courseOfferingId, CancellationToken cancellationToken = default);
     
 
 
@@ -73,6 +81,7 @@ public interface ICourseOfferingRepository : IGenericRepository<CourseOffering>
     /// Gets the aggregate figures shown on the course analysis screen.
     /// </summary>
     /// <param name="courseOfferingId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The analysis figures for the offering.</returns>
-    Task<CourseAnalysisResponseDto> GetCourseAnalysisAsync(int courseOfferingId);
+    Task<CourseAnalysisResponseDto> GetCourseAnalysisAsync(int courseOfferingId, CancellationToken cancellationToken = default);
 }

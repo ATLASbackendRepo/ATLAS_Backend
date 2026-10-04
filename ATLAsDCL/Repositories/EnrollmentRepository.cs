@@ -22,13 +22,13 @@ public class EnrollmentRepository
     /// <summary>
     /// Get Enrollment Details Async.
     /// </summary>
-    public async Task<Enrollment?> GetEnrollmentDetailsAsync(int id)
+    public async Task<Enrollment?> GetEnrollmentDetailsAsync(int id, CancellationToken cancellationToken = default)
     {
         return await _context.Enrollments
             .AsNoTracking()
             .Include(e => e.Student)
             .Include(e => e.CourseOffering)
-            .FirstOrDefaultAsync(e => e.EnrollmentID == id);
+            .FirstOrDefaultAsync(e => e.EnrollmentID == id, cancellationToken);
     }
     /// <summary>
     /// Get Enrollment Id Async.
@@ -67,7 +67,7 @@ public class EnrollmentRepository
             .Where(e =>
                 e.CourseOfferingID == courseOfferingId &&
                 academicNumbers.Contains(e.Student!.AcademicId!))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         foreach (var enrollment in enrollments)
         {
@@ -83,39 +83,39 @@ public class EnrollmentRepository
     /// <summary>
     /// Is Student Enrolled Async.
     /// </summary>
-    public async Task<bool> IsStudentEnrolledAsync(int studentId, int courseOfferingId, DateTime semester)
+    public async Task<bool> IsStudentEnrolledAsync(int studentId, int courseOfferingId, DateTime semester, CancellationToken cancellationToken = default)
     {
         return await _context.Enrollments
     .AsNoTracking()
     .AnyAsync(e =>
         e.StudentID == studentId &&
         e.CourseOfferingID == courseOfferingId &&
-        e.CourseOffering.Semester.AcademicYear == semester.Date.Year.ToString());
+        e.CourseOffering.Semester.AcademicYear == semester.Date.Year.ToString(), cancellationToken);
     }
 
     /// <summary>
     /// Get Student Enrollments Async.
     /// </summary>
-    public async Task<IEnumerable<Enrollment>> GetStudentEnrollmentsAsync(int studentId)
+    public async Task<IEnumerable<Enrollment>> GetStudentEnrollmentsAsync(int studentId, CancellationToken cancellationToken = default)
     {
         return await _context.Enrollments
             .AsNoTracking()
             .Include(e => e.CourseOffering)
             .ThenInclude(co => co.Course)
             .Where(e => e.StudentID == studentId)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     /// <summary>
     /// Get Course Enrollments Async.
     /// </summary>
-    public async Task<IEnumerable<Enrollment>> GetCourseEnrollmentsAsync(int courseOfferingId)
+    public async Task<IEnumerable<Enrollment>> GetCourseEnrollmentsAsync(int courseOfferingId, CancellationToken cancellationToken = default)
     {
         return await _context.Enrollments
             .AsNoTracking()
             .Include(e => e.Student)
             .Where(e => e.CourseOfferingID == courseOfferingId)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     /// <summary>
@@ -127,7 +127,7 @@ public class EnrollmentRepository
         return await _context.SemesterStudentRankings
             .AsNoTracking()
             .Where(r => r.SemesterID == semesterId && r.StudentID == studentId )
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     /// <summary>
@@ -146,13 +146,13 @@ public class EnrollmentRepository
     /// <summary>
     /// Get Student User Ids By Course Offering Async.
     /// </summary>
-    public async Task<List<int?>> GetStudentUserIdsByCourseOfferingAsync(int courseOfferingId)
+    public async Task<List<int?>> GetStudentUserIdsByCourseOfferingAsync(int courseOfferingId, CancellationToken cancellationToken = default)
     {
         return await _context.Enrollments
             .Where(e => e.CourseOfferingID == courseOfferingId)
             .Select(e => e.Student.UserId)
             .Distinct()
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
 
@@ -169,10 +169,11 @@ public class EnrollmentRepository
     /// </summary>
     /// <param name="dto">Course, semester, department and level to enroll.</param>
     /// <param name="createdByUserId">User that performs the enrollment.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of inserted enrollment rows.</returns>
     public async Task<int> BulkEnrollStudentsFastAsync(
         BulkCreateEnrollmentDTO dto,
-        int createdByUserId)
+        int createdByUserId, CancellationToken cancellationToken = default)
     {
         if (createdByUserId <= 0)
         {
@@ -183,7 +184,7 @@ public class EnrollmentRepository
         var semester = await _context.Semesters
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.AcademicYear == dto.AcademicYear
-                                   && s.SemesterName == dto.SemesterName);
+                                   && s.SemesterName == dto.SemesterName, cancellationToken);
 
         if (semester is null)
         {
@@ -197,7 +198,7 @@ public class EnrollmentRepository
             .Where(co => co.CourseID == dto.CourseID
                       && co.SemesterID == semester.SemesterID)
             .Select(co => co.CourseOfferingID)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (courseOfferingId == 0)
         {
@@ -233,14 +234,15 @@ public class EnrollmentRepository
     /// The semester and the course offering must already exist and the student
     /// is resolved by academic id, so nothing is created as a side effect.
     /// </summary>
-    /// <param name="AcadimicID">Academic id of the student to enroll.</param>
+    /// <param name="AcdimicID">Academic id of the student to enroll.</param>
     /// <param name="dto">Course and semester the student is enrolled into.</param>
     /// <param name="createdByUserId">User that performs the enrollment.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>True when a new enrollment row was inserted.</returns>
     public async Task<bool> AddSingleStudentToEnrollmentAsync(
         string AcdimicID,
         BulkCreateEnrollmentDTO dto,
-        int createdByUserId)
+        int createdByUserId, CancellationToken cancellationToken = default)
     {
         if (createdByUserId <= 0)
         {
@@ -251,7 +253,7 @@ public class EnrollmentRepository
         var semester = await _context.Semesters
             .AsNoTracking()
             .FirstOrDefaultAsync(s => s.AcademicYear == dto.AcademicYear
-                                   && s.SemesterName == dto.SemesterName);
+                                   && s.SemesterName == dto.SemesterName, cancellationToken);
 
         if (semester is null)
         {
@@ -265,7 +267,7 @@ public class EnrollmentRepository
             .Where(co => co.CourseID == dto.CourseID
                       && co.SemesterID == semester.SemesterID)
             .Select(co => co.CourseOfferingID)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (courseOfferingId == 0)
         {
@@ -278,7 +280,7 @@ public class EnrollmentRepository
             .AsNoTracking()
             .Where(s => s.AcademicId == AcdimicID)
             .Select(s => s.StudentId)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
         if (studentId == 0)
         {
@@ -288,7 +290,7 @@ public class EnrollmentRepository
 
         var isAlreadyEnrolled = await _context.Enrollments
             .AnyAsync(e => e.StudentID == studentId
-                        && e.CourseOfferingID == courseOfferingId);
+                        && e.CourseOfferingID == courseOfferingId, cancellationToken);
 
         if (isAlreadyEnrolled)
         {
@@ -303,7 +305,7 @@ public class EnrollmentRepository
             CreatedByUserID = createdByUserId
         });
 
-        await _context.SaveChangesAsync();
+        await _context.SaveChangesAsync(cancellationToken);
 
         return true;
     }
@@ -311,11 +313,11 @@ public class EnrollmentRepository
     /// <summary>
     /// Delete Enrollment By Id Async.
     /// </summary>
-    public async Task<bool> DeleteEnrollmentByIdAsync(int enrollmentId)
+    public async Task<bool> DeleteEnrollmentByIdAsync(int enrollmentId, CancellationToken cancellationToken = default)
     {
         var deletedRows = await _context.Enrollments
             .Where(e => e.EnrollmentID == enrollmentId)
-            .ExecuteDeleteAsync();
+            .ExecuteDeleteAsync(cancellationToken);
 
         return deletedRows > 0;
     }
@@ -327,7 +329,7 @@ public class EnrollmentRepository
       string? searchKeyword = null,
       int? doctorId = null,
       int pageIndex = 1,
-      int pageSize = 10)
+      int pageSize = 10, CancellationToken cancellationToken = default)
   {
    
       var query = _context.CourseOfferings.AsNoTracking();
@@ -345,7 +347,7 @@ public class EnrollmentRepository
       }
 
      
-      var totalCount = await query.CountAsync();
+      var totalCount = await query.CountAsync(cancellationToken);
 
 
         var items = await query
@@ -372,7 +374,7 @@ public class EnrollmentRepository
                StudentsCount = co.Enrollments.Count(),
                EnrollmentIDs = co.Enrollments.Select(e => e.EnrollmentID).ToList()
            })
-           .ToListAsync();
+           .ToListAsync(cancellationToken);
 
         return new PagedResultDto<CourseEnrollmentSummaryDto>
         {

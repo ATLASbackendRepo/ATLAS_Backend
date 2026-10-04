@@ -50,7 +50,7 @@ public class ExportCourseGradesQueryHandler
 
         // Make sure Course Offering exists
         var courseOffering = await _unitOfWork.CourseOfferings
-            .GetByIdAsync(request.CourseOfferingId);
+            .GetByIdAsync(request.CourseOfferingId, cancellationToken);
 
         if (courseOffering is null)
         {
@@ -61,7 +61,7 @@ public class ExportCourseGradesQueryHandler
         // DB -> Projection -> DTO (student name, code, academic id, degrees).
         var students = await _unitOfWork.CourseGrades
             .GetCourseGradesForExportAsync(
-                request.CourseOfferingId);
+                request.CourseOfferingId, cancellationToken);
 
         if (students.Count == 0)
         {
@@ -71,7 +71,7 @@ public class ExportCourseGradesQueryHandler
 
         // Assessment modules are still needed for the table headers.
         var modules = await _unitOfWork.AssessmentModules.FindAsync(
-            m => m.CourseOfferingID == request.CourseOfferingId);
+            m => m.CourseOfferingID == request.CourseOfferingId, cancellationToken);
 
         var moduleList = modules
             .OrderBy(m => m.ModuleID)

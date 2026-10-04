@@ -32,11 +32,11 @@ namespace ATLAS.Controllers.Department
         [ProducesResponseType(StatusCodes.Status201Created)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
-        public async Task<IActionResult> CreateDepartment([FromBody] string departmentName, int institutionId)
+        public async Task<IActionResult> CreateDepartment([FromBody] string departmentName, int institutionId, CancellationToken cancellationToken = default)
         {
             if (!string.IsNullOrEmpty(departmentName) && institutionId > 0)
             {
-                var departmentId = await _mediator.Send(new CreateDepartmentCommand(departmentName, institutionId));
+                var departmentId = await _mediator.Send(new CreateDepartmentCommand(departmentName, institutionId), cancellationToken);
                 if (departmentId <= 0)
                 {
                     return BadRequest("Failed to create department.");
@@ -55,13 +55,13 @@ namespace ATLAS.Controllers.Department
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
-        public async Task<IActionResult> UpdateDepartment(int departmentId, [FromBody] string departmentName)
+        public async Task<IActionResult> UpdateDepartment(int departmentId, [FromBody] string departmentName, CancellationToken cancellationToken = default)
         {
             try
             {
                 if (departmentId > 0 && !string.IsNullOrEmpty(departmentName))
                 {
-                    var result = await _mediator.Send(new UpdateDepartmentCommand(departmentId, departmentName));
+                    var result = await _mediator.Send(new UpdateDepartmentCommand(departmentId, departmentName), cancellationToken);
                     if (result)
                         return Ok("Department updated successfully.");
 
@@ -83,13 +83,13 @@ namespace ATLAS.Controllers.Department
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminSoftDeletePolicy")]
-        public async Task<IActionResult> DeleteDepartment(int departmentId)
+        public async Task<IActionResult> DeleteDepartment(int departmentId, CancellationToken cancellationToken = default)
         {
             if (departmentId <= 0)
             {
                 return BadRequest("Invalid department ID.");
             }
-            var ISDelete = await _mediator.Send(new DeleteDepartmentCommand(departmentId));
+            var ISDelete = await _mediator.Send(new DeleteDepartmentCommand(departmentId), cancellationToken);
             if (!ISDelete)
             {
                 return NotFound("Department not found.");
@@ -106,9 +106,9 @@ namespace ATLAS.Controllers.Department
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminGetAllPolicy")]
-        public async Task<IActionResult> GetDepartments([FromQuery] string? departmentName)
+        public async Task<IActionResult> GetDepartments([FromQuery] string? departmentName, CancellationToken cancellationToken = default)
         {
-            var departments = await _mediator.Send(new GetAllDepartment(departmentName));
+            var departments = await _mediator.Send(new GetAllDepartment(departmentName), cancellationToken);
 
             // LOW-07: an empty result is a successful query, not a missing
             // resource. Returning 404 here meant a client could not distinguish

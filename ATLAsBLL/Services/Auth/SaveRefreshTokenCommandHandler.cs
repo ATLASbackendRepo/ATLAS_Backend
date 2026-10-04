@@ -21,7 +21,7 @@ public sealed class SaveRefreshTokenCommandHandler(IUnitOfWork unitOfWork)
         SaveRefreshTokenCommand request,
         CancellationToken cancellationToken)
     {
-        var user = await unitOfWork.Users.GetByIdAsync(request.UserId)
+        var user = await unitOfWork.Users.GetByIdAsync(request.UserId, cancellationToken)
             ?? throw new KeyNotFoundException("User not found.");
 
         user.PreviousRefreshTokenHash = user.RefreshTokenHash;
@@ -62,7 +62,7 @@ public sealed class RotateRefreshTokenCommandHandler(IUnitOfWork unitOfWork)
     {
         // An account that has been deactivated or had its family revoked keeps a
         // null current hash, so a stale token cannot be rotated back to life.
-        var user = await unitOfWork.Users.GetByIdAsync(request.UserId)
+        var user = await unitOfWork.Users.GetByIdAsync(request.UserId, cancellationToken)
             ?? throw new KeyNotFoundException("User not found.");
 
         if (!user.IsActive || user.RefreshTokenRevokedAt is not null)

@@ -22,7 +22,7 @@ public class DeleteInstitutionHandler : IRequestHandler<DeleteInstitutionCommand
     /// </summary>
     public async Task<bool> Handle(DeleteInstitutionCommand request, CancellationToken cancellationToken)
     {
-        var IsDeletd = await unitOfWork.Institutions.DeleteInstitutionAsync(request.Id);
+        var IsDeletd = await unitOfWork.Institutions.DeleteInstitutionAsync(request.Id, cancellationToken);
 
         return IsDeletd;
     }

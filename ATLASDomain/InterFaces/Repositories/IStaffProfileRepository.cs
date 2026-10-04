@@ -15,7 +15,8 @@ public interface IStaffProfileRepository : IGenericRepository<StaffProfile>
     /// Gets the staff profile belonging to a user.
     /// </summary>
     /// <param name="userId">User identifier.</param>
+    /// <param name="cancellationToken">Cancels the query.</param>
     /// <returns>The staff profile, or null when the user has none.</returns>
-    Task<StaffProfile?> GetByUserIdAsync(int userId);
+    Task<StaffProfile?> GetByUserIdAsync(int userId, CancellationToken cancellationToken = default);
  
 }

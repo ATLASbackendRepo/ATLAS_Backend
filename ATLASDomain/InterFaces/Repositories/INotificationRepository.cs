@@ -15,20 +15,23 @@ namespace ATLASDomain.Interfaces.Repositories
         /// Gets the unread notifications of a user, newest first.
         /// </summary>
         /// <param name="userId">User identifier.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>The unread notifications.</returns>
-        Task<IEnumerable<Notification>> GetUnreadForUserAsync(int userId);
+        Task<IEnumerable<Notification>> GetUnreadForUserAsync(int userId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Marks a single notification as read.
         /// </summary>
         /// <param name="notificationId">Notification identifier.</param>
-        Task MarkAsReadAsync(int notificationId);
+        /// <param name="cancellationToken">Cancellation token.</param>
+        Task MarkAsReadAsync(int notificationId, CancellationToken cancellationToken = default);
 
         /// <summary>
         /// Marks every notification of a user as read.
         /// </summary>
         /// <param name="userId">User identifier.</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
         /// <returns>The number of notifications updated.</returns>
-        Task<int> MarkAllAsReadAsync(int userId);
+        Task<int> MarkAllAsReadAsync(int userId, CancellationToken cancellationToken = default);
     }
 }

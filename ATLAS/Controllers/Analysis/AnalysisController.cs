@@ -43,7 +43,7 @@ namespace ATLASAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [EnableRateLimiting("AnalysisPolicy")]
-        public async Task<ActionResult<CourseAnalysisResponseDto>> GetCourseAnalysis(int courseOfferingId)
+        public async Task<ActionResult<CourseAnalysisResponseDto>> GetCourseAnalysis(int courseOfferingId, CancellationToken cancellationToken = default)
         {
          
             if (courseOfferingId <= 0)
@@ -54,7 +54,7 @@ namespace ATLASAPI.Controllers
             if (!await _courseAuthorization.CanAccessOfferingAsync(User, courseOfferingId, HttpContext.RequestAborted))
                 return Forbid();
 
-            var result = await _mediator.Send(new CourseAnalysisquery(courseOfferingId));
+            var result = await _mediator.Send(new CourseAnalysisquery(courseOfferingId), cancellationToken);
 
             
             if (result == null || (!result.ModuleAverages.Any() && result.Distribution.ClassAvg == 0))

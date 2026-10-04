@@ -28,7 +28,7 @@ namespace ATLAsBLL.Services.Student.Queries.GetStudentsByOferringCoures
         public async Task<IEnumerable<StudentDTO>> Handle(GetStudentsByOferringCouresQuery request, CancellationToken cancellationToken)
         {
 
-            var students = await _unitOfWork.Students.GetAllStudentWithCoursefferingAsync(request.CourseOfferingID);
+            var students = await _unitOfWork.Students.GetAllStudentWithCoursefferingAsync(request.CourseOfferingID, cancellationToken);
 
             if (students == null) return Enumerable.Empty<StudentDTO>();
 

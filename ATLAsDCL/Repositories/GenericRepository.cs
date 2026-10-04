@@ -27,74 +27,98 @@ public class GenericRepository<TEntity> : IGenericRepository<TEntity>
     /// <summary>
     /// Get By Id Async.
     /// </summary>
-    public async Task<TEntity?> GetByIdAsync(int id)
+    /// <param name="id">Primary key value.</param>
+    /// <param name="cancellationToken">Cancels the query.</param>
+    public async Task<TEntity?> GetByIdAsync(int id, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FindAsync(id);
+        return await _dbSet.FindAsync(new object?[] { id }, cancellationToken);
     }
 
     /// <summary>
     /// Get All Async.
     /// </summary>
-    public async Task<IEnumerable<TEntity>> GetAllAsync()
+    /// <param name="cancellationToken">Cancels the query.</param>
+    public async Task<IEnumerable<TEntity>> GetAllAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbSet.ToListAsync();
+        return await _dbSet.ToListAsync(cancellationToken);
     }
 
     /// <summary>
     /// Find Async.
     /// </summary>
-    public async Task<IEnumerable<TEntity>> FindAsync(Expression<Func<TEntity, bool>> predicate)
+    /// <param name="predicate">Filter to apply in the database.</param>
+    /// <param name="cancellationToken">Cancels the query.</param>
+    public async Task<IEnumerable<TEntity>> FindAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
     {
-        return await _dbSet.Where(predicate).ToListAsync();
+        return await _dbSet.Where(predicate).ToListAsync(cancellationToken);
     }
 
     /// <summary>
     /// First Or Default Async.
     /// </summary>
-    public async Task<TEntity?> FirstOrDefaultAsync(Expression<Func<TEntity, bool>> predicate)
+    /// <param name="predicate">Filter to apply in the database.</param>
+    /// <param name="cancellationToken">Cancels the query.</param>
+    public async Task<TEntity?> FirstOrDefaultAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FirstOrDefaultAsync(predicate);
+        return await _dbSet.FirstOrDefaultAsync(predicate, cancellationToken);
     }
 
     /// <summary>
     /// Any Async.
     /// </summary>
-    public async Task<bool> AnyAsync(Expression<Func<TEntity, bool>> predicate)
+    /// <param name="predicate">Filter to apply in the database.</param>
+    /// <param name="cancellationToken">Cancels the query.</param>
+    public async Task<bool> AnyAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
     {
-        return await _dbSet.AnyAsync(predicate);
+        return await _dbSet.AnyAsync(predicate, cancellationToken);
     }
 
     /// <summary>
     /// Count Async.
     /// </summary>
-    public async Task<int> CountAsync()
+    /// <param name="cancellationToken">Cancels the query.</param>
+    public async Task<int> CountAsync(CancellationToken cancellationToken = default)
     {
-        return await _dbSet.CountAsync();
+        return await _dbSet.CountAsync(cancellationToken);
     }
 
     /// <summary>
     /// Count Async.
     /// </summary>
-    public async Task<int> CountAsync(Expression<Func<TEntity, bool>> predicate)
+    /// <param name="predicate">Filter to apply in the database.</param>
+    /// <param name="cancellationToken">Cancels the query.</param>
+    public async Task<int> CountAsync(
+        Expression<Func<TEntity, bool>> predicate,
+        CancellationToken cancellationToken = default)
     {
-        return await _dbSet.CountAsync(predicate);
+        return await _dbSet.CountAsync(predicate, cancellationToken);
     }
 
 
     /// <summary>
     /// Add Async.
     /// </summary>
-    public async Task AddAsync(TEntity entity)
+    /// <param name="entity">The entity to add.</param>
+    /// <param name="cancellationToken">Cancels the operation.</param>
+    public async Task AddAsync(TEntity entity, CancellationToken cancellationToken = default)
     {
-        await _dbSet.AddAsync(entity);
+        await _dbSet.AddAsync(entity, cancellationToken);
     }
 
     /// <summary>
     /// Add Range Async.
     /// </summary>
-    public async Task AddRangeAsync(IEnumerable<TEntity> entities)
+    /// <param name="entities">The entities to add.</param>
+    /// <param name="cancellationToken">Cancels the operation.</param>
+    public async Task AddRangeAsync(IEnumerable<TEntity> entities, CancellationToken cancellationToken = default)
     {
-        await _dbSet.AddRangeAsync(entities);
+        await _dbSet.AddRangeAsync(entities, cancellationToken);
     }
 
     /// <summary>

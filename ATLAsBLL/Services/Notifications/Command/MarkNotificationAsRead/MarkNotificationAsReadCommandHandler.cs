@@ -25,7 +25,7 @@ public class MarkNotificationAsReadCommandHandler : IRequestHandler<MarkNotifica
     /// </summary>
     public async Task<int> Handle(MarkNotificationAsReadCommand request, CancellationToken cancellationToken)
     {
-        var notification = await _unitOfWork.Notifications.GetByIdAsync(request.NotificationId);
+        var notification = await _unitOfWork.Notifications.GetByIdAsync(request.NotificationId, cancellationToken);
 
         if (notification == null)
         {
@@ -38,7 +38,7 @@ public class MarkNotificationAsReadCommandHandler : IRequestHandler<MarkNotifica
             throw new Exceptions.ForbiddenAccessException("You can only mark your own notifications as read.");
         }
 
-        await _unitOfWork.Notifications.MarkAsReadAsync(request.NotificationId);
+        await _unitOfWork.Notifications.MarkAsReadAsync(request.NotificationId, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return request.NotificationId;

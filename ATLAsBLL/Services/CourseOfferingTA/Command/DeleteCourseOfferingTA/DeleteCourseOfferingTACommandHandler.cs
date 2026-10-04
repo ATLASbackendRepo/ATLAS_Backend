@@ -21,7 +21,7 @@ namespace ATLAsBLL.Features.CourseOfferingTAs.Commands.DeleteCourseOfferingTA
         /// </summary>
         public async Task<bool> Handle(DeleteCourseOfferingTACommand request, CancellationToken cancellationToken)
         {
-            var record = await _unitOfWork.CourseOfferingTAs.GetByIdAsync(request.CourseOfferingTAId);
+            var record = await _unitOfWork.CourseOfferingTAs.GetByIdAsync(request.CourseOfferingTAId, cancellationToken);
             if (record == null) throw new System.Collections.Generic.KeyNotFoundException("TA Assignment record not found.");
 
             _unitOfWork.CourseOfferingTAs.Delete(record);

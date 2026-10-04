@@ -27,7 +27,7 @@ namespace ATLAsBLL.Features.CourseOfferingDoctors.Commands.CreateCourseOfferingD
                 CourseOfferingID = request.CourseOfferingId,
                 DoctorID = request.DoctorId
             };
-            await _unitOfWork.CourseOfferingDoctors.AddAsync(cod);
+            await _unitOfWork.CourseOfferingDoctors.AddAsync(cod, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return cod.CourseOfferingDoctorID;
         }

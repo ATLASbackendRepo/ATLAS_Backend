@@ -26,7 +26,7 @@ public class DeleteCourseGroupMessageCommandHandler : IRequestHandler<DeleteCour
     /// </summary>
     public async Task<int> Handle(DeleteCourseGroupMessageCommand request, CancellationToken cancellationToken)
     {
-        var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId);
+        var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId, cancellationToken);
 
         if (message == null)
         {
@@ -39,7 +39,7 @@ public class DeleteCourseGroupMessageCommandHandler : IRequestHandler<DeleteCour
             throw new ForbiddenAccessException("You can only delete your own messages.");
         }
 
-        await _unitOfWork.CourseGroupMessages.SoftDeleteAsync(message);
+        await _unitOfWork.CourseGroupMessages.SoftDeleteAsync(message, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return message.MessageID;

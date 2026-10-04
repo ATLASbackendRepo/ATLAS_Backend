@@ -29,7 +29,7 @@ namespace ATLAsBLL.Services.Course.Queries
      /// </summary>
      public async Task<List<CourseDTO>> Handle(GetAllCourseQuery request, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.Courses.GetAllCourse(request.courseName);
+            return await _unitOfWork.Courses.GetAllCourse(request.courseName, cancellationToken);
         }
     }
 }

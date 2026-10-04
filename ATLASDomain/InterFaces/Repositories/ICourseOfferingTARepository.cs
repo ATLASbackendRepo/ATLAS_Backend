@@ -11,6 +11,7 @@ public interface ICourseOfferingTARepository
     /// Gets the teaching assistant assignments of a course offering.
     /// </summary>
     /// <param name="offeringId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The teaching assistant assignments.</returns>
-    Task<IEnumerable<CourseOfferingTA>> GetTAsByOfferingAsync(int offeringId);
+    Task<IEnumerable<CourseOfferingTA>> GetTAsByOfferingAsync(int offeringId, CancellationToken cancellationToken = default);
 }

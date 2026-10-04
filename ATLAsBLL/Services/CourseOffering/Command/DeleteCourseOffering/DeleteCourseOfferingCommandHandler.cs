@@ -25,7 +25,7 @@ namespace ATLAsBLL.Features.CourseOfferings.Commands.DeleteCourseOffering
         /// </summary>
         public async Task<bool> Handle(DeleteCourseOfferingCommand request, CancellationToken cancellationToken)
         {
-            var offering = await _unitOfWork.CourseOfferings.GetByIdAsync(request.CourseOfferingId);
+            var offering = await _unitOfWork.CourseOfferings.GetByIdAsync(request.CourseOfferingId, cancellationToken);
 
             if (offering == null)
             {

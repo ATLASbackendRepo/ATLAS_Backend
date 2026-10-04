@@ -22,10 +22,10 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule
         /// </summary>
         public async Task<int> Handle(CreateAssessmentModuleCommand request, CancellationToken cancellationToken)
         {
-            var DoctorsID = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(request.DTO.CourseOfferingId);
+            var DoctorsID = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(request.DTO.CourseOfferingId, cancellationToken);
             if (!DoctorsID.ToList().Contains(request.UserId))
             {
-                var teachingAssistants = await _unitOfWork.CourseOfferingTAs.GetTAsByOfferingAsync(request.DTO.CourseOfferingId);
+                var teachingAssistants = await _unitOfWork.CourseOfferingTAs.GetTAsByOfferingAsync(request.DTO.CourseOfferingId, cancellationToken);
                 if (!teachingAssistants.Any(ta => ta.TeacherAssistID == request.UserId))
                     throw new UnauthorizedAccessException("You are not assigned to the specified course offering.");
             }
@@ -41,7 +41,7 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule
             // The modules of one offering compose a single course grade, so their
             // max degrees may add up to at most 100 (MED-07).
             var offeringTotal = await _unitOfWork.AssessmentModules
-                .GetTotalMaxDegreeByCourseOfferingAsync(request.DTO.CourseOfferingId);
+                .GetTotalMaxDegreeByCourseOfferingAsync(request.DTO.CourseOfferingId, cancellationToken);
 
             if (offeringTotal + request.DTO.MaxDegree > AssessmentModule.MaximumOfferingTotalMaxDegree)
             {
@@ -55,7 +55,7 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule
                 ModuleName = request.DTO.ModuleName ,
                 MaxDegree = request.DTO.MaxDegree
             };
-            await _unitOfWork.AssessmentModules.AddAsync(module);
+            await _unitOfWork.AssessmentModules.AddAsync(module, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return module.ModuleID;
         }

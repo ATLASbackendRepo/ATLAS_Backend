@@ -47,6 +47,7 @@ namespace ATLASAPI.Controllers
         /// <summary>
         /// Get Course Students Paged.
         /// </summary>
+        /// <param name="cancellationToken">Cancellation token.</param>
         [HttpGet("course-offering/{courseOfferingId:int}/students")]
         [ProducesResponseType(typeof(PagedResultDto<StudentCardDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -56,7 +57,7 @@ namespace ATLASAPI.Controllers
             int courseOfferingId,
             [FromQuery] int pageNumber = 1,
             [FromQuery] int pageSize = 9,
-            [FromQuery] string? searchTerm = null)
+            [FromQuery] string? searchTerm = null, CancellationToken cancellationToken = default)
         {
             // Input validation for route and pagination parameters
             if (courseOfferingId <= 0 || pageNumber <= 0 || pageSize <= 0 || pageSize > GetStudentsPagedQueryModel.MaxPageSize)
@@ -75,7 +76,7 @@ namespace ATLASAPI.Controllers
                 SearchTerm = searchTerm
             };
 
-            var result = await _mediator.Send(new GetCourseStudentsQuery(queryModel));
+            var result = await _mediator.Send(new GetCourseStudentsQuery(queryModel), cancellationToken);
 
             return Ok(result);
         }
@@ -92,7 +93,7 @@ namespace ATLASAPI.Controllers
         [Authorize(Roles = "Doctor,TeachingAssistant,Admin,SAdmin")]
         [EnableRateLimiting("CourseGradeAssignPolicy")]
         public async Task<IActionResult> AssignGrade(
-             [FromBody] AssignCourseGradeCommand command)
+             [FromBody] AssignCourseGradeCommand command, CancellationToken cancellationToken = default)
         {
             if (command == null || command.EnrollmentId <= 0 || command.ModuleId <= 0)
             {
@@ -108,7 +109,7 @@ namespace ATLASAPI.Controllers
 
             command = command with { UserId = userId };
 
-            var result = await _mediator.Send(command);
+            var result = await _mediator.Send(command, cancellationToken);
 
             if (!result)
                 return NotFound("Failed to assign grade.");

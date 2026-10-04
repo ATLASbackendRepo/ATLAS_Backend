@@ -19,16 +19,18 @@ public interface ICourseGradeHistoryRepository
     /// Gets the change trail of a single grade, newest first.
     /// </summary>
     /// <param name="gradeId">Grade whose history is requested.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The recorded changes, most recent first.</returns>
-    Task<IEnumerable<CourseGradeHistory>> GetForGradeAsync(int gradeId);
+    Task<IEnumerable<CourseGradeHistory>> GetForGradeAsync(int gradeId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the changes a single user made to a single grade, newest first.
     /// </summary>
     /// <param name="gradeId">Grade whose history is requested.</param>
     /// <param name="changedBy">Account whose entries are wanted.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The recorded changes, most recent first.</returns>
     Task<IEnumerable<CourseGradeHistory>> GetForGradeByUserAsync(
         int gradeId,
-        int changedBy);
+        int changedBy, CancellationToken cancellationToken = default);
 }

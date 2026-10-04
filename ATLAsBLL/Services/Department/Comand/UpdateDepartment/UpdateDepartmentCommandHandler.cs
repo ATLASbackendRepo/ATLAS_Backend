@@ -25,7 +25,7 @@ namespace ATLAsBLL.Features.Department.Comand.UpdateDepartment
         /// </summary>
         public async Task<bool> Handle(UpdateDepartmentCommand request, CancellationToken cancellationToken)
         {
-            var department = await _unitOfWork.Departments.GetByIdAsync(request.DepartmentID);
+            var department = await _unitOfWork.Departments.GetByIdAsync(request.DepartmentID, cancellationToken);
 
             if (department == null)
             {

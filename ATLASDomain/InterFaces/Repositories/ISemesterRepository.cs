@@ -14,9 +14,10 @@ public interface ISemesterRepository : IGenericRepository<Semester>
     /// closing (MED-07).
     /// </summary>
     /// <param name="courseOfferingId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>
     /// True when the offering's semester exists and its grading is closed;
     /// false when grading is open or the semester row is missing.
     /// </returns>
-    Task<bool> IsGradingClosedForOfferingAsync(int courseOfferingId);
+    Task<bool> IsGradingClosedForOfferingAsync(int courseOfferingId, CancellationToken cancellationToken = default);
 }

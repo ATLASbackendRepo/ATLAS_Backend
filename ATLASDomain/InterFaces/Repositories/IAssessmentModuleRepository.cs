@@ -14,8 +14,9 @@ public interface IAssessmentModuleRepository : IGenericRepository<AssessmentModu
     /// display data, ordered for presentation.
     /// </summary>
     /// <param name="courseOfferingId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The modules of the offering.</returns>
-    Task<IEnumerable<AssessmentModelDisplayDTO>> GetModulesByCourseOfferingAsync(int courseOfferingId);
+    Task<IEnumerable<AssessmentModelDisplayDTO>> GetModulesByCourseOfferingAsync(int courseOfferingId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the sum of <see cref="AssessmentModule.MaxDegree"/> over every module
@@ -23,8 +24,9 @@ public interface IAssessmentModuleRepository : IGenericRepository<AssessmentModu
     /// total within <see cref="AssessmentModule.MaximumOfferingTotalMaxDegree"/> (MED-07).
     /// </summary>
     /// <param name="courseOfferingId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Sum of the module max degrees; 0 when the offering has no modules.</returns>
-    Task<decimal> GetTotalMaxDegreeByCourseOfferingAsync(int courseOfferingId);
+    Task<decimal> GetTotalMaxDegreeByCourseOfferingAsync(int courseOfferingId, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the highest degree already recorded in the module's grades, so the
@@ -32,7 +34,8 @@ public interface IAssessmentModuleRepository : IGenericRepository<AssessmentModu
     /// below a grade that exists (MED-07).
     /// </summary>
     /// <param name="moduleId">Assessment module identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Highest recorded degree; 0 when the module has no grades.</returns>
-    Task<decimal> GetMaxDegreeByModuleAsync(int moduleId);
+    Task<decimal> GetMaxDegreeByModuleAsync(int moduleId, CancellationToken cancellationToken = default);
 }
 

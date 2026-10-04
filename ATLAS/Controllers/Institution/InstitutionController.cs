@@ -37,11 +37,11 @@ namespace ATLAS.Controllers.Institution
         [Authorize(Roles = "SAdmin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
  
-        public async Task<IActionResult> CreateInstitution([FromBody] CreateInstitutionDto institutionDto)
+        public async Task<IActionResult> CreateInstitution([FromBody] CreateInstitutionDto institutionDto, CancellationToken cancellationToken = default)
         {
             if (institutionDto != null)
             {
-                var institution = await _mediator.Send(new CreateInstitutionCommand(institutionDto));
+                var institution = await _mediator.Send(new CreateInstitutionCommand(institutionDto), cancellationToken);
                 if (institution == null)
                 {
                     return BadRequest("Failed to create institution.");
@@ -70,13 +70,13 @@ namespace ATLAS.Controllers.Institution
         [Authorize(Roles = "SAdmin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
 
-        public async Task<IActionResult> UpdateInstitution([FromBody] UpdateInstitutionDto Dto)
+        public async Task<IActionResult> UpdateInstitution([FromBody] UpdateInstitutionDto Dto, CancellationToken cancellationToken = default)
         {
             try
             {
                 if (Dto != null)
                 {
-                    var IsUpdatede = await _mediator.Send(new UpdateInstitutionCommand(Dto));
+                    var IsUpdatede = await _mediator.Send(new UpdateInstitutionCommand(Dto), cancellationToken);
                     if (IsUpdatede)
                         return Ok("institution updated successfully.");
 
@@ -103,13 +103,13 @@ namespace ATLAS.Controllers.Institution
         [Authorize(Roles = "SAdmin")]
         [EnableRateLimiting("AdminSoftDeletePolicy")]
 
-        public async Task<IActionResult> DeleteInstitution(int InstitutionID)
+        public async Task<IActionResult> DeleteInstitution(int InstitutionID, CancellationToken cancellationToken = default)
         {
             if (InstitutionID <= 0)
             {
                 return BadRequest("Invalid institution ID.");
             }
-            var ISDelete = await _mediator.Send(new DeleteInstitutionCommand(InstitutionID));
+            var ISDelete = await _mediator.Send(new DeleteInstitutionCommand(InstitutionID), cancellationToken);
             if (!ISDelete)
             {
                 return NotFound("institution not found.");
@@ -131,9 +131,9 @@ namespace ATLAS.Controllers.Institution
         [EnableRateLimiting("AdminGetAllPolicy")]
 
    
-        public async Task<IActionResult> GetInstitution()
+        public async Task<IActionResult> GetInstitution(CancellationToken cancellationToken = default)
         {
-            var institution = await _mediator.Send(new GetAllInstitutionsQuery());
+            var institution = await _mediator.Send(new GetAllInstitutionsQuery(), cancellationToken);
 
             // LOW-07: an empty result is a successful query, not a 404. The
             // message also said "No departments found" on an institution
@@ -152,9 +152,9 @@ namespace ATLAS.Controllers.Institution
         [EnableRateLimiting("AdminGetAllPolicy")]
 
        
-        public async Task<IActionResult> GetInstitutionByID(int InstitutionID)
+        public async Task<IActionResult> GetInstitutionByID(int InstitutionID, CancellationToken cancellationToken = default)
         {
-            var institution = await _mediator.Send(new GetInstitutionByIdQuery(InstitutionID));
+            var institution = await _mediator.Send(new GetInstitutionByIdQuery(InstitutionID), cancellationToken);
             if (institution == null)
             {
                 return NotFound("Institution not found.");

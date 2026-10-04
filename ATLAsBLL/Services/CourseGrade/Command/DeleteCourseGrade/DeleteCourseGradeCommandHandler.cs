@@ -25,7 +25,7 @@ namespace ATLAsBLL.Features.CourseGrades.Commands.DeleteCourseGrade
         /// </summary>
         public async Task<bool> Handle(DeleteCourseGradeCommand request, CancellationToken cancellationToken)
         {
-            var grade = await _unitOfWork.CourseGrades.GetByIdAsync(request.CG_ID);
+            var grade = await _unitOfWork.CourseGrades.GetByIdAsync(request.CG_ID, cancellationToken);
 
             if (grade == null)
             {

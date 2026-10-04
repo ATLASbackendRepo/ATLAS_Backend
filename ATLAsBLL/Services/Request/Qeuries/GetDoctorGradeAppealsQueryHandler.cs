@@ -29,7 +29,7 @@ namespace ATLAsBLL.Services.Request.Qeuries
             GetDoctorGradeAppealsQuery query,
             CancellationToken cancellationToken)
         {
-            return await _UnitOfWork.GradeAppealRequests.GetByDoctorIdAsync(query.DoctorUserId);
+            return await _UnitOfWork.GradeAppealRequests.GetByDoctorIdAsync(query.DoctorUserId, cancellationToken);
         }
     }
 }

@@ -20,12 +20,12 @@ public class SemesterRepository
     /// treated as open grading so the grade handlers keep working on data that
     /// predates the foreign key (MED-07).
     /// </summary>
-    public async Task<bool> IsGradingClosedForOfferingAsync(int courseOfferingId)
+    public async Task<bool> IsGradingClosedForOfferingAsync(int courseOfferingId, CancellationToken cancellationToken = default)
     {
         return await _context.Semesters
             .AsNoTracking()
             .Where(s => s.CourseOfferings.Any(o => o.CourseOfferingID == courseOfferingId))
             .Select(s => s.IsGradingClosed)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
     }
 }

@@ -37,12 +37,12 @@ namespace ATLAS.API.Controllers.Profile
         [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
         [Authorize(Roles = "Doctor,TeachingAssistant")]
         [EnableRateLimiting("ProfileReadPolicy")]
-        public async Task<ActionResult<StaffProfileResponseDto>> GetByUserId()
+        public async Task<ActionResult<StaffProfileResponseDto>> GetByUserId(CancellationToken cancellationToken = default)
 
         {
            var userId = GetCurrentUserId();
 
-            var result = await _mediator.Send(new GetStaffProfileByUserIdQuery(userId));
+            var result = await _mediator.Send(new GetStaffProfileByUserIdQuery(userId), cancellationToken);
 
             if (result == null)
                 return NotFound($"No  profile found ");
@@ -61,12 +61,12 @@ namespace ATLAS.API.Controllers.Profile
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize(Roles = "Doctor,TeachingAssistant")]
         [EnableRateLimiting("ProfileUpdatePolicy")]
-        public async Task<IActionResult> UpdateProfile([FromBody] StaffProfileUpdateDTO dto)
+        public async Task<IActionResult> UpdateProfile([FromBody] StaffProfileUpdateDTO dto, CancellationToken cancellationToken = default)
             {
                 var userId = GetCurrentUserId();
             var command = new updateStaffProfileInfoCommand(userId, dto);
 
-            var result = await _mediator.Send(command);
+            var result = await _mediator.Send(command, cancellationToken);
 
                 if (!result)
                     return NotFound(new { message = "Staff profile not found." });
@@ -83,12 +83,12 @@ namespace ATLAS.API.Controllers.Profile
         [ProducesResponseType(typeof(ValidationProblemDetails), 400)]
         [Authorize(Roles = "Student")]
         [EnableRateLimiting("ProfileReadPolicy")]
-        public async Task<ActionResult<StaffProfileResponseDto>> GetStudentProfileByUserId()
+        public async Task<ActionResult<StaffProfileResponseDto>> GetStudentProfileByUserId(CancellationToken cancellationToken = default)
 
         {
             var userId = GetCurrentUserId();
 
-            var result = await _mediator.Send(new GetStudentProfileByUserIdQuery(userId));
+            var result = await _mediator.Send(new GetStudentProfileByUserIdQuery(userId), cancellationToken);
 
             if (result == null)
                 return NotFound($"No  profile found ");
@@ -107,12 +107,12 @@ namespace ATLAS.API.Controllers.Profile
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize(Roles = "Student")]
         [EnableRateLimiting("ProfileUpdatePolicy")]
-        public async Task<IActionResult> UpdateStudentProfile([FromBody] StudentUpdateProfileInfoDTO dto)
+        public async Task<IActionResult> UpdateStudentProfile([FromBody] StudentUpdateProfileInfoDTO dto, CancellationToken cancellationToken = default)
             {
                 var userId = GetCurrentUserId();
             var command = new updateStudentProfileInfoCommand(userId, dto);
 
-            var result = await _mediator.Send(command);
+            var result = await _mediator.Send(command, cancellationToken);
 
                 if (!result)
                     return NotFound(new { message = "Student profile not found." });

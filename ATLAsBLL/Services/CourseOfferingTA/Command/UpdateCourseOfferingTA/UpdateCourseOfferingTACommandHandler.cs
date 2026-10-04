@@ -21,7 +21,7 @@ namespace ATLAsBLL.Features.CourseOfferingTAs.Commands.UpdateCourseOfferingTA
         /// </summary>
         public async Task<bool> Handle(UpdateCourseOfferingTACommand request, CancellationToken cancellationToken)
         {
-            var record = await _unitOfWork.CourseOfferingTAs.GetByIdAsync(request.CourseOfferingTAId);
+            var record = await _unitOfWork.CourseOfferingTAs.GetByIdAsync(request.CourseOfferingTAId, cancellationToken);
             if (record == null) throw new System.Collections.Generic.KeyNotFoundException("TA Assignment record not found.");
 
             record.TeacherAssistID = request.NewTAID;

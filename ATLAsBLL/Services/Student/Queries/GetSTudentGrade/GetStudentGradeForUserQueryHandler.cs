@@ -21,10 +21,10 @@ internal sealed class GetStudentGradeForUserQueryHandler : IRequestHandler<GetSt
     /// </summary>
     public async Task<StudentGradeDto?> Handle(GetStudentGradeForUserQuery request, CancellationToken cancellationToken)
     {
-        var student = await _unitOfWork.Students.GetStudentByUserIDAsync(request.UserId);
+        var student = await _unitOfWork.Students.GetStudentByUserIDAsync(request.UserId, cancellationToken);
         return student is null
             ? null
             : await _unitOfWork.Students.GetStudentWithModeAsync(
-                request.CourseOfferingId, request.ModuleId, student.StudentCode);
+                request.CourseOfferingId, request.ModuleId, student.StudentCode, cancellationToken);
     }
 }

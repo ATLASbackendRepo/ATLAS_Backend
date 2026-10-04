@@ -27,7 +27,7 @@ namespace ATLAsBLL.Features.CourseOfferingTAs.Commands.CreateCourseOfferingTA
                 CourseOfferingID = request.CourseOfferingId,
                 TeacherAssistID = request.TAID
             };
-            await _unitOfWork.CourseOfferingTAs.AddAsync(cot);
+            await _unitOfWork.CourseOfferingTAs.AddAsync(cot, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return cot.CourseOfferingTAID;
         }

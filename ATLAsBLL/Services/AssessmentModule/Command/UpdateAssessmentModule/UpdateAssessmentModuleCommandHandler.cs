@@ -23,10 +23,10 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule
         public async Task<bool> Handle(UpdateAssessmentModuleCommand request, CancellationToken cancellationToken)
         {
             
-            var module = await _unitOfWork.AssessmentModules.GetByIdAsync(request.DTO.ModuleId);
+            var module = await _unitOfWork.AssessmentModules.GetByIdAsync(request.DTO.ModuleId, cancellationToken);
             if (module == null) throw new System.Collections.Generic.KeyNotFoundException("Module not found.");
-            var doctors = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(module.CourseOfferingID);
-            var teachingAssistants = await _unitOfWork.CourseOfferingTAs.GetTAsByOfferingAsync(module.CourseOfferingID);
+            var doctors = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(module.CourseOfferingID, cancellationToken);
+            var teachingAssistants = await _unitOfWork.CourseOfferingTAs.GetTAsByOfferingAsync(module.CourseOfferingID, cancellationToken);
             if (!doctors.Contains(request.UserId) && !teachingAssistants.Any(ta => ta.TeacherAssistID == request.UserId))
                 throw new UnauthorizedAccessException("You are not assigned to this course offering.");
             if (request.DTO.MaxDegree < AssessmentModule.MinimumMaxDegree || request.DTO.MaxDegree > AssessmentModule.MaximumMaxDegree)
@@ -41,7 +41,7 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule
             // Lowering MaxDegree below a grade that already exists would silently
             // invalidate the recorded grade, so it is refused (MED-07).
             var maxRecordedDegree = await _unitOfWork.AssessmentModules
-                .GetMaxDegreeByModuleAsync(module.ModuleID);
+                .GetMaxDegreeByModuleAsync(module.ModuleID, cancellationToken);
 
             if (request.DTO.MaxDegree < maxRecordedDegree)
             {
@@ -52,7 +52,7 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule
             // The modules of one offering compose a single course grade, so their
             // max degrees may add up to at most 100 (MED-07).
             var offeringTotal = await _unitOfWork.AssessmentModules
-                .GetTotalMaxDegreeByCourseOfferingAsync(module.CourseOfferingID);
+                .GetTotalMaxDegreeByCourseOfferingAsync(module.CourseOfferingID, cancellationToken);
 
             if (offeringTotal - module.MaxDegree + request.DTO.MaxDegree > AssessmentModule.MaximumOfferingTotalMaxDegree)
             {

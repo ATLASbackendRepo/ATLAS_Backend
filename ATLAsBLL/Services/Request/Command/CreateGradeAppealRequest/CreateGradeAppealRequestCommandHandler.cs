@@ -38,7 +38,7 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
                 throw new ArgumentException("A course offering and assessment module are required.");
 
             var DoctorIds = await _UnitOfWork.CourseOfferingDoctors
-                .GetDoctorIdsByCourseOfferingIdAsync(command.Request.CourseOfferingID);
+                .GetDoctorIdsByCourseOfferingIdAsync(command.Request.CourseOfferingID, cancellationToken);
 
 
             if (!DoctorIds.Contains(command.Request.DoctorUserID))
@@ -46,14 +46,14 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
                 throw new ForbiddenAccessException("Selected doctor does not teach the specified course offering.");
             }
 
-            var studentIdentity = await _UnitOfWork.Students.GetStudentByUserIDAsync(command.UserId);
+            var studentIdentity = await _UnitOfWork.Students.GetStudentByUserIDAsync(command.UserId, cancellationToken);
 
             if (studentIdentity is null)
             {
                 throw new KeyNotFoundException($"Student with ID '{command.UserId}' was not found.");
             }
 
-            var student = await _UnitOfWork.Students.GetStudentWithEnrollmentsAsync(studentIdentity.StudentId)
+            var student = await _UnitOfWork.Students.GetStudentWithEnrollmentsAsync(studentIdentity.StudentId, cancellationToken)
                 ?? throw new KeyNotFoundException($"Student with ID '{command.UserId}' was not found.");
 
             var enrollment = student.Enrollments?
@@ -61,14 +61,14 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
             if (enrollment is null)
                 throw new ForbiddenAccessException("You are not enrolled in the specified course offering.");
 
-            var module = await _UnitOfWork.AssessmentModules.GetByIdAsync(command.Request.AssessmentModuleID.Value);
+            var module = await _UnitOfWork.AssessmentModules.GetByIdAsync(command.Request.AssessmentModuleID.Value, cancellationToken);
             if (module is null || module.CourseOfferingID != command.Request.CourseOfferingID)
                 throw new ArgumentException("The assessment module does not belong to the specified course offering.");
 
-            if (await _UnitOfWork.GradeAppealRequests.HasOpenRequestAsync(student.StudentId, module.ModuleID))
+            if (await _UnitOfWork.GradeAppealRequests.HasOpenRequestAsync(student.StudentId, module.ModuleID, cancellationToken))
                 throw new InvalidOperationException("An open appeal already exists for this assessment module.");
 
-            var grade = await _UnitOfWork.CourseGrades.GetGradeByEnrollmentAndModuleAsync(enrollment.EnrollmentID, module.ModuleID);
+            var grade = await _UnitOfWork.CourseGrades.GetGradeByEnrollmentAndModuleAsync(enrollment.EnrollmentID, module.ModuleID, cancellationToken);
             if (grade is null)
                 throw new KeyNotFoundException("No grade exists for the selected assessment module.");
 
@@ -76,7 +76,7 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
 
             return await _UnitOfWork.GradeAppealRequests.AddAsync(
                 command.Request,
-                student.StudentId);
+                student.StudentId, cancellationToken);
         }
     }
 }

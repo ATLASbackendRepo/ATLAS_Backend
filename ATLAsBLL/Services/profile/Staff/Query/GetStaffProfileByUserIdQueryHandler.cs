@@ -33,7 +33,7 @@ namespace ATLAsBLL.Services.profile.Staff.Query
             GetStaffProfileByUserIdQuery request,
             CancellationToken cancellationToken)
         {
-            var profile = await _unitOfWork.StaffProfile.GetByUserIdAsync(request.UserId);
+            var profile = await _unitOfWork.StaffProfile.GetByUserIdAsync(request.UserId, cancellationToken);
 
             if (profile == null|| profile.User == null || profile.Role == null)
                 return null;

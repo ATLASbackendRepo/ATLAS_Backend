@@ -13,34 +13,39 @@ public interface IUserRepository : IGenericRepository<User>
     /// Gets a user by username.
     /// </summary>
     /// <param name="userName">Username to match.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The user, or null when no account has that username.</returns>
-    Task<User?> GetByUserNameAsync(string userName);
+    Task<User?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default);
     /// <summary>
     /// Gets a user by identifier.
     /// </summary>
     /// <param name="userId">User identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The user, or null when it does not exist.</returns>
-    Task<User?> GetByUserIdAsync(int userId);
+    Task<User?> GetByUserIdAsync(int userId, CancellationToken cancellationToken = default);
     /// <summary>
     /// Gets a filtered, paged list of the staff accounts holding a given role.
     /// </summary>
     /// <param name="role">Role to filter on.</param>
     /// <param name="filter">Paging and filtering criteria.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The matching staff accounts.</returns>
-     Task<IEnumerable<StaffDto>> GetAllStaffAsync(enUserRole role, StaffFilterDTO filter);
+     Task<IEnumerable<StaffDto>> GetAllStaffAsync(enUserRole role, StaffFilterDTO filter, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the user account behind an academic number.
     /// </summary>
     /// <param name="academicID">Academic number.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The user, or null when no account has that number.</returns>
-    Task<User?> GetUserByAcademicIDAsync(string academicID);
+    Task<User?> GetUserByAcademicIDAsync(string academicID, CancellationToken cancellationToken = default);
     /// <summary>
     /// Checks whether a username is already taken.
     /// </summary>
     /// <param name="userName">Username to test.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>True when an account already uses that username.</returns>
-    Task<bool> UserNameExistsAsync(string userName);
+    Task<bool> UserNameExistsAsync(string userName, CancellationToken cancellationToken = default);
 
     /// <summary>
     /// Gets the user id behind an academic number.

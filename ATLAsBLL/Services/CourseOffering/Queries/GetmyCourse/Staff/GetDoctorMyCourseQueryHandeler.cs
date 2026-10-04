@@ -28,7 +28,7 @@ namespace ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Doctor
         public async Task<IEnumerable<DoctorCourseOfferingDTO>> Handle(GetStaffMyCourseQuery request, CancellationToken cancellationToken)
         {
 
-            var myCourses = await _unitOfWork.CourseOfferings.GetStaffMyCourseAsync(request.StaffId);
+            var myCourses = await _unitOfWork.CourseOfferings.GetStaffMyCourseAsync(request.StaffId, cancellationToken);
 
             return myCourses;
         }

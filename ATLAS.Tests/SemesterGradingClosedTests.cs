@@ -90,7 +90,7 @@ public class SemesterGradingClosedTests
 
         var semesters = new Mock<ISemesterRepository>();
         semesters
-            .Setup(repository => repository.GetByIdAsync(1))
+            .Setup(repository => repository.GetByIdAsync(1, It.IsAny<CancellationToken>()))
             .ReturnsAsync(semester);
 
         var unitOfWork = new Mock<IUnitOfWork>();

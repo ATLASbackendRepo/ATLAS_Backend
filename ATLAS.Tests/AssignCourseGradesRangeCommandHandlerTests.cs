@@ -55,12 +55,12 @@ public class AssignCourseGradesRangeCommandHandlerTests : IDisposable
 
         // Grading is open unless a test says otherwise (MED-07).
         _semesters
-            .Setup(repository => repository.IsGradingClosedForOfferingAsync(It.IsAny<int>()))
+            .Setup(repository => repository.IsGradingClosedForOfferingAsync(It.IsAny<int>(), It.IsAny<CancellationToken>()))
             .ReturnsAsync(false);
 
         _grades
             .Setup(repository => repository.AddRangeAsync(
-                It.IsAny<List<CourseGrade>>()))
+                It.IsAny<List<CourseGrade>>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
     }
 
@@ -72,7 +72,7 @@ public class AssignCourseGradesRangeCommandHandlerTests : IDisposable
     public async Task Handle_RejectsImportsWhenTheSemesterGradingIsClosed()
     {
         _semesters
-            .Setup(repository => repository.IsGradingClosedForOfferingAsync(CourseOfferingId))
+            .Setup(repository => repository.IsGradingClosedForOfferingAsync(CourseOfferingId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(true);
 
         SetupModule(CourseOfferingId);
@@ -235,8 +235,8 @@ public class AssignCourseGradesRangeCommandHandlerTests : IDisposable
 
         _grades
             .Setup(repository => repository.AddRangeAsync(
-                It.IsAny<List<CourseGrade>>()))
-            .Callback<List<CourseGrade>>(grades => saved.AddRange(grades))
+                It.IsAny<List<CourseGrade>>(), It.IsAny<CancellationToken>()))
+            .Callback<List<CourseGrade>, CancellationToken>((grades, _) => saved.AddRange(grades))
             .Returns(Task.CompletedTask);
 
         var path = CreateWorkbook(("STU001", 12.5m), ("STU002", 19m));
@@ -303,7 +303,7 @@ public class AssignCourseGradesRangeCommandHandlerTests : IDisposable
         decimal maxDegree = 20)
     {
         _modules
-            .Setup(repository => repository.GetByIdAsync(ModuleId))
+            .Setup(repository => repository.GetByIdAsync(ModuleId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AssessmentModule
             {
                 ModuleID = ModuleId,
@@ -393,7 +393,7 @@ public class AssignCourseGradesRangeCommandHandlerTests : IDisposable
     {
         _grades.Verify(
             repository => repository.AddRangeAsync(
-                It.IsAny<List<CourseGrade>>()),
+                It.IsAny<List<CourseGrade>>(), It.IsAny<CancellationToken>()),
             Times.Never);
 
         _unitOfWork.Verify(

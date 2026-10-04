@@ -18,41 +18,41 @@ public class UserRepository
     /// <summary>
     /// Get By User Name Async.
     /// </summary>
-    public async Task<User?> GetByUserNameAsync(string userName)
+    public async Task<User?> GetByUserNameAsync(string userName, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FirstOrDefaultAsync(u => u.FullName == userName);
+        return await _dbSet.FirstOrDefaultAsync(u => u.FullName == userName, cancellationToken);
     }
     /// <summary>
     /// Get By User Id Async.
     /// </summary>
-    public async Task<User?> GetByUserIdAsync(int userId)
+    public async Task<User?> GetByUserIdAsync(int userId, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.FirstOrDefaultAsync(u => u.UserId == userId);
+        return await _dbSet.FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
     }
 
 
     /// <summary>
     /// Get User By Academic IDAsync.
     /// </summary>
-    public async Task<User?> GetUserByAcademicIDAsync(string academicID)
+    public async Task<User?> GetUserByAcademicIDAsync(string academicID, CancellationToken cancellationToken = default)
     {
         return await _context.Users
-            .FirstOrDefaultAsync(u=> u.AcademicId  == academicID);
+            .FirstOrDefaultAsync(u=> u.AcademicId  == academicID, cancellationToken);
     }
 
 
     /// <summary>
     /// User Name Exists Async.
     /// </summary>
-    public async Task<bool> UserNameExistsAsync(string userName)
+    public async Task<bool> UserNameExistsAsync(string userName, CancellationToken cancellationToken = default)
     {
-        return await _dbSet.AnyAsync(u => u.FullName == userName);
+        return await _dbSet.AnyAsync(u => u.FullName == userName, cancellationToken);
     }
 
     /// <summary>
     /// Get All Staff Async.
     /// </summary>
-    public async Task<IEnumerable<StaffDto>> GetAllStaffAsync(enUserRole role, StaffFilterDTO filter)
+    public async Task<IEnumerable<StaffDto>> GetAllStaffAsync(enUserRole role, StaffFilterDTO filter, CancellationToken cancellationToken = default)
     {
         var query = _context.Users
             .AsNoTracking()
@@ -101,7 +101,7 @@ public class UserRepository
             .Skip((pageNumber - 1) * pageSize)
             .Take(pageSize);
 
-        return await staffList.ToListAsync();
+        return await staffList.ToListAsync(cancellationToken);
     }
   
 

@@ -15,9 +15,10 @@ public interface ICourseRepository : IGenericRepository<Course>
     /// Gets the course catalogue, optionally filtered by a name fragment.
     /// </summary>
     /// <param name="Name_Filter">
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// Substring to match against the course name; null or empty returns everything.
     /// </param>
     /// <returns>The matching courses.</returns>
-    Task<List<CourseDTO>> GetAllCourse(string? Name_Filter);
+    Task<List<CourseDTO>> GetAllCourse(string? Name_Filter, CancellationToken cancellationToken = default);
 
 }

@@ -47,7 +47,7 @@ namespace ATLAsBLL.Features.Users.Commands.CreateUsersRange
             }
 
             
-            await _unitOfWork.Users.AddRangeAsync(usersEntities);
+            await _unitOfWork.Users.AddRangeAsync(usersEntities, cancellationToken);
 
             
             await _unitOfWork.SaveChangesAsync(cancellationToken);

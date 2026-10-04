@@ -32,13 +32,13 @@ namespace ATLAS.Controllers.Course
         [ProducesResponseType(StatusCodes.Status201Created)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
-        public async Task<IActionResult> CreateCourse([FromBody] CreateCourseDTO createCourseDTO)
+        public async Task<IActionResult> CreateCourse([FromBody] CreateCourseDTO createCourseDTO, CancellationToken cancellationToken = default)
         {
             try
             {
                 if (!string.IsNullOrEmpty(createCourseDTO.CourseName) && createCourseDTO.CreditHours > 0)
                 {
-                    var CourseID = await _mediator.Send(new CreateCourseCommand(createCourseDTO));
+                    var CourseID = await _mediator.Send(new CreateCourseCommand(createCourseDTO), cancellationToken);
                     if (CourseID <= 0)
                     {
                         return BadRequest("Failed to create Course.");
@@ -64,13 +64,13 @@ namespace ATLAS.Controllers.Course
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
-        public async Task<IActionResult> UpdateCourse([FromBody] UpdateCourseDTO updateCourse)
+        public async Task<IActionResult> UpdateCourse([FromBody] UpdateCourseDTO updateCourse, CancellationToken cancellationToken = default)
         {
             try
             {
                 if (updateCourse.Id > 0 && !string.IsNullOrEmpty(updateCourse.CourseName))
                 {
-                    var result = await _mediator.Send(new UpdateCourseCommand(updateCourse));
+                    var result = await _mediator.Send(new UpdateCourseCommand(updateCourse), cancellationToken);
                     if (result)
                         return Ok("Department updated successfully.");
 
@@ -97,13 +97,13 @@ namespace ATLAS.Controllers.Course
             [ProducesResponseType(StatusCodes.Status200OK)]
             [Authorize(Roles = "SAdmin,Admin")]
             [EnableRateLimiting("AdminSoftDeletePolicy")]
-            public async Task<IActionResult> DeleteCourse(int CourseId)
+            public async Task<IActionResult> DeleteCourse(int CourseId, CancellationToken cancellationToken = default)
             {
                 if (CourseId <= 0)
                 {
                     return BadRequest("Invalid Course ID.");
                 }
-                var ISDelete = await _mediator.Send(new DeleteCourseCommand(CourseId));
+                var ISDelete = await _mediator.Send(new DeleteCourseCommand(CourseId), cancellationToken);
                 if (!ISDelete)
                 {
                     return NotFound("Department not found.");
@@ -121,9 +121,9 @@ namespace ATLAS.Controllers.Course
         [ProducesResponseType(StatusCodes.Status200OK)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminGetAllPolicy")]
-        public async Task<IActionResult> GetCourses([FromQuery] string? Coursename)
+        public async Task<IActionResult> GetCourses([FromQuery] string? Coursename, CancellationToken cancellationToken = default)
         {
-            var departments = await _mediator.Send(new GetAllCourseQuery(Coursename));
+            var departments = await _mediator.Send(new GetAllCourseQuery(Coursename), cancellationToken);
 
             // LOW-07: an empty result is a successful query and returns 200 with
             // an empty array. The message here also said "No departments found",

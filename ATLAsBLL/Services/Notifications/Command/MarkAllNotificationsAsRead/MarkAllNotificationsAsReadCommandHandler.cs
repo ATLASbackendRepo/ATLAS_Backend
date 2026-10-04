@@ -28,6 +28,6 @@ public class MarkAllNotificationsAsReadCommandHandler : IRequestHandler<MarkAllN
         // The bulk update is executed immediately and reports how many rows it
         // changed, so it is returned instead of the (always zero) number of
         // entities the unit of work saved (LOW-11).
-        return await _unitOfWork.Notifications.MarkAllAsReadAsync(request.UserId);
+        return await _unitOfWork.Notifications.MarkAllAsReadAsync(request.UserId, cancellationToken);
     }
 }

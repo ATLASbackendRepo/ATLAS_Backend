@@ -53,15 +53,15 @@ public class AssessmentModuleMaxDegreeTests
 
         // The caller is the assigned doctor, so the TA lookup is not consulted.
         _doctors
-            .Setup(repository => repository.GetDoctorsByOfferingAsync(CourseOfferingId))
+            .Setup(repository => repository.GetDoctorsByOfferingAsync(CourseOfferingId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<int> { UserId });
 
         _teachingAssistants
-            .Setup(repository => repository.GetTAsByOfferingAsync(CourseOfferingId))
+            .Setup(repository => repository.GetTAsByOfferingAsync(CourseOfferingId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new List<CourseOfferingTA>());
 
         _modules
-            .Setup(repository => repository.AddAsync(It.IsAny<AssessmentModule>()))
+            .Setup(repository => repository.AddAsync(It.IsAny<AssessmentModule>(), It.IsAny<CancellationToken>()))
             .Returns(Task.CompletedTask);
     }
 
@@ -150,8 +150,8 @@ public class AssessmentModuleMaxDegreeTests
         AssessmentModule? added = null;
 
         _modules
-            .Setup(repository => repository.AddAsync(It.IsAny<AssessmentModule>()))
-            .Callback<AssessmentModule>(module => added = module)
+            .Setup(repository => repository.AddAsync(It.IsAny<AssessmentModule>(), It.IsAny<CancellationToken>()))
+            .Callback<AssessmentModule, CancellationToken>((module, _) => added = module)
             .Returns(Task.CompletedTask);
 
         await CreateHandler().Handle(
@@ -296,7 +296,7 @@ public class AssessmentModuleMaxDegreeTests
     private void SetupExistingModule(decimal maxDegree)
     {
         _modules
-            .Setup(repository => repository.GetByIdAsync(ModuleId))
+            .Setup(repository => repository.GetByIdAsync(ModuleId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(new AssessmentModule
             {
                 ModuleID = ModuleId,
@@ -312,7 +312,7 @@ public class AssessmentModuleMaxDegreeTests
     private void SetupOfferingTotal(decimal total)
     {
         _modules
-            .Setup(repository => repository.GetTotalMaxDegreeByCourseOfferingAsync(CourseOfferingId))
+            .Setup(repository => repository.GetTotalMaxDegreeByCourseOfferingAsync(CourseOfferingId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(total);
     }
 
@@ -322,7 +322,7 @@ public class AssessmentModuleMaxDegreeTests
     private void SetupRecordedMaxDegree(decimal maxDegree)
     {
         _modules
-            .Setup(repository => repository.GetMaxDegreeByModuleAsync(ModuleId))
+            .Setup(repository => repository.GetMaxDegreeByModuleAsync(ModuleId, It.IsAny<CancellationToken>()))
             .ReturnsAsync(maxDegree);
     }
 
@@ -332,7 +332,7 @@ public class AssessmentModuleMaxDegreeTests
     private void AssertNothingWasWritten()
     {
         _modules.Verify(
-            repository => repository.AddAsync(It.IsAny<AssessmentModule>()),
+            repository => repository.AddAsync(It.IsAny<AssessmentModule>(), It.IsAny<CancellationToken>()),
             Times.Never);
 
         _unitOfWork.Verify(

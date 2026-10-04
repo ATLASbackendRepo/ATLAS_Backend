@@ -27,13 +27,13 @@ namespace ATLAsDCL.Repositories
         /// 0 so the caller can reject the row instead of silently creating an
         /// institution from a typo (MED-14).
         /// </summary>
-        public async Task<int> GetInstitutionWithNameAsync(string institutionName)
+        public async Task<int> GetInstitutionWithNameAsync(string institutionName, CancellationToken cancellationToken = default)
         {
             var institutionId = await _context.Institutions
                 .AsNoTracking()
                 .Where(i => i.name == institutionName)
                 .Select(i => (int?)i.InstitutionID)
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
 
             return institutionId ?? 0;
         }
@@ -45,7 +45,7 @@ namespace ATLAsDCL.Repositories
         /// <summary>
         /// Get All Institutions Async.
         /// </summary>
-        public async Task<List<InstitutionDto>> GetAllInstitutionsAsync()
+        public async Task<List<InstitutionDto>> GetAllInstitutionsAsync(CancellationToken cancellationToken = default)
         {
             return await _context.Institutions
                 .Select(i => new InstitutionDto
@@ -53,13 +53,13 @@ namespace ATLAsDCL.Repositories
                     InstitutionID = i.InstitutionID,
                     Name = i.name
                 })
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
         /// <summary>
         /// Get Institution By Id Async.
         /// </summary>
-        public async Task<InstitutionDto> GetInstitutionByIdAsync( int id)
+        public async Task<InstitutionDto> GetInstitutionByIdAsync( int id, CancellationToken cancellationToken = default)
         {
             return await _context.Institutions
                 .Where(i => i.InstitutionID == id)
@@ -68,13 +68,13 @@ namespace ATLAsDCL.Repositories
                     InstitutionID = i.InstitutionID,
                     Name = i.name
                 })
-                .FirstOrDefaultAsync();
+                .FirstOrDefaultAsync(cancellationToken);
         }
 
         /// <summary>
         /// Create Institution Async.
         /// </summary>
-        public async Task<InstitutionDto> CreateInstitutionAsync( CreateInstitutionDto dto)
+        public async Task<InstitutionDto> CreateInstitutionAsync( CreateInstitutionDto dto, CancellationToken cancellationToken = default)
         {
             var institution = new Institution
             {
@@ -82,7 +82,7 @@ namespace ATLAsDCL.Repositories
             };
 
             _context.Institutions.Add(institution);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
 
             return new InstitutionDto
             {
@@ -94,27 +94,27 @@ namespace ATLAsDCL.Repositories
         /// <summary>
         /// Update Institution Async.
         /// </summary>
-        public async Task<bool> UpdateInstitutionAsync( UpdateInstitutionDto dto)
+        public async Task<bool> UpdateInstitutionAsync( UpdateInstitutionDto dto, CancellationToken cancellationToken = default)
         {
-            var institution = await _context.Institutions.FindAsync(dto.InstitutionID);
+            var institution = await _context.Institutions.FindAsync(dto.InstitutionID, cancellationToken);
             if (institution == null) return false;
 
             institution.name = dto.Name;
 
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return true;
         }
 
         /// <summary>
         /// Delete Institution Async.
         /// </summary>
-        public async Task<bool> DeleteInstitutionAsync(int id)
+        public async Task<bool> DeleteInstitutionAsync(int id, CancellationToken cancellationToken = default)
         {
-            var institution = await _context.Institutions.FindAsync(id);
+            var institution = await _context.Institutions.FindAsync(id, cancellationToken);
             if (institution == null) return false;
 
             _context.Institutions.Remove(institution);
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
             return true;
         }
 

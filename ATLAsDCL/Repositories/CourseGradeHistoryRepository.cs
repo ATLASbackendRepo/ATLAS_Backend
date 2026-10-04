@@ -19,7 +19,7 @@ public class CourseGradeHistoryRepository
     /// <summary>
     /// Get For Grade Async.
     /// </summary>
-    public async Task<IEnumerable<CourseGradeHistory>> GetForGradeAsync(int gradeId)
+    public async Task<IEnumerable<CourseGradeHistory>> GetForGradeAsync(int gradeId, CancellationToken cancellationToken = default)
     {
         // AsNoTracking: the history is a read-only record, so there is nothing to
         // write back and tracking it would only add change-tracking overhead.
@@ -28,7 +28,7 @@ public class CourseGradeHistoryRepository
             .Where(h => h.CG_ID == gradeId)
             .OrderByDescending(h => h.ChangedAtUtc)
             .ThenByDescending(h => h.HistoryId)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     /// <summary>
@@ -36,13 +36,13 @@ public class CourseGradeHistoryRepository
     /// </summary>
     public async Task<IEnumerable<CourseGradeHistory>> GetForGradeByUserAsync(
         int gradeId,
-        int changedBy)
+        int changedBy, CancellationToken cancellationToken = default)
     {
         return await _context.Set<CourseGradeHistory>()
             .AsNoTracking()
             .Where(h => h.CG_ID == gradeId && h.ChangedBy == changedBy)
             .OrderByDescending(h => h.ChangedAtUtc)
             .ThenByDescending(h => h.HistoryId)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 }

@@ -28,7 +28,7 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
     /// </summary>
     public async Task<int> Handle(MarkMessageAsReadCommand request, CancellationToken cancellationToken)
     {
-        var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId);
+        var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId, cancellationToken);
 
         if (message == null || message.IsDeleted)
         {
@@ -39,7 +39,7 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
         {
 
             var isEnrolled = await _unitOfWork.Enrollments.FirstOrDefaultAsync(e =>
-                e.CourseOfferingID == message.CourseOfferingID && e.Student.UserId == request.UserId);
+                e.CourseOfferingID == message.CourseOfferingID && e.Student.UserId == request.UserId, cancellationToken);
 
             if (isEnrolled == null)
             {
@@ -49,7 +49,7 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
         else if (request.Role == "Doctor")
         {
             var isInstructor = await _unitOfWork.CourseOfferingDoctors.FirstOrDefaultAsync(co =>
-                co.CourseOfferingID == message.CourseOfferingID && co.Doctor.UserId == request.UserId);
+                co.CourseOfferingID == message.CourseOfferingID && co.Doctor.UserId == request.UserId, cancellationToken);
             if (isInstructor == null)
             {
                 throw new ForbiddenAccessException("You are not the instructor for this course.");
@@ -58,7 +58,7 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
         else if (request.Role == "TeachingAssistant")
         {
             var isteacherassist = await _unitOfWork.CourseOfferingTAs.FirstOrDefaultAsync(co =>
-                co.CourseOfferingID == message.CourseOfferingID && co.TeachingAssistant.UserId == request.UserId);
+                co.CourseOfferingID == message.CourseOfferingID && co.TeachingAssistant.UserId == request.UserId, cancellationToken);
             if (isteacherassist == null)
             {
                 throw new ForbiddenAccessException("You are not the instructor for this course.");
@@ -73,7 +73,7 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
         // satisfied and a second insert would only raise a duplicate key (LOW-11).
         var alreadyRead = await _unitOfWork.CourseGroupMessagesRead.AnyAsync(
             receipt => receipt.MessageID == request.MessageId &&
-                       receipt.UserID == request.UserId);
+                       receipt.UserID == request.UserId, cancellationToken);
 
         if (alreadyRead)
         {
@@ -88,7 +88,7 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
             ReadAt = DateTime.UtcNow
         };
 
-        await _unitOfWork.CourseGroupMessagesRead.AddAsync(readReceipt );
+        await _unitOfWork.CourseGroupMessagesRead.AddAsync(readReceipt , cancellationToken);
 
         try
         {
@@ -100,7 +100,7 @@ public class MarkMessageAsReadCommandHandler : IRequestHandler<MarkMessageAsRead
             // outcome this request wanted. Anything else is a real failure.
             var persisted = await _unitOfWork.CourseGroupMessagesRead.AnyAsync(
                 receipt => receipt.MessageID == request.MessageId &&
-                           receipt.UserID == request.UserId);
+                           receipt.UserID == request.UserId, cancellationToken);
 
             if (!persisted)
             {

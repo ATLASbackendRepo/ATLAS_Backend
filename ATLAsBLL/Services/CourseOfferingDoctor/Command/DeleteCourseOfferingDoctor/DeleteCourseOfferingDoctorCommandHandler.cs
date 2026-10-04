@@ -21,7 +21,7 @@ namespace ATLAsBLL.Features.CourseOfferingDoctors.Commands.DeleteCourseOfferingD
         /// </summary>
         public async Task<bool> Handle(DeleteCourseOfferingDoctorCommand request, CancellationToken cancellationToken)
         {
-            var record = await _unitOfWork.CourseOfferingDoctors.GetByIdAsync(request.CourseOfferingDoctorId);
+            var record = await _unitOfWork.CourseOfferingDoctors.GetByIdAsync(request.CourseOfferingDoctorId, cancellationToken);
             if (record == null) throw new System.Collections.Generic.KeyNotFoundException("Assignment record not found.");
 
             _unitOfWork.CourseOfferingDoctors.Delete(record);

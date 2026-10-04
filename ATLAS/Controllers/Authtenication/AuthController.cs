@@ -72,7 +72,7 @@ namespace ATLAS.Controllers.Authtenication
         [HttpPost("Login")]
         [EnableRateLimiting("AuthLimiter")]
         [AllowAnonymous]
-        public async Task<IActionResult> Login([FromBody]  LoginDTO request)
+        public async Task<IActionResult> Login([FromBody]  LoginDTO request, CancellationToken cancellationToken = default)
         {
             if (request is null ||
                string.IsNullOrWhiteSpace(request.AcademicId) ||
@@ -81,7 +81,7 @@ namespace ATLAS.Controllers.Authtenication
                 return BadRequest("Academic ID and password are required.");
             }
 
-            var User = await _mediator.Send(new GetUserByAcademicIdQuery(request.AcademicId));
+            var User = await _mediator.Send(new GetUserByAcademicIdQuery(request.AcademicId), cancellationToken);
 
 
 
@@ -179,7 +179,7 @@ namespace ATLAS.Controllers.Authtenication
                     User.UserId,
                     refreshToken
                 )
-            );
+            , cancellationToken);
             return Ok(new TokenResponse
             {
                 AccessToken = accessToken,
@@ -194,7 +194,7 @@ namespace ATLAS.Controllers.Authtenication
         /// </summary>
         [HttpPost("refresh")]
         [EnableRateLimiting("AuthLimiter")]
-        public async Task<IActionResult> Refresh([FromBody] ATLASDomain.DTO.Login.RefreshRequest request)
+        public async Task<IActionResult> Refresh([FromBody] ATLASDomain.DTO.Login.RefreshRequest request, CancellationToken cancellationToken = default)
         {
             if (request is null ||
                 string.IsNullOrWhiteSpace(request.RefreshToken) ||
@@ -204,7 +204,7 @@ namespace ATLAS.Controllers.Authtenication
             }
 
 
-            var User = await _mediator.Send(new GetUserByAcademicIdQuery(request.AcdimicID));
+            var User = await _mediator.Send(new GetUserByAcademicIdQuery(request.AcdimicID), cancellationToken);
 
 
             if (User == null || !User.IsActive)
@@ -229,7 +229,7 @@ namespace ATLAS.Controllers.Authtenication
             // accepted again. If it is, the whole family is revoked immediately.
             if (!currentMatches && previousMatches)
             {
-                await _mediator.Send(new RevokeRefreshTokenCommand(User.UserId));
+                await _mediator.Send(new RevokeRefreshTokenCommand(User.UserId), cancellationToken);
                 return Unauthorized();
             }
 
@@ -244,14 +244,14 @@ namespace ATLAS.Controllers.Authtenication
                 // The hash observed a moment ago. Capping the rotation on this exact
                 // value is what turns a read-then-write into an atomic swap.
                 User.RefreshTokenHash!,
-                newRefreshToken));
+                newRefreshToken), cancellationToken);
 
             if (!rotation.Succeeded)
             {
                 // The token was rotated away between the read above and the write.
                 // Somebody is replaying a spent token, so the entire family is
                 // treated as compromised rather than merely expired.
-                await _mediator.Send(new RevokeRefreshTokenCommand(User.UserId));
+                await _mediator.Send(new RevokeRefreshTokenCommand(User.UserId), cancellationToken);
                 return Unauthorized();
             }
 
@@ -309,7 +309,7 @@ namespace ATLAS.Controllers.Authtenication
         /// </summary>
         [HttpPost("logout")]
         [Authorize]
-        public async Task<IActionResult> Logout([FromBody] LogoutRequest request)
+        public async Task<IActionResult> Logout([FromBody] LogoutRequest request, CancellationToken cancellationToken = default)
         {
             if (request is null ||
                 string.IsNullOrWhiteSpace(request.RefreshToken))
@@ -328,7 +328,7 @@ namespace ATLAS.Controllers.Authtenication
                 return Unauthorized();
             }
 
-            var user = await _mediator.Send(new GetUserByIdQuery(callerUserId));
+            var user = await _mediator.Send(new GetUserByIdQuery(callerUserId), cancellationToken);
 
             if (user == null || string.IsNullOrWhiteSpace(user.RefreshTokenHash))
                 return Ok();
@@ -339,7 +339,7 @@ namespace ATLAS.Controllers.Authtenication
             if (!refreshValid)
                 return BadRequest("The refresh token does not belong to the signed-in account.");
 
-            await _mediator.Send(new RevokeRefreshTokenCommand(user.UserId));
+            await _mediator.Send(new RevokeRefreshTokenCommand(user.UserId), cancellationToken);
             return Ok("Logged out successfully");
         }
 
@@ -354,7 +354,7 @@ namespace ATLAS.Controllers.Authtenication
         [HttpPost("ChangePassword")]
         [Authorize]
         [EnableRateLimiting("AuthLimiter")]
-        public async Task<IActionResult> ChangePassword([FromBody] ChangePassword model)
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePassword model, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
@@ -371,9 +371,9 @@ namespace ATLAS.Controllers.Authtenication
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = !string.IsNullOrEmpty(userId) && int.TryParse(userId, out var parsedUserId)
-                ? await _mediator.Send(new GetUserByIdQuery(parsedUserId))
+                ? await _mediator.Send(new GetUserByIdQuery(parsedUserId), cancellationToken)
                 : !string.IsNullOrWhiteSpace(AcademicId)
-                    ? await _mediator.Send(new GetUserByAcademicIdQuery(AcademicId))
+                    ? await _mediator.Send(new GetUserByAcademicIdQuery(AcademicId), cancellationToken)
                     : null;
             if (user == null)
             {
@@ -384,7 +384,7 @@ namespace ATLAS.Controllers.Authtenication
             bool isChange;
             try
             {
-                isChange = await _mediator.Send(new ChangePasswordcommand(user, model));
+                isChange = await _mediator.Send(new ChangePasswordcommand(user, model), cancellationToken);
             }
             catch (UnauthorizedAccessException)
             {
@@ -409,7 +409,7 @@ namespace ATLAS.Controllers.Authtenication
         [HttpPost("ChangePasswordAdmin")]
          [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AuthLimiter")]
-        public async Task<IActionResult> ChangePasswordAdmin([FromBody] ChangePasswordAdmin model)
+        public async Task<IActionResult> ChangePasswordAdmin([FromBody] ChangePasswordAdmin model, CancellationToken cancellationToken = default)
         {
             if (!ModelState.IsValid)
             {
@@ -422,9 +422,9 @@ namespace ATLAS.Controllers.Authtenication
 
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = !string.IsNullOrEmpty(userId) && int.TryParse(userId, out var parsedUserId)
-                ? await _mediator.Send(new GetUserByIdQuery(parsedUserId))
+                ? await _mediator.Send(new GetUserByIdQuery(parsedUserId), cancellationToken)
                 : !string.IsNullOrWhiteSpace(AcademicId)
-                    ? await _mediator.Send(new GetUserByAcademicIdQuery(AcademicId))
+                    ? await _mediator.Send(new GetUserByAcademicIdQuery(AcademicId), cancellationToken)
                     : null;
             if (user == null)
             {
@@ -435,7 +435,7 @@ namespace ATLAS.Controllers.Authtenication
             bool isChange;
             try
             {
-                isChange = await _mediator.Send(new ChangePasswordAdimincommand(user, model));
+                isChange = await _mediator.Send(new ChangePasswordAdimincommand(user, model), cancellationToken);
             }
             catch (UnauthorizedAccessException)
             {

@@ -27,7 +27,7 @@ namespace ATLAsBLL.Services.CourseGrade.Queries
         /// </summary>
         public async Task<PagedResultDto<StudentCardDto>> Handle(GetCourseStudentsQuery request, CancellationToken cancellationToken)
         {
-            return await _unitOfWork.CourseGrades.GetCourseStudentsPagedAsync(request.QueryModel);
+            return await _unitOfWork.CourseGrades.GetCourseStudentsPagedAsync(request.QueryModel, cancellationToken);
         }
     }
 }

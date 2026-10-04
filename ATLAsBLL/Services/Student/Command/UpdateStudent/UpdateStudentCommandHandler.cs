@@ -26,7 +26,7 @@ namespace ATLAsBLL.Features.Students.Commands.UpdateStudent
         public async Task<bool> Handle(UpdateStudentCommand request, CancellationToken cancellationToken)
         {
             
-            var student = await _unitOfWork.Students.GetStudentWithUserAsync(request.UpdateStudentDto.StudentCode);
+            var student = await _unitOfWork.Students.GetStudentWithUserAsync(request.UpdateStudentDto.StudentCode, cancellationToken);
 
             if (student == null || student.User == null)
             {

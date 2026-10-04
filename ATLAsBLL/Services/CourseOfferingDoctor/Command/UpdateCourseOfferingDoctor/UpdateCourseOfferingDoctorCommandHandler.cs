@@ -21,7 +21,7 @@ namespace ATLAsBLL.Features.CourseOfferingDoctors.Commands.UpdateCourseOfferingD
         /// </summary>
         public async Task<bool> Handle(UpdateCourseOfferingDoctorCommand request, CancellationToken cancellationToken)
         {
-            var record = await _unitOfWork.CourseOfferingDoctors.GetByIdAsync(request.CourseOfferingDoctorId);
+            var record = await _unitOfWork.CourseOfferingDoctors.GetByIdAsync(request.CourseOfferingDoctorId, cancellationToken);
             if (record == null) throw new System.Collections.Generic.KeyNotFoundException("Assignment record not found.");
 
             record.DoctorID = request.NewDoctorId;

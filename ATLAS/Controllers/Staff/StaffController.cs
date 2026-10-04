@@ -36,10 +36,10 @@ namespace ATLAS.Controllers.Staff
         [Authorize(Roles = "Admin,SAdmin")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [EnableRateLimiting("AdminGetAllPolicy")]
-        public async Task<ActionResult<IEnumerable<StaffDto>>> GetAllStudent(enUserRole role , [FromQuery] StaffFilterDTO staffFilter)
+        public async Task<ActionResult<IEnumerable<StaffDto>>> GetAllStudent(enUserRole role , [FromQuery] StaffFilterDTO staffFilter, CancellationToken cancellationToken = default)
         {
 
-            var Staff = await _mediator.Send(new GetallStaff(role, staffFilter));
+            var Staff = await _mediator.Send(new GetallStaff(role, staffFilter), cancellationToken);
 
             // LOW-07: an empty result set is a successful query and returns 200
             // with an empty array. The 404 here meant a client could not tell
@@ -57,9 +57,9 @@ namespace ATLAS.Controllers.Staff
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
-        public async Task<ActionResult> CreateStaff([FromBody] CreateStaffDto createStaffDTO)
+        public async Task<ActionResult> CreateStaff([FromBody] CreateStaffDto createStaffDTO, CancellationToken cancellationToken = default)
         {
-                var staffId = await _mediator.Send(new CreateUserCommand(createStaffDTO));
+                var staffId = await _mediator.Send(new CreateUserCommand(createStaffDTO), cancellationToken);
                 if (staffId > 0)
                 {
                     // LOW-07: creating a staff member is a 201, not a 200.
@@ -80,10 +80,10 @@ namespace ATLAS.Controllers.Staff
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
-        public async Task<ActionResult> updateStaff([FromBody] Create_Update_StaffDto UpdateStaffDTO)
+        public async Task<ActionResult> updateStaff([FromBody] Create_Update_StaffDto UpdateStaffDTO, CancellationToken cancellationToken = default)
         {
             
-                var staff = await _mediator.Send(new UpdateUserCommand(UpdateStaffDTO));
+                var staff = await _mediator.Send(new UpdateUserCommand(UpdateStaffDTO), cancellationToken);
                 if (staff)
                 {
                     return Ok(new { message = "Staff updated successfully." });
@@ -103,10 +103,10 @@ namespace ATLAS.Controllers.Staff
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminSoftDeletePolicy")]
-        public async Task<ActionResult> deleteStaff([FromQuery] string StaffCode)
+        public async Task<ActionResult> deleteStaff([FromQuery] string StaffCode, CancellationToken cancellationToken = default)
         {
             
-                var staff = await _mediator.Send(new DeleteUserCommand(StaffCode));
+                var staff = await _mediator.Send(new DeleteUserCommand(StaffCode), cancellationToken);
                 if (staff)
                 {
                     return Ok(new { message = "Staff deleted successfully." });

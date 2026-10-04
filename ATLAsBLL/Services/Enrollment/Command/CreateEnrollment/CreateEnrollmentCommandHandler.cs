@@ -31,7 +31,7 @@ namespace ATLAsBLL.Features.Enrollments.Commands.CreateEnrollment
             if (request.BulkCreateEnrollmentDTO1 == null)
                 throw new Exception();
 
-            var ISInserted = await _unitOfWork.Enrollments.AddSingleStudentToEnrollmentAsync(request.AcdimicID, request.BulkCreateEnrollmentDTO1, request.CreatedByUserId);
+            var ISInserted = await _unitOfWork.Enrollments.AddSingleStudentToEnrollmentAsync(request.AcdimicID, request.BulkCreateEnrollmentDTO1, request.CreatedByUserId, cancellationToken);
 
 
 

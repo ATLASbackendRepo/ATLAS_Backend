@@ -23,10 +23,10 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.DeleteAssessmentModule
         {
             if(request.ModuleId <= 0) throw new System.ArgumentException("Invalid module ID.");
 
-            var module = await _unitOfWork.AssessmentModules.GetByIdAsync(request.ModuleId);
+            var module = await _unitOfWork.AssessmentModules.GetByIdAsync(request.ModuleId, cancellationToken);
             if (module == null) throw new System.Collections.Generic.KeyNotFoundException("Module not found.");
-            var doctors = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(module.CourseOfferingID);
-            var teachingAssistants = await _unitOfWork.CourseOfferingTAs.GetTAsByOfferingAsync(module.CourseOfferingID);
+            var doctors = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(module.CourseOfferingID, cancellationToken);
+            var teachingAssistants = await _unitOfWork.CourseOfferingTAs.GetTAsByOfferingAsync(module.CourseOfferingID, cancellationToken);
             if (!doctors.Contains(request.UserId) && !teachingAssistants.Any(ta => ta.TeacherAssistID == request.UserId))
                 throw new UnauthorizedAccessException("You are not assigned to this course offering.");
 

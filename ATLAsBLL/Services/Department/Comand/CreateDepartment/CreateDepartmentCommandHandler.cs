@@ -33,7 +33,7 @@ namespace ATLAsBLL.Features.Department.Comand.CreateDepartment
                 InstitutionID = request.InstitutionId
             };
 
-            await _unitOfWork.Departments.AddAsync(department);
+            await _unitOfWork.Departments.AddAsync(department, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return department.DepartmentId;

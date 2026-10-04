@@ -25,7 +25,7 @@ namespace ATLAsBLL.Features.Users.Commands.DeleteUser
         /// </summary>
         public async Task<bool> Handle(DeleteUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _unitOfWork.Users.GetUserByAcademicIDAsync(request.AcademicId);
+            var user = await _unitOfWork.Users.GetUserByAcademicIDAsync(request.AcademicId, cancellationToken);
 
             if (user == null)
             {
