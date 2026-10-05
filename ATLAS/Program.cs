@@ -91,6 +91,23 @@ builder.Services.AddScoped
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<ATLAS.Attendance.IAttendanceService, ATLAS.Attendance.AttendanceService>();
 
+// MED-17: attendance scans are only accepted from a device the server has paired.
+// The options are validated on start so a misconfigured lifetime or an
+// accidentally short key is caught at boot rather than on the first scan.
+builder.Services.AddOptions<ATLAS.Attendance.DeviceBindingOptions>()
+    .Bind(builder.Configuration.GetSection(ATLAS.Attendance.DeviceBindingOptions.SectionName))
+    .Validate(
+        o => string.IsNullOrWhiteSpace(o.Key) || o.Key.Length >= 64,
+        "Attendance:DeviceBinding:Key must be empty (derived from Jwt:Key) or at least 64 characters long.")
+    .Validate(
+        o => o.PairingTokenLifetimeDays is > 0 and <= 730,
+        "Attendance:DeviceBinding:PairingTokenLifetimeDays must be between 1 and 730.")
+    .Validate(
+        o => o.MaxDevicesPerStudent is >= 1 and <= 20,
+        "Attendance:DeviceBinding:MaxDevicesPerStudent must be between 1 and 20.")
+    .ValidateOnStart();
+builder.Services.AddScoped<ATLAS.Attendance.IDeviceBindingService, ATLAS.Attendance.DeviceBindingService>();
+
 // ======================================================
 // JWT Options
 // ======================================================
@@ -559,6 +576,37 @@ builder.Services.AddRateLimiter(options =>
             !string.IsNullOrEmpty(userId)
                 ? $"req-write:user:{userId}"
                 : $"req-write:ip:{httpContext.Connection.RemoteIpAddress}";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+
+    // ==================================================
+    // DEVICE PAIRING
+    // ==================================================
+
+    // MED-17: pairing is what mints a device secret, so it is the one attendance
+    // endpoint worth rate limiting tightly. A student only pairs a handful of
+    // devices in their time at the institution.
+    options.AddPolicy("DevicePairPolicy", httpContext =>
+    {
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
+
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"device-pair:user:{userId}"
+                : $"device-pair:ip:{httpContext.Connection.RemoteIpAddress}";
 
         return RateLimitPartition.GetFixedWindowLimiter(
             partitionKey,

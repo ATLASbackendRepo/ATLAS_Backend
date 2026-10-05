@@ -310,6 +310,11 @@ namespace ATLAsDCL.Migrations
 
                     b.HasKey("AttendanceSessionId");
 
+                    b.HasIndex("CourseOfferingId")
+                        .IsUnique()
+                        .HasDatabaseName("UX_AttendanceSessions_OneActivePerOffering")
+                        .HasFilter("[Status] = 1");
+
                     b.HasIndex("CreatedByUserId");
 
                     b.HasIndex("CourseOfferingId", "Status");
@@ -650,6 +655,55 @@ namespace ATLAsDCL.Migrations
                     b.HasKey("InstitutionID");
 
                     b.ToTable("Institutions", (string)null);
+                });
+
+            modelBuilder.Entity("ATLASDomain.Entities.RegisteredDevice", b =>
+                {
+                    b.Property<int>("RegisteredDeviceId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("RegisteredDeviceId"));
+
+                    b.Property<string>("DeviceId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("DeviceIdHash")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("nvarchar(64)");
+
+                    b.Property<string>("DeviceName")
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("DeviceSecret")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime>("PairedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<DateTime?>("RevokedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("RegisteredDeviceId");
+
+                    b.HasIndex("DeviceIdHash")
+                        .IsUnique();
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("RegisteredDevices");
                 });
 
             modelBuilder.Entity("ATLASDomain.Entities.SecurityEvent", b =>
@@ -1347,6 +1401,17 @@ namespace ATLAsDCL.Migrations
                     b.Navigation("Doctor");
 
                     b.Navigation("Student");
+                });
+
+            modelBuilder.Entity("ATLASDomain.Entities.RegisteredDevice", b =>
+                {
+                    b.HasOne("ATLASDomain.Entities.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("ATLASDomain.Entities.Student", b =>

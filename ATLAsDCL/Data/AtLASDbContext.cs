@@ -96,6 +96,10 @@ namespace ATLAsDCL.Data
         /// </summary>
         public DbSet<AttendanceRecord> AttendanceRecords { get; set; } = null!;
         /// <summary>
+        /// Registered Devices.
+        /// </summary>
+        public DbSet<RegisteredDevice> RegisteredDevices { get; set; } = null!;
+        /// <summary>
         /// Semester Student Rankings.
         /// </summary>
         public DbSet<SemesterStudentRankingView> SemesterStudentRankings { get; set; } = null!;
