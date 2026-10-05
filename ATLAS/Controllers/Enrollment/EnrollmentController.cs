@@ -32,11 +32,11 @@ namespace ATLAS.Controllers.Enrollment
         /// Create Enrollment.
         /// </summary>
         [HttpPost]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [EnableRateLimiting("AdminUpdatePolicy")]
        
-        public async Task<IActionResult> CreateEnrollment([FromQuery] string academicId, [FromBody] BulkCreateEnrollmentDTO dto)
+        public async Task<IActionResult> CreateEnrollment([FromQuery] string academicId, [FromBody] BulkCreateEnrollmentDTO dto, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(academicId))
             {
@@ -52,7 +52,7 @@ namespace ATLAS.Controllers.Enrollment
 
             
                 var result = await _mediator.Send(
-                    new CreateEnrollmentCommand(academicId, dto, userId));
+                    new CreateEnrollmentCommand(academicId, dto, userId), cancellationToken);
 
                 if (!result)
                 {
@@ -60,7 +60,8 @@ namespace ATLAS.Controllers.Enrollment
                         "The student is already enrolled in this course offering.");
                 }
 
-                return Ok("Enrollment created successfully.");
+                // LOW-07: creating an enrollment is a 201, not a 200.
+                return StatusCode(StatusCodes.Status201Created, "Enrollment created successfully.");
             
         }
 
@@ -68,12 +69,12 @@ namespace ATLAS.Controllers.Enrollment
         /// Create Range Enrollment.
         /// </summary>
         [HttpPost("range")]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [EnableRateLimiting("AdminCreateRangePolicy")]
         
-        public async Task<IActionResult> CreateRangeEnrollment([FromBody] BulkCreateEnrollmentDTO dto)
+        public async Task<IActionResult> CreateRangeEnrollment([FromBody] BulkCreateEnrollmentDTO dto, CancellationToken cancellationToken = default)
         {
                 var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
 
@@ -83,7 +84,7 @@ namespace ATLAS.Controllers.Enrollment
                 }
 
                 var result = await _mediator.Send(
-                    new CreateEnrollmentsRangeCommand(dto, userId));
+                    new CreateEnrollmentsRangeCommand(dto, userId), cancellationToken);
 
                 if (!result)
                 {
@@ -91,7 +92,9 @@ namespace ATLAS.Controllers.Enrollment
                         "No student matched the enrollment filter, or they are already enrolled.");
                 }
 
-                return Ok("Enrollments range created successfully.");
+                // LOW-07: bulk creation still creates resources, so it returns a
+                // 201 with no single Location to point at.
+                return StatusCode(StatusCodes.Status201Created, "Enrollments range created successfully.");
             
         }
        /// <summary>
@@ -103,14 +106,14 @@ namespace ATLAS.Controllers.Enrollment
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [EnableRateLimiting("AdminSoftDeletePolicy")]
  
-        public async Task<IActionResult> DeleteEnrollment(int id)
+        public async Task<IActionResult> DeleteEnrollment(int id, CancellationToken cancellationToken = default)
         {
             if (id <= 0)
             {
                 return BadRequest("Invalid enrollment ID.");
             }
 
-            var isDeleted = await _mediator.Send(new DeleteEnrollmentCommand(id));
+            var isDeleted = await _mediator.Send(new DeleteEnrollmentCommand(id), cancellationToken);
             if (!isDeleted)
             {
                 return NotFound($"Enrollment with ID {id} not found.");
@@ -129,9 +132,9 @@ namespace ATLAS.Controllers.Enrollment
         public async Task<IActionResult> GetEnrollments(
             [FromQuery] string? searchKeyword = null,
             [FromQuery] int? doctorId = null,
-            [FromQuery] int pageIndex = 1)
+            [FromQuery] int pageIndex = 1, CancellationToken cancellationToken = default)
         {
-            var enrollments = await _mediator.Send(new GetEnrollment(searchKeyword, doctorId, pageIndex));
+            var enrollments = await _mediator.Send(new GetEnrollment(searchKeyword, doctorId, pageIndex), cancellationToken);
             if (enrollments == null)
             {
                 return NotFound("No enrollments found.");

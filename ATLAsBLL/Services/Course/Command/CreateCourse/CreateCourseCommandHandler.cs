@@ -39,7 +39,7 @@ namespace ATLAsBLL.Features.Courses.Commands.CreateCourse
                 IsPractical = request.CreateCourseDTO.IsPractical
             };
 
-            await _unitOfWork.Courses.AddAsync(course);
+            await _unitOfWork.Courses.AddAsync(course, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return course.CourseID;

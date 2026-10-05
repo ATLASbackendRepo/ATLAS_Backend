@@ -19,18 +19,18 @@ public class StudentRepository
     /// <summary>
     /// Get Student With Department Async.
     /// </summary>
-    public async Task<Student?> GetStudentWithDepartmentAsync(int studentId)
+    public async Task<Student?> GetStudentWithDepartmentAsync(int studentId, CancellationToken cancellationToken = default)
     {
         return await _context.Students
             .AsNoTracking()
             .Include(s => s.Department)
-            .FirstOrDefaultAsync(s => s.StudentId == studentId);
+            .FirstOrDefaultAsync(s => s.StudentId == studentId, cancellationToken);
     }
 
     /// <summary>
     /// Get All Students.
     /// </summary>
-    public async Task<List<StudentDTO>> GetAllStudents(StudentFilterDTO fillter)
+    public async Task<List<StudentDTO>> GetAllStudents(StudentFilterDTO fillter, CancellationToken cancellationToken = default)
     {
         var students = _context.Students
                .AsNoTracking()
@@ -57,6 +57,13 @@ public class StudentRepository
             students = students.Where(s => s.IsActive == fillter.Status.Value);
          }
 
+
+        // MED-12: this list is now bounded. Without the Skip/Take below the query
+        // materialised the entire Students table, so one request could return every
+        // row the system holds. The page size is clamped by PagedFilter.Normalize,
+        // so a client cannot ask for an unbounded page by sending a huge number.
+        var (pageNumber, pageSize) = fillter.Normalize();
+
          var studentDtos = await students
             .Select(s => new StudentDTO
             {
@@ -67,14 +74,19 @@ public class StudentRepository
                 Departmentname = s.Department != null ? s.Department.D_Name ?? string.Empty : string.Empty,
                 IsActive = s.IsActive
             })
-            .ToListAsync();
+            // A stable sort is required for paging to be correct: without a
+            // deterministic order, rows can repeat or vanish between pages.
+            .OrderBy(s => s.StudentCode)
+            .Skip((pageNumber - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync(cancellationToken);
         return studentDtos;
     }
 
     /// <summary>
     /// Get Student With Enrollments Async.
     /// </summary>
-    public async Task<Student?> GetStudentWithEnrollmentsAsync(int studentId)
+    public async Task<Student?> GetStudentWithEnrollmentsAsync(int studentId, CancellationToken cancellationToken = default)
     {
         return await _context.Students
             .AsNoTracking()
@@ -82,13 +94,13 @@ public class StudentRepository
             .Include(s => s.Enrollments)
                 .ThenInclude(e => e.CourseOffering)
                 .ThenInclude(co => co.Course)
-            .FirstOrDefaultAsync(s => s.StudentId == studentId);
+            .FirstOrDefaultAsync(s => s.StudentId == studentId, cancellationToken);
     }
 
     /// <summary>
     /// Get Student With User Async.
     /// </summary>
-    public async Task<Student?> GetStudentWithUserAsync(string studentCode)
+    public async Task<Student?> GetStudentWithUserAsync(string studentCode, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(studentCode))
         {
@@ -102,63 +114,63 @@ public class StudentRepository
         // resolve to an arbitrary student.
         return await _context.Students
             .Include(s => s.User)
-            .FirstOrDefaultAsync(s => s.StudentCode == code);
+            .FirstOrDefaultAsync(s => s.StudentCode == code, cancellationToken);
     }
     /// <summary>
     /// Get Student By User IDAsync.
     /// </summary>
-    public async Task<Student?> GetStudentByUserIDAsync(int UserID)
+    public async Task<Student?> GetStudentByUserIDAsync(int UserID, CancellationToken cancellationToken = default)
     {
         return await _context.Students
             .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.UserId  == UserID);
+            .FirstOrDefaultAsync(s => s.UserId  == UserID, cancellationToken);
     }
 
     /// <summary>
     /// Student Code Exists Async.
     /// </summary>
-    public async Task<bool> StudentCodeExistsAsync(string studentCode)
+    public async Task<bool> StudentCodeExistsAsync(string studentCode, CancellationToken cancellationToken = default)
     {
         return await _context.Students
-            .AnyAsync(s => s.StudentCode == studentCode);
+            .AnyAsync(s => s.StudentCode == studentCode, cancellationToken);
     }
 
 
     /// <summary>
     /// Get Student By Code Async.
     /// </summary>
-    public async Task<Student?> GetStudentByCodeAsync(string studentCode)
+    public async Task<Student?> GetStudentByCodeAsync(string studentCode, CancellationToken cancellationToken = default)
     {
         return await _context.Students
             .AsNoTracking()
-            .FirstOrDefaultAsync(s => s.StudentCode == studentCode);
+            .FirstOrDefaultAsync(s => s.StudentCode == studentCode, cancellationToken);
     }
     /// <summary>
     /// Get Student By Academic IDAsync.
     /// </summary>
-    public async Task<Student?> GetStudentByAcademicIDAsync(string academicID)
+    public async Task<Student?> GetStudentByAcademicIDAsync(string academicID, CancellationToken cancellationToken = default)
     {
         return await _context.Students
             .AsNoTracking()
             .Include(s => s.User)
-            .FirstOrDefaultAsync(s => s.AcademicId == academicID);
+            .FirstOrDefaultAsync(s => s.AcademicId == academicID, cancellationToken);
     }
 
     /// <summary>
     /// Get All Student With Level Async.
     /// </summary>
-    public async Task<IEnumerable<Student>> GetAllStudentWithLevelAsync(int level)
+    public async Task<IEnumerable<Student>> GetAllStudentWithLevelAsync(int level, CancellationToken cancellationToken = default)
     {
         return await _context.Students
             .AsNoTracking()
             .Include(s => s.User)
             .Where(s => s.AcademicLevel == level)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
     /// <summary>
     /// Get All Student With Courseffering Async.
     /// </summary>
-    public async Task<IEnumerable<Student>> GetAllStudentWithCoursefferingAsync(int courseOfferingID)
+    public async Task<IEnumerable<Student>> GetAllStudentWithCoursefferingAsync(int courseOfferingID, CancellationToken cancellationToken = default)
     {
         return await _context.Students
             .AsNoTracking()
@@ -166,14 +178,14 @@ public class StudentRepository
             .Include(s => s.Enrollments)
                 .ThenInclude(e => e.CourseOffering)
             .Where(s => s.Enrollments.Any(e => e.CourseOfferingID == courseOfferingID))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
 
     /// <summary>
     /// Get All Student With Mode Async.
     /// </summary>
-    public async Task<IEnumerable<StudentGradeDto>> GetAllStudentWithModeAsync(int courseOfferingID, int modelId)
+    public async Task<IEnumerable<StudentGradeDto>> GetAllStudentWithModeAsync(int courseOfferingID, int modelId, CancellationToken cancellationToken = default)
     {
         return await _context.StudentGradeModels
             .AsNoTracking()
@@ -185,12 +197,12 @@ public class StudentRepository
                 Studentname = s.FullName,
                 Studentdegree = s.StudentDegree
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
     /// <summary>
     /// Get Student With Mode Async.
     /// </summary>
-    public async Task<StudentGradeDto?> GetStudentWithModeAsync(int courseOfferingID, int modelId, string StudentCode)
+    public async Task<StudentGradeDto?> GetStudentWithModeAsync(int courseOfferingID, int modelId, string StudentCode, CancellationToken cancellationToken = default)
     {
         return await _context.StudentGradeModels
             .AsNoTracking()
@@ -202,6 +214,6 @@ public class StudentRepository
                 Studentname = s.FullName,
                 Studentdegree = s.StudentDegree
             })
-            .FirstOrDefaultAsync(s => s.StudentCode == StudentCode);
+            .FirstOrDefaultAsync(s => s.StudentCode == StudentCode, cancellationToken);
     }
 }

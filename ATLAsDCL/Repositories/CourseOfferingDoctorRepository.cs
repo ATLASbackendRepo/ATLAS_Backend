@@ -17,37 +17,37 @@ public class CourseOfferingDoctorRepository
     /// <summary>
     /// Get By Doctor Async.
     /// </summary>
-    public async Task<IEnumerable<CourseOfferingDoctor>> GetByDoctorAsync(int doctorId)
+    public async Task<IEnumerable<CourseOfferingDoctor>> GetByDoctorAsync(int doctorId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseOfferingDoctors
             .AsNoTracking()
             .Include(c => c.CourseOffering)
             .Where(c => c.DoctorID == doctorId)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     /// <summary>
     /// Get Doctors By Offering Async.
     /// </summary>
-    public async Task<IEnumerable<int>> GetDoctorsByOfferingAsync(int offeringId)
+    public async Task<IEnumerable<int>> GetDoctorsByOfferingAsync(int offeringId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseOfferingDoctors
        .AsNoTracking()
        .Where(c => c.CourseOfferingID == offeringId)
        .Select(c => c.DoctorID)
        .Distinct()
-       .ToListAsync();
+       .ToListAsync(cancellationToken);
     }
     /// <summary>
     /// Get Doctor Ids By Course Offering Id Async.
     /// </summary>
-    public async Task<IEnumerable<int>> GetDoctorIdsByCourseOfferingIdAsync(int offeringId)
+    public async Task<IEnumerable<int>> GetDoctorIdsByCourseOfferingIdAsync(int offeringId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseOfferingDoctors
             .AsNoTracking()
             .Include(c => c.CourseOffering)
             .Where(c => c.CourseOfferingID == offeringId)
             .Select(c => c.DoctorID)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 }

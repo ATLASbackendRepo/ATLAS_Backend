@@ -25,7 +25,7 @@ namespace ATLAsBLL.Features.Semesters.Commands.UpdateSemester
         /// </summary>
         public async Task<bool> Handle(UpdateSemesterCommand request, CancellationToken cancellationToken)
         {
-            var semester = await _unitOfWork.Semesters.GetByIdAsync(request.SemesterID);
+            var semester = await _unitOfWork.Semesters.GetByIdAsync(request.SemesterID, cancellationToken);
 
             if (semester == null)
             {
@@ -34,6 +34,10 @@ namespace ATLAsBLL.Features.Semesters.Commands.UpdateSemester
 
             semester.SemesterName = request.SemesterName;
             semester.AcademicYear = request.AcademicYear;
+
+            // Closing the grading is what makes the grade-assignment handlers
+            // refuse writes for every offering of this semester (MED-07).
+            semester.IsGradingClosed = request.IsGradingClosed;
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return true;

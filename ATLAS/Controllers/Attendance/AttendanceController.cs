@@ -2,6 +2,7 @@ using System.Security.Claims;
 using ATLAS.Attendance;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.RateLimiting;
 
 namespace ATLAS.Controllers.Attendance;
 /// <summary>
@@ -10,7 +11,7 @@ namespace ATLAS.Controllers.Attendance;
 
 [ApiController]
 [Route("api/attendance")]
-public sealed class AttendanceController(IAttendanceService attendance, ICourseOfferingAuthorizationService offeringAuthorization) : ControllerBase
+public sealed class AttendanceController(IAttendanceService attendance, IDeviceBindingService deviceBinding, ICourseOfferingAuthorizationService offeringAuthorization) : ControllerBase
 {
     /// <summary>
     /// Start.
@@ -72,9 +73,59 @@ public sealed class AttendanceController(IAttendanceService attendance, ICourseO
     {
         if (!TryGetUserId(out var userId)) return Unauthorized();
         if (string.IsNullOrWhiteSpace(request.QrToken)) return BadRequest(new { message = "A QR token is required." });
-        try { return Ok(await attendance.RecordScanAsync(request.QrToken, userId, request.DeviceId, cancellationToken)); }
+        try { return Ok(await attendance.RecordScanAsync(request, userId, cancellationToken)); }
         catch (AttendanceValidationException ex) { return BadRequest(new { message = ex.Message }); }
         catch (AttendanceConflictException ex) { return Conflict(new { message = ex.Message }); }
+    }
+
+    /// <summary>
+    /// Pair Device.
+    /// </summary>
+    /// <remarks>
+    /// MED-17: the only way a device becomes able to record attendance. The server
+    /// mints the secret and the pairing token here, so a client that invents a
+    /// device identifier has nothing a scan can be signed with.
+    /// </remarks>
+    [HttpPost("devices")]
+    [Authorize(Roles = "Student")]
+    [EnableRateLimiting("DevicePairPolicy")]
+    [ProducesResponseType(typeof(DevicePairingDto), StatusCodes.Status201Created)]
+    public async Task<ActionResult<DevicePairingDto>> PairDevice([FromBody] DevicePairingRequest request, CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId)) return Unauthorized();
+        if (string.IsNullOrWhiteSpace(request.DeviceId)) return BadRequest(new { message = "A device identifier is required." });
+        try
+        {
+            var pairing = await deviceBinding.PairAsync(userId, request.DeviceId, request.DeviceName, cancellationToken);
+            return CreatedAtAction(nameof(ListDevices), null, pairing);
+        }
+        catch (AttendanceValidationException ex) { return BadRequest(new { message = ex.Message }); }
+        catch (AttendanceConflictException ex) { return Conflict(new { message = ex.Message }); }
+    }
+
+    /// <summary>
+    /// List Devices.
+    /// </summary>
+    [HttpGet("devices")]
+    [Authorize(Roles = "Student")]
+    [ProducesResponseType(typeof(IReadOnlyList<RegisteredDeviceDto>), StatusCodes.Status200OK)]
+    public async Task<ActionResult<IReadOnlyList<RegisteredDeviceDto>>> ListDevices(CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId)) return Unauthorized();
+        return Ok(await deviceBinding.ListAsync(userId, cancellationToken));
+    }
+
+    /// <summary>
+    /// Revoke Device.
+    /// </summary>
+    [HttpDelete("devices/{deviceId}")]
+    [Authorize(Roles = "Student")]
+    public async Task<IActionResult> RevokeDevice(string deviceId, CancellationToken cancellationToken)
+    {
+        if (!TryGetUserId(out var userId)) return Unauthorized();
+        return await deviceBinding.RevokeAsync(userId, deviceId, cancellationToken)
+            ? NoContent()
+            : NotFound(new { message = "That device is not registered to this account." });
     }
 
 

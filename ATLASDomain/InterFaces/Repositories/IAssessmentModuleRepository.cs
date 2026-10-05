@@ -9,6 +9,33 @@ namespace ATLASDomain.Interfaces.Repositories;
 /// </summary>
 public interface IAssessmentModuleRepository : IGenericRepository<AssessmentModule>
 {
-    Task<IEnumerable<AssessmentModelDisplayDTO>> GetModulesByCourseOfferingAsync(int courseOfferingId);
+    /// <summary>
+    /// Gets the assessment modules of a course offering together with their
+    /// display data, ordered for presentation.
+    /// </summary>
+    /// <param name="courseOfferingId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The modules of the offering.</returns>
+    Task<IEnumerable<AssessmentModelDisplayDTO>> GetModulesByCourseOfferingAsync(int courseOfferingId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the sum of <see cref="AssessmentModule.MaxDegree"/> over every module
+    /// of the course offering, so the Create/Update handlers can keep the offering
+    /// total within <see cref="AssessmentModule.MaximumOfferingTotalMaxDegree"/> (MED-07).
+    /// </summary>
+    /// <param name="courseOfferingId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Sum of the module max degrees; 0 when the offering has no modules.</returns>
+    Task<decimal> GetTotalMaxDegreeByCourseOfferingAsync(int courseOfferingId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the highest degree already recorded in the module's grades, so the
+    /// Update handler can refuse to lower <see cref="AssessmentModule.MaxDegree"/>
+    /// below a grade that exists (MED-07).
+    /// </summary>
+    /// <param name="moduleId">Assessment module identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Highest recorded degree; 0 when the module has no grades.</returns>
+    Task<decimal> GetMaxDegreeByModuleAsync(int moduleId, CancellationToken cancellationToken = default);
 }
 

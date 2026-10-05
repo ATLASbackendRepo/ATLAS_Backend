@@ -3,7 +3,11 @@ namespace ATLASDomain.DTO.Student
     /// <summary>
     /// Student Filter DTO.
     /// </summary>
-    public class StudentFilterDTO
+    /// <remarks>
+    /// Inherits paging from <see cref="PagedFilter"/>, so the student list can no
+    /// longer be requested without a bounded page size (MED-12).
+    /// </remarks>
+    public class StudentFilterDTO : PagedFilter
     {
         /// <summary>
         /// Search.

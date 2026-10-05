@@ -85,7 +85,7 @@ public class AssignCourseGradesRangeCommandHandler
                 cancellationToken);
 
             var module = await _unitOfWork.AssessmentModules
-                .GetByIdAsync(request.ModelID);
+                .GetByIdAsync(request.ModelID, cancellationToken);
 
             if (module is null)
             {
@@ -98,6 +98,14 @@ public class AssignCourseGradesRangeCommandHandler
                 throw new InvalidDataException(
                     $"Assessment module {request.ModelID} does not belong to " +
                     $"course offering {request.CourseOfferingID}.");
+            }
+
+            // After the semester's grading is closed the import must not change
+            // any grade either, so the file is refused before it writes (MED-07).
+            if (await _unitOfWork.Semesters.IsGradingClosedForOfferingAsync(module.CourseOfferingID, cancellationToken))
+            {
+                throw new InvalidOperationException(
+                    "Grading is closed for this semester; grades can no longer be imported.");
             }
 
             foreach (var row in rows)
@@ -143,7 +151,7 @@ public class AssignCourseGradesRangeCommandHandler
                 });
             }
 
-            await _unitOfWork.CourseGrades.AddRangeAsync(grades);
+            await _unitOfWork.CourseGrades.AddRangeAsync(grades, cancellationToken);
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 

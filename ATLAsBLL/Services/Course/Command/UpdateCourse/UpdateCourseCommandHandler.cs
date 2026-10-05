@@ -26,7 +26,7 @@ namespace ATLAsBLL.Features.Courses.Commands.UpdateCourse
         /// </summary>
         public async Task<bool> Handle(UpdateCourseCommand request, CancellationToken cancellationToken)
         {
-            var course = await _unitOfWork.Courses.GetByIdAsync(request.UpdateCourseDTO.Id);
+            var course = await _unitOfWork.Courses.GetByIdAsync(request.UpdateCourseDTO.Id, cancellationToken);
 
             if (course == null)
             {

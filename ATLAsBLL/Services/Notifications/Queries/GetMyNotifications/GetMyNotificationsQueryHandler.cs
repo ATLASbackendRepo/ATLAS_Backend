@@ -33,11 +33,11 @@ public class GetMyNotificationsQueryHandler : IRequestHandler<GetMyNotifications
 
         if (request.UnreadOnly)
         {
-            notifications = await _unitOfWork.Notifications.GetUnreadForUserAsync(request.UserId);
+            notifications = await _unitOfWork.Notifications.GetUnreadForUserAsync(request.UserId, cancellationToken);
         }
         else
         {
-            notifications = await _unitOfWork.Notifications.FindAsync(n => n.RecipientUserID == request.UserId);
+            notifications = await _unitOfWork.Notifications.FindAsync(n => n.RecipientUserID == request.UserId, cancellationToken);
         }
 
         // Map to anonymous objects for API response

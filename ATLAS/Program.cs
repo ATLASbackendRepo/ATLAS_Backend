@@ -32,8 +32,49 @@ builder.Host.UseSerilog((context, configuration) =>
     configuration
         .ReadFrom.Configuration(context.Configuration)
         .Enrich.FromLogContext()
-        .Enrich.WithProperty("Application", "ATLAS")
-        .WriteTo.Console();
+        .Enrich.WithProperty("Application", "ATLAS");
+
+    // MED-10: the Seq URL was hard-coded to http://seq:80 in appsettings.json, so
+    // the Seq__ServerUrl variable that docker-compose already sets had no effect
+    // and every other environment tried to reach a host named "seq" that does not
+    // exist there. It is now bound from configuration, and the sink is attached
+    // from code so the value can come from either the Serilog section or the
+    // compose variable.
+    var seqServerUrl = context.Configuration["Serilog:WriteTo:1:Args:serverUrl"]
+        ?? context.Configuration["Seq__ServerUrl"]
+        ?? context.Configuration["Seq:ServerUrl"];
+
+    if (!string.IsNullOrWhiteSpace(seqServerUrl))
+    {
+        // Only add the sink when the configuration actually supplies a URL. An
+        // unreachable sink is worse than no sink: Serilog swallows and retries,
+        // which slows every write path.
+        configuration.WriteTo.Seq(seqServerUrl);
+    }
+});
+
+// MED-03: the rate limiter partitions by remote IP, and behind a reverse proxy
+// that address is the proxy's own. Without ForwardedHeaders every request looks
+// like it comes from the same host, so a per-IP limit silently becomes a global
+// one and the whole campus shares a single allowance.
+builder.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>(options =>
+{
+    options.ForwardedHeaders = Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedFor |
+                               Microsoft.AspNetCore.HttpOverrides.ForwardedHeaders.XForwardedProto;
+
+    // Only the proxies this deployment actually sits behind may set these
+    // headers. Leaving the default "any known network" in place would let a
+    // client that can reach Kestrel directly spoof its own address.
+    options.KnownNetworks.Clear();
+    options.KnownProxies.Clear();
+
+    foreach (var proxy in builder.Configuration
+                 .GetSection("ForwardedHeaders:KnownProxies")
+                 .Get<string[]>() ?? Array.Empty<string>())
+    {
+        if (System.Net.IPAddress.TryParse(proxy, out var address))
+            options.KnownProxies.Add(address);
+    }
 });
 
 // ======================================================
@@ -49,6 +90,23 @@ builder.Services.AddScoped
     CourseOfferingAuthorizationService>();
 builder.Services.AddSingleton(TimeProvider.System);
 builder.Services.AddScoped<ATLAS.Attendance.IAttendanceService, ATLAS.Attendance.AttendanceService>();
+
+// MED-17: attendance scans are only accepted from a device the server has paired.
+// The options are validated on start so a misconfigured lifetime or an
+// accidentally short key is caught at boot rather than on the first scan.
+builder.Services.AddOptions<ATLAS.Attendance.DeviceBindingOptions>()
+    .Bind(builder.Configuration.GetSection(ATLAS.Attendance.DeviceBindingOptions.SectionName))
+    .Validate(
+        o => string.IsNullOrWhiteSpace(o.Key) || o.Key.Length >= 64,
+        "Attendance:DeviceBinding:Key must be empty (derived from Jwt:Key) or at least 64 characters long.")
+    .Validate(
+        o => o.PairingTokenLifetimeDays is > 0 and <= 730,
+        "Attendance:DeviceBinding:PairingTokenLifetimeDays must be between 1 and 730.")
+    .Validate(
+        o => o.MaxDevicesPerStudent is >= 1 and <= 20,
+        "Attendance:DeviceBinding:MaxDevicesPerStudent must be between 1 and 20.")
+    .ValidateOnStart();
+builder.Services.AddScoped<ATLAS.Attendance.IDeviceBindingService, ATLAS.Attendance.DeviceBindingService>();
 
 // ======================================================
 // JWT Options
@@ -170,8 +228,14 @@ builder.Services
 
         options.Events = new JwtBearerEvents
         {
-            OnTokenValidated = context =>
+            OnTokenValidated = async context =>
             {
+                // MED-01 needs a scoped DbContext to read the account, and the JWT
+                // middleware runs before the request scope the endpoint would get,
+                // so a scope factory is captured here and used per request.
+                var stampValidationScopeFactory =
+                    context.HttpContext.RequestServices
+                        .GetRequiredService<IServiceScopeFactory>();
                 // A token issued for the mandatory first password change is
                 // only accepted by the endpoints that complete that change.
                 var restricted = context.Principal?
@@ -190,9 +254,75 @@ builder.Services
                         context.Fail(
                             "This token may only be used to change the password.");
                     }
+
+                    return;
                 }
 
-                return Task.CompletedTask;
+                // MED-01: the signature proves the token was issued by this server
+                // and has not expired, but it says nothing about the account since.
+                // A token captured before a logout, a deactivation or a role change
+                // would otherwise keep working until it expired, because none of
+                // those events can alter an already-signed token. The security
+                // stamp is what closes that window: it is minted into the token at
+                // login, it is compared against the live row on every request, and
+                // it is rotated whenever the account's state changes in a way that
+                // must take effect immediately.
+                var stampClaim = context.Principal?.FindFirst(AtlasClaims.SecurityStamp)?.Value;
+
+                if (string.IsNullOrWhiteSpace(stampClaim))
+                {
+                    // A token without a stamp predates the column, so its validity
+                    // cannot be re-checked. Refusing it forces a re-login rather
+                    // than granting an unverifiable lifetime.
+                    context.Fail("The token carries no security stamp.");
+                    return;
+                }
+
+                var callerId = context.Principal?.FindFirstValue(ClaimTypes.NameIdentifier);
+
+                if (!int.TryParse(callerId, out var userId) || userId <= 0)
+                {
+                    context.Fail("The token carries no usable account identifier.");
+                    return;
+                }
+
+                // The stamp and the active flag are read straight from the
+                // database rather than from a cache: a cache would reintroduce the
+                // very window MED-01 exists to close, because a deactivated account
+                // would stay valid for as long as the entry lived. One indexed
+                // primary-key lookup per request is a fair price for that.
+                using var stampScope = stampValidationScopeFactory.CreateScope();
+
+                var users = stampScope.ServiceProvider
+                    .GetRequiredService<ATLASDomain.Interfaces.Repositories.IUserRepository>();
+
+                var account = await users.GetByUserIdAsync(userId);
+
+                if (account is null)
+                {
+                    context.Fail("The account no longer exists.");
+                    return;
+                }
+
+                // A deactivated account must lose access on the very next request,
+                // not when its token happens to expire.
+                if (!account.IsActive)
+                {
+                    context.Fail("The account has been deactivated.");
+                    return;
+                }
+
+                // Constant-time comparison so a token cannot be used as an oracle to
+                // recover the stamp value and forge a matching token.
+                if (!System.Security.Cryptography.CryptographicOperations.FixedTimeEquals(
+                        Encoding.UTF8.GetBytes(stampClaim.ToLowerInvariant()),
+                        Encoding.UTF8.GetBytes(account.SecurityStamp.ToString())))
+                {
+                    context.Fail("The token has been invalidated.");
+                    return;
+                }
+
+                return;
             }
         };
     });
@@ -446,6 +576,37 @@ builder.Services.AddRateLimiter(options =>
             !string.IsNullOrEmpty(userId)
                 ? $"req-write:user:{userId}"
                 : $"req-write:ip:{httpContext.Connection.RemoteIpAddress}";
+
+        return RateLimitPartition.GetFixedWindowLimiter(
+            partitionKey,
+            _ => new FixedWindowRateLimiterOptions
+            {
+                PermitLimit = 10,
+                Window = TimeSpan.FromMinutes(1),
+                QueueLimit = 0,
+                AutoReplenishment = true
+            });
+    });
+
+    // ==================================================
+    // DEVICE PAIRING
+    // ==================================================
+
+    // MED-17: pairing is what mints a device secret, so it is the one attendance
+    // endpoint worth rate limiting tightly. A student only pairs a handful of
+    // devices in their time at the institution.
+    options.AddPolicy("DevicePairPolicy", httpContext =>
+    {
+        var userId =
+            httpContext.User
+                .FindFirst(ClaimTypes.NameIdentifier)?.Value
+            ?? httpContext.User
+                .FindFirst("sub")?.Value;
+
+        var partitionKey =
+            !string.IsNullOrEmpty(userId)
+                ? $"device-pair:user:{userId}"
+                : $"device-pair:ip:{httpContext.Connection.RemoteIpAddress}";
 
         return RateLimitPartition.GetFixedWindowLimiter(
             partitionKey,
@@ -789,9 +950,38 @@ builder.Services
     .Bind(builder.Configuration.GetSection(DiscordOptions.SectionName))
     .ValidateOnStart();
 
-builder.Services.AddHttpClient<DiscordNotificationProvider>();
+// MED-11: the typed HttpClient was registered with AddHttpClient, but the
+// provider was then re-registered with AddScoped<INotificationProvider, ...>.
+// AddScoped does not understand IHttpClientFactory, so it built the provider
+// through the container's default HttpClient - which has no timeout at all and
+// lives for the whole application lifetime.
+//
+// That combination is the worst of both: a hung Discord webhook would block the
+// alert poller forever, and because there is no timeout the poll loop would never
+// advance past that row, so every other pending alert would stall with it.
+//
+// Both registrations below resolve the provider through IHttpClientFactory, so
+// the named client - and its timeout - is actually honoured.
+builder.Services
+    .AddHttpClient<DiscordNotificationProvider>(client =>
+    {
+        // The poller runs on a 15-second cadence. A webhook that has not answered
+        // within a few seconds is not going to answer at all, and holding the poll
+        // open for it delays every other alert.
+        client.Timeout = TimeSpan.FromSeconds(10);
+    })
+    .ConfigurePrimaryHttpMessageHandler(() => new HttpClientHandler
+    {
+        AutomaticDecompression = System.Net.DecompressionMethods.All
+    });
 
-builder.Services.AddScoped<INotificationProvider, DiscordNotificationProvider>();
+// Resolving the provider from its own typed-client registration is what makes the
+// configured HttpClient - and therefore the timeout above - the one actually
+// injected. It is registered as transient by AddHttpClient; resolving it from
+// within the poller's scope gives one instance per scope.
+builder.Services.AddScoped<INotificationProvider>(serviceProvider =>
+    serviceProvider.GetRequiredService<DiscordNotificationProvider>());
+
 builder.Services.AddScoped<INotificationProvider, EmailNotificationProvider>();
 
 builder.Services.AddHostedService<AlertBackgroundService>();
@@ -905,9 +1095,48 @@ if (app.Environment.IsDevelopment())
 // into one consistent problem response.
 app.UseExceptionHandler();
 
+// LOW-04: this must precede HttpsRedirection, CORS and the correlation-id
+// middleware. Placed after them, a failure raised by one of those never reaches
+// the handler and escapes as an unstructured 500.
+app.UseForwardedHeaders();
+
+// LOW-03: the responses advertised the server implementation and carried no
+// anti-framing or content-sniffing protection at all. The Server header is
+// suppressed by Kestrel's own option below; these are set here so they also
+// apply to responses produced by middleware that runs before the endpoints.
+app.Use(async (context, next) =>
+{
+    context.Response.Headers["X-Content-Type-Options"] = "nosniff";
+    context.Response.Headers["X-Frame-Options"] = "DENY";
+    context.Response.Headers.Remove("Server");
+    context.Response.Headers.Remove("X-Powered-By");
+    await next();
+});
+
 app.UseHttpsRedirection();
 
 app.UseCors("StudentApiCorsPolicy");
+
+// MED-10: there was no request logging at all, so nothing recorded which
+// endpoints were actually being called, how long they took, or their status
+// codes. This emits one structured line per request. It sits before the
+// correlation-id middleware on purpose so that the correlation id it logs is
+// the one the handlers below it also use.
+app.UseSerilogRequestLogging(options =>
+{
+    options.MessageTemplate =
+        "{RequestMethod} {RequestPath} responded {StatusCode} in {Elapsed:0.0000} ms";
+
+    // Health and readiness probes fire every few seconds and would otherwise
+    // dominate the log volume and bury real traffic.
+    options.GetLevel = (httpContext, _, exception) =>
+        exception is not null
+            ? Serilog.Events.LogEventLevel.Error
+            : httpContext.Request.Path.StartsWithSegments("/healthz") ||
+              httpContext.Request.Path.StartsWithSegments("/readyz")
+                ? Serilog.Events.LogEventLevel.Verbose
+                : Serilog.Events.LogEventLevel.Information;
+});
 
 app.UseMiddleware<CorrelationIdMiddleware>();
 

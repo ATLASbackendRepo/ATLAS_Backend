@@ -25,7 +25,7 @@ namespace ATLAsBLL.Features.Semesters.Commands.DeleteSemester
         /// </summary>
         public async Task<bool> Handle(DeleteSemesterCommand request, CancellationToken cancellationToken)
         {
-            var semester = await _unitOfWork.Semesters.GetByIdAsync(request.SemesterID);
+            var semester = await _unitOfWork.Semesters.GetByIdAsync(request.SemesterID, cancellationToken);
 
             if (semester == null)
             {

@@ -12,5 +12,5 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
     public record CreateGradeAppealRequestCommand(
       int UserId,
       CreateGradeAppealRequestDto Request)
-      : ICommand<int>;
+      : ICommand<int>, IWriteCommand;
 }

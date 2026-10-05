@@ -12,7 +12,13 @@ namespace ATLASDomain.InterFaces.Repositories
     /// </summary>
     public interface IStudentProfileRepository :IGenericRepository<StudentProfile>
     {
-        Task<StudentProfile?> GetByUserIdAsync(int UserId);
+        /// <summary>
+        /// Gets the student profile belonging to a user.
+        /// </summary>
+        /// <param name="UserId">User identifier.</param>
+        /// <param name="cancellationToken">Cancels the query.</param>
+        /// <returns>The student profile, or null when the user has none.</returns>
+        Task<StudentProfile?> GetByUserIdAsync(int UserId, CancellationToken cancellationToken = default);
       
 
     }

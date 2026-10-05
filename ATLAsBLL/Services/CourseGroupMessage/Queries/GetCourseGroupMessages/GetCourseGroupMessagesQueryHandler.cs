@@ -52,7 +52,7 @@ public class GetCourseGroupMessagesQueryHandler
             .GetByCourseOfferingAsync(
                 request.CourseOfferingId,
                 request.Page,
-                request.PageSize);
+                request.PageSize, cancellationToken);
 
         // Map to DTO
         return messages.Select(m => new CourseGroupMessageDto

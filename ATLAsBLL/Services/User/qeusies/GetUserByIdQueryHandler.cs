@@ -38,7 +38,7 @@ namespace ATLAsBLL.Services.User.qeusies
                     nameof(request.UserId));
 
             return await _uintofwork.Users
-                .GetByUserIdAsync(request.UserId);
+                .GetByUserIdAsync(request.UserId, cancellationToken);
         }
     }
 }

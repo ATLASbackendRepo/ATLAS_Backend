@@ -25,7 +25,7 @@ namespace ATLAsBLL.Features.Users.Commands.UpdateUser
         /// </summary>
         public async Task<bool> Handle(UpdateUserCommand request, CancellationToken cancellationToken)
         {
-            var user = await _unitOfWork.Users.GetUserByAcademicIDAsync(request.Update_StaffDto.AcademicId);
+            var user = await _unitOfWork.Users.GetUserByAcademicIDAsync(request.Update_StaffDto.AcademicId, cancellationToken);
 
             if (user == null)
             {

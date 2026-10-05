@@ -28,7 +28,7 @@ namespace ATLAsBLL.Services.CourseOffering.Queries.Analysis
         /// </summary>
         public async Task<CourseAnalysisResponseDto> Handle(CourseAnalysisquery request, CancellationToken cancellationToken)
         {
-            var response = await _unitOfWork.CourseOfferings.GetCourseAnalysisAsync(request.CourseOfferingId);
+            var response = await _unitOfWork.CourseOfferings.GetCourseAnalysisAsync(request.CourseOfferingId, cancellationToken);
 
             return response;
         }

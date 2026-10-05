@@ -25,7 +25,7 @@ namespace ATLAsBLL.Services.AssessmentModule.Qureies
         public async Task<IEnumerable<AssessmentModelDisplayDTO>> Handle(AssessmentModelDisplayQuery request, CancellationToken cancellationToken)
         {
             if (request.courseOfferingId <= 0) throw new ArgumentException("Invalid course offering ID.");
-            var modules = await _unitOfWork.AssessmentModules.GetModulesByCourseOfferingAsync(request.courseOfferingId);
+            var modules = await _unitOfWork.AssessmentModules.GetModulesByCourseOfferingAsync(request.courseOfferingId, cancellationToken);
             if (!modules.Any()) throw new KeyNotFoundException("Module not found.");
          
 

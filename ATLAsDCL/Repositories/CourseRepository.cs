@@ -22,7 +22,7 @@ public class CourseRepository
     /// <summary>
     /// Get All Course.
     /// </summary>
-    public async Task<List<CourseDTO>> GetAllCourse(string? Name_Filter)
+    public async Task<List<CourseDTO>> GetAllCourse(string? Name_Filter, CancellationToken cancellationToken = default)
     {
         var query = _context.Courses
              .AsNoTracking()
@@ -44,7 +44,7 @@ public class CourseRepository
            IsPractical = C.IsPractical
           
        })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return Courses;
     }
@@ -52,6 +52,6 @@ public class CourseRepository
     //public async Task<bool> CourseCodeExistsAsync(string code)
     //{
     //    return await _context.Courses
-    //        .AnyAsync(c => c.CourseCode == code);
+    //        .AnyAsync(c => c.CourseCode == code, cancellationToken);
     //}
 }

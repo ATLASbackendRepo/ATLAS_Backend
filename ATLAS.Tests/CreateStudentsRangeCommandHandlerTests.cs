@@ -52,21 +52,21 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
         _unitOfWork.SetupGet(work => work.StudentProfile).Returns(_profiles.Object);
 
         _institutions
-            .Setup(repository => repository.GetInstitutionWithNameAsync(InstitutionName))
+            .Setup(repository => repository.GetInstitutionWithNameAsync(InstitutionName, It.IsAny<CancellationToken>()))
             .ReturnsAsync(4);
 
         _departments
-            .Setup(repository => repository.GetDepartmentWithnameAsync(DepartmentName, 4))
+            .Setup(repository => repository.GetDepartmentWithnameAsync(DepartmentName, 4, It.IsAny<CancellationToken>()))
             .ReturnsAsync(9);
 
         _students
-            .Setup(repository => repository.AddRangeAsync(It.IsAny<IEnumerable<Student>>()))
-            .Callback<IEnumerable<Student>>(rows => _writtenStudents = rows.ToList())
+            .Setup(repository => repository.AddRangeAsync(It.IsAny<IEnumerable<Student>>(), It.IsAny<CancellationToken>()))
+            .Callback<IEnumerable<Student>, CancellationToken>((rows, _) => _writtenStudents = rows.ToList())
             .Returns(Task.CompletedTask);
 
         _profiles
-            .Setup(repository => repository.AddRangeAsync(It.IsAny<IEnumerable<StudentProfile>>()))
-            .Callback<IEnumerable<StudentProfile>>(rows => _writtenProfiles = rows.ToList())
+            .Setup(repository => repository.AddRangeAsync(It.IsAny<IEnumerable<StudentProfile>>(), It.IsAny<CancellationToken>()))
+            .Callback<IEnumerable<StudentProfile>, CancellationToken>((rows, _) => _writtenProfiles = rows.ToList())
             .Returns(Task.CompletedTask);
 
         // The database assigns the student identities on the first SaveChanges.
@@ -122,9 +122,61 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
             Times.Never);
 
         _students.Verify(
-            repository => repository.AddRangeAsync(It.IsAny<IEnumerable<Student>>()),
+            repository => repository.AddRangeAsync(It.IsAny<IEnumerable<Student>>(), It.IsAny<CancellationToken>()),
             Times.Never);
 
+        Assert.False(File.Exists(path));
+    }
+
+    /// <summary>
+    /// MED-14: a row that names an institution the lookup does not know is
+    /// rejected before anything is written; the lookup never creates the
+    /// institution from the typo.
+    /// </summary>
+    [Fact]
+    public async Task Handle_RejectsRowsWithAnUnknownInstitution()
+    {
+        _institutions
+            .Setup(repository => repository.GetInstitutionWithNameAsync("Typo University", It.IsAny<CancellationToken>()))
+            .ReturnsAsync(0);
+
+        var path = CreateWorkbookWithNames("Typo University", DepartmentName, ("STU001", "One"));
+
+        await Assert.ThrowsAsync<InvalidDataException>(() =>
+            CreateHandler().Handle(
+                new CreateStudentsRangeCommand(path),
+                CancellationToken.None));
+
+        Assert.Empty(_writtenStudents);
+        _unitOfWork.Verify(
+            work => work.BeginTransactionAsync(It.IsAny<CancellationToken>()),
+            Times.Never);
+        Assert.False(File.Exists(path));
+    }
+
+    /// <summary>
+    /// MED-14: a row that names a department the lookup does not know for the
+    /// resolved institution is rejected before anything is written.
+    /// </summary>
+    [Fact]
+    public async Task Handle_RejectsRowsWithAnUnknownDepartment()
+    {
+        _departments
+            .Setup(repository => repository.GetDepartmentWithnameAsync("Typo Department", 4, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(0);
+
+        var path = CreateWorkbookWithNames(InstitutionName, "Typo Department", ("STU001", "One"));
+
+        var exception = await Assert.ThrowsAsync<InvalidDataException>(() =>
+            CreateHandler().Handle(
+                new CreateStudentsRangeCommand(path),
+                CancellationToken.None));
+
+        Assert.Contains("Typo Department", exception.Message);
+        Assert.Empty(_writtenStudents);
+        _unitOfWork.Verify(
+            work => work.BeginTransactionAsync(It.IsAny<CancellationToken>()),
+            Times.Never);
         Assert.False(File.Exists(path));
     }
 
@@ -162,11 +214,11 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
 
         // One insert per batch, and each profile points at its own student.
         _students.Verify(
-            repository => repository.AddRangeAsync(It.IsAny<IEnumerable<Student>>()),
+            repository => repository.AddRangeAsync(It.IsAny<IEnumerable<Student>>(), It.IsAny<CancellationToken>()),
             Times.Once);
 
         _profiles.Verify(
-            repository => repository.AddRangeAsync(It.IsAny<IEnumerable<StudentProfile>>()),
+            repository => repository.AddRangeAsync(It.IsAny<IEnumerable<StudentProfile>>(), It.IsAny<CancellationToken>()),
             Times.Once);
 
         _unitOfWork.Verify(
@@ -196,7 +248,7 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
     public async Task Handle_RollsBackTheTransaction_WhenTheInsertFails()
     {
         _students
-            .Setup(repository => repository.AddRangeAsync(It.IsAny<IEnumerable<Student>>()))
+            .Setup(repository => repository.AddRangeAsync(It.IsAny<IEnumerable<Student>>(), It.IsAny<CancellationToken>()))
             .ThrowsAsync(new InvalidOperationException("insert failed"));
 
         var path = CreateWorkbook(("STU001", "One"));
@@ -299,6 +351,20 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
     /// <param name="rows">Academic number and name of every data row.</param>
     /// <returns>Path of the generated file.</returns>
     private string CreateWorkbook(params (string AcademicNumber, string FullName)[] rows)
+        => CreateWorkbookWithNames(InstitutionName, DepartmentName, rows);
+
+    /// <summary>
+    /// Builds a workbook whose rows carry the given institution and department
+    /// names, so a row can be rejected when a lookup does not know them.
+    /// </summary>
+    /// <param name="institutionName">Institution name written into every row.</param>
+    /// <param name="departmentName">Department name written into every row.</param>
+    /// <param name="rows">Academic number and name of every data row.</param>
+    /// <returns>Path of the generated file.</returns>
+    private string CreateWorkbookWithNames(
+        string institutionName,
+        string departmentName,
+        params (string AcademicNumber, string FullName)[] rows)
     {
         var path = Path.Combine(Path.GetTempPath(), $"atlas-student-import-{Guid.NewGuid():N}.xlsx");
         _createdFiles.Add(path);
@@ -317,8 +383,8 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
             {
                 var row = index + 2;
 
-                sheet.Cell(row, 1).Value = InstitutionName;
-                sheet.Cell(row, 2).Value = DepartmentName;
+                sheet.Cell(row, 1).Value = institutionName;
+                sheet.Cell(row, 2).Value = departmentName;
                 sheet.Cell(row, 3).Value = rows[index].FullName;
                 sheet.Cell(row, 4).Value = "Level 1";
                 sheet.Cell(row, 5).Value = rows[index].AcademicNumber;

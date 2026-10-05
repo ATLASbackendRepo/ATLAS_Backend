@@ -45,7 +45,7 @@ namespace ATLAS.Controllers.CourseOffering
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Authorize(Roles = "Student")]
         [EnableRateLimiting("CourseQueryPolicy")]
-        public async Task<ActionResult<IEnumerable<CourseOfferingDTO>>> GetStudentMyCourses()
+        public async Task<ActionResult<IEnumerable<CourseOfferingDTO>>> GetStudentMyCourses(CancellationToken cancellationToken = default)
         {
             var userId = GetCurrentUserId();
             if (userId < 1)
@@ -53,7 +53,7 @@ namespace ATLAS.Controllers.CourseOffering
                 return Unauthorized();
             }
 
-            var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Student.GetMyCourseQuery(userId));
+            var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Student.GetMyCourseQuery(userId), cancellationToken);
             if (courses == null || !courses.Any())
             {
                 return NotFound($"No courses found for student ID {userId}.");
@@ -73,7 +73,7 @@ namespace ATLAS.Controllers.CourseOffering
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("CourseQueryPolicy")]
-        public async Task<ActionResult<IEnumerable<CourseOfferingDTO>>> GetAdminStudentMyCourses([FromRoute] string AcdimicID)
+        public async Task<ActionResult<IEnumerable<CourseOfferingDTO>>> GetAdminStudentMyCourses([FromRoute] string AcdimicID, CancellationToken cancellationToken = default)
         {
               var userId = await GetCurrentUserId(AcdimicID);
 
@@ -82,7 +82,7 @@ namespace ATLAS.Controllers.CourseOffering
                     return BadRequest("Invalid Request.");
                 }
 
-                var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Student.GetMyCourseQuery(userId));
+                var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Student.GetMyCourseQuery(userId), cancellationToken);
                 if (courses == null || !courses.Any())
                 {
                     return NotFound($"No courses found for student ID {userId}.");
@@ -102,14 +102,14 @@ namespace ATLAS.Controllers.CourseOffering
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Authorize(Roles = "Doctor,TeachingAssistant")]
         [EnableRateLimiting("CourseQueryPolicy")]
-        public async Task<ActionResult<IEnumerable<DoctorCourseOfferingDTO>>> GetStaffMyCourses()
+        public async Task<ActionResult<IEnumerable<DoctorCourseOfferingDTO>>> GetStaffMyCourses(CancellationToken cancellationToken = default)
         {
             var StaffId = GetCurrentUserId();
             if (StaffId < 1)
             {
                 return BadRequest("Invalid Staff ID.");
             }
-            var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Doctor.GetStaffMyCourseQuery(StaffId));
+            var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Doctor.GetStaffMyCourseQuery(StaffId), cancellationToken);
             if (courses == null || !courses.Any())
             {
                 return NotFound($"No courses found for Staff ID {StaffId}.");
@@ -128,7 +128,7 @@ namespace ATLAS.Controllers.CourseOffering
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("CourseQueryPolicy")]
-        public async Task<ActionResult<IEnumerable<DoctorCourseOfferingDTO>>> GetAdminStaffMyCourses([FromRoute] string AcdimicID)
+        public async Task<ActionResult<IEnumerable<DoctorCourseOfferingDTO>>> GetAdminStaffMyCourses([FromRoute] string AcdimicID, CancellationToken cancellationToken = default)
         {
             
                 var StaffId = await GetCurrentUserId(AcdimicID);
@@ -137,7 +137,7 @@ namespace ATLAS.Controllers.CourseOffering
                 {
                     return BadRequest("Invalid Request.");
                 }
-                var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Doctor.GetStaffMyCourseQuery(StaffId));
+                var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Doctor.GetStaffMyCourseQuery(StaffId), cancellationToken);
                 if (courses == null || !courses.Any())
                 {
                     return NotFound($"No courses found for Staff ID {StaffId }.");
@@ -156,14 +156,14 @@ namespace ATLAS.Controllers.CourseOffering
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Authorize(Roles = "Student,Admin,SAdmin")]
         [EnableRateLimiting("CourseDetailsPolicy")]
-        public async Task<ActionResult<IEnumerable<CourseofferingDetailsDTO>>> GetCourseDetails(int courseOfferingId)
+        public async Task<ActionResult<IEnumerable<CourseofferingDetailsDTO>>> GetCourseDetails(int courseOfferingId, CancellationToken cancellationToken = default)
         {
             var userId = GetCurrentUserId();
             if (userId < 1 || courseOfferingId < 1)
             {
                 return BadRequest("Invalid student ID or course offering ID.");
             }
-            var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetCourseDetails.GetCourseDetailsQuery(courseOfferingId, userId));
+            var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetCourseDetails.GetCourseDetailsQuery(courseOfferingId, userId), cancellationToken);
             if (courses == null || !courses.Any())
             {
                 return NotFound($"No course details found for CourseOfferingId {courseOfferingId} and StudentId {userId}.");
@@ -184,7 +184,7 @@ namespace ATLAS.Controllers.CourseOffering
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [Authorize(Roles = "Student")]
         [EnableRateLimiting("CourseQueryPolicy")]
-        public async Task<ActionResult<IEnumerable<int>>> GetDoctorIDs(int courseOfferingId)
+        public async Task<ActionResult<IEnumerable<int>>> GetDoctorIDs(int courseOfferingId, CancellationToken cancellationToken = default)
         {
             
                 var userId = GetCurrentUserId();
@@ -192,7 +192,7 @@ namespace ATLAS.Controllers.CourseOffering
                 {
                     return BadRequest("Invalid user ID or course offering ID.");
                 }
-                var doctorIDs = await _mediator.Send(new ATLAsBLL.Services.CourseOfferingDoctor.Query.GetDoctorIDQuery(courseOfferingId));
+                var doctorIDs = await _mediator.Send(new ATLAsBLL.Services.CourseOfferingDoctor.Query.GetDoctorIDQuery(courseOfferingId), cancellationToken);
                 if (doctorIDs == null || !doctorIDs.Any())
                 {
                     return NotFound($"No doctors found for CourseOfferingId {courseOfferingId}.");
@@ -215,7 +215,7 @@ namespace ATLAS.Controllers.CourseOffering
         /// <summary>
         /// Get Current User Id.
         /// </summary>
-        private async Task<int> GetCurrentUserId(string academicId)
+        private async Task<int> GetCurrentUserId(string academicId, CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(academicId))
             {
@@ -223,7 +223,7 @@ namespace ATLAS.Controllers.CourseOffering
             }
 
             // ✅ استخدام await للحصول على النتيجة كـ int?
-            var userID = await _mediator.Send(new GetUserID(academicId));
+            var userID = await _mediator.Send(new GetUserID(academicId), cancellationToken);
 
             if (userID is null)
             {

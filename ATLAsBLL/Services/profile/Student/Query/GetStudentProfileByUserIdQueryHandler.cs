@@ -32,10 +32,10 @@ namespace ATLAsBLL.Services.profile.Student.Query
             GetStudentProfileByUserIdQuery request,
             CancellationToken cancellationToken)
         {
-            var student = await _unitOfWork.Students.GetStudentByUserIDAsync(request.UserId);
+            var student = await _unitOfWork.Students.GetStudentByUserIDAsync(request.UserId, cancellationToken);
             if (student == null)
                 return null;
-            var profile = await _unitOfWork.StudentProfile.GetByUserIdAsync(student.StudentId);
+            var profile = await _unitOfWork.StudentProfile.GetByUserIdAsync(student.StudentId, cancellationToken);
 
             if (profile == null)
                 return null;

@@ -31,7 +31,7 @@ namespace ATLAsBLL.Services.Student.Queries.GetallStudent
         public async Task<IEnumerable<StudentDTO>> Handle(GetStudentsByLevelQuery request, CancellationToken cancellationToken)
         {
 
-            var students = await _unitOfWork.Students.GetAllStudentWithLevelAsync(request.Level);
+            var students = await _unitOfWork.Students.GetAllStudentWithLevelAsync(request.Level, cancellationToken);
 
             if (students == null) return Enumerable.Empty<StudentDTO>();
 

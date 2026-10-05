@@ -26,11 +26,16 @@ public class EditCourseGroupMessageCommandHandler : IRequestHandler<EditCourseGr
     /// </summary>
     public async Task<int> Handle(EditCourseGroupMessageCommand request, CancellationToken cancellationToken)
     {
-        var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId);
+        var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId, cancellationToken);
 
         if (message == null)
         {
             throw new KeyNotFoundException($"Message with ID {request.MessageId} not found.");
+        }
+
+        if (message.IsDeleted)
+        {
+            throw new InvalidDataException("A deleted message can no longer be edited.");
         }
 
         // Authorization: only sender can edit

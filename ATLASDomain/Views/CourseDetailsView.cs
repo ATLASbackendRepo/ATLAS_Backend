@@ -30,13 +30,14 @@ namespace ATLASDomain.Views
         /// </summary>
         public int ModuleId { get; set; } 
         /// <summary>
-        /// studentdegree.
+        /// studentdegree. Kept as a decimal so the values computed from
+        /// CourseGrades.StudentDegree are not truncated in the view (MED-15).
         /// </summary>
-        public int studentdegree { get; set; }
+        public decimal studentdegree { get; set; }
         /// <summary>
-        /// max Degree.
+        /// max Degree. Kept as a decimal to match AssessmentModules.MaxDegree.
         /// </summary>
-        public int maxDegree { get; set; }
+        public decimal maxDegree { get; set; }
 
         /// <summary>
         /// Module Name.

@@ -22,7 +22,7 @@ public class UpdateInstitutionHandler : IRequestHandler<UpdateInstitutionCommand
     /// </summary>
     public async Task<bool> Handle(UpdateInstitutionCommand request, CancellationToken cancellationToken)
     {
-        var ISupdated = await unitOfWork.Institutions.UpdateInstitutionAsync(request.Dto);
+        var ISupdated = await unitOfWork.Institutions.UpdateInstitutionAsync(request.Dto, cancellationToken);
 
         return ISupdated;
     }

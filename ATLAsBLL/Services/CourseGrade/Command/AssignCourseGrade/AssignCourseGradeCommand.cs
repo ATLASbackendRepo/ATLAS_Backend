@@ -10,5 +10,5 @@ namespace ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade
         int ModuleId,
         decimal StudentDegree,
         int UserId
-    ) : ICommand<bool>;
+    ) : ICommand<bool>, IWriteCommand;
 }

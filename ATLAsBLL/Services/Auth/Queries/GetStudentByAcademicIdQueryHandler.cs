@@ -39,7 +39,7 @@ namespace ATLAsBLL.Services.Auth.Queries
             var academicId = request.AcademicId.Trim();
 
             return await _unitofwork.Users
-                .GetUserByAcademicIDAsync(academicId);
+                .GetUserByAcademicIDAsync(academicId, cancellationToken);
         }
     }
 }

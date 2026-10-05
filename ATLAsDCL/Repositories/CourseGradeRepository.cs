@@ -18,7 +18,7 @@ public class CourseGradeRepository
     /// <summary>
     /// Get Grades By Enrollment Async.
     /// </summary>
-    public async Task<IEnumerable<CourseGrade>> GetGradesByEnrollmentAsync(int enrollmentId)
+    public async Task<IEnumerable<CourseGrade>> GetGradesByEnrollmentAsync(int enrollmentId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseGrades
             .AsNoTracking()
@@ -30,28 +30,28 @@ public class CourseGradeRepository
                 ModuleID = g.ModuleID,
                 StudentDegree = g.StudentDegree
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
 
     /// <summary>
     /// Get Grade By Enrollment And Module Async.
     /// </summary>
-    public async Task<CourseGrade?> GetGradeByEnrollmentAndModuleAsync(int enrollmentId, int moduleId)
+    public async Task<CourseGrade?> GetGradeByEnrollmentAndModuleAsync(int enrollmentId, int moduleId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseGrades
-            .FirstOrDefaultAsync(g => g.EnrollmentID == enrollmentId && g.ModuleID == moduleId);
+            .FirstOrDefaultAsync(g => g.EnrollmentID == enrollmentId && g.ModuleID == moduleId, cancellationToken);
     }
 
     /// <summary>
     /// Get Avg Grades By Module Enrollment Async.
     /// </summary>
-    public async Task<double> GetAvgGradesByModuleEnrollmentAsync(int moduleId, int enrollmentId)
+    public async Task<double> GetAvgGradesByModuleEnrollmentAsync(int moduleId, int enrollmentId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseGrades
             .Where(g => g.ModuleID == moduleId && g.EnrollmentID == enrollmentId)
             .Select(x => (double?)x.StudentDegree)
-             .AverageAsync() ?? 0;
+             .AverageAsync(cancellationToken) ?? 0;
     }
 
 
@@ -60,7 +60,7 @@ public class CourseGradeRepository
         /// <summary>
         /// Get Course Students Paged Async.
         /// </summary>
-        public async Task<PagedResultDto<StudentCardDto>> GetCourseStudentsPagedAsync(GetStudentsPagedQueryModel param)
+        public async Task<PagedResultDto<StudentCardDto>> GetCourseStudentsPagedAsync(GetStudentsPagedQueryModel param, CancellationToken cancellationToken = default)
     {
         var pageNumber = Math.Max(1, param.PageNumber);
         var pageSize = Math.Clamp(param.PageSize, 1, GetStudentsPagedQueryModel.MaxPageSize);
@@ -81,7 +81,7 @@ public class CourseGradeRepository
         }
 
 
-        var totalCount = await query.CountAsync();
+        var totalCount = await query.CountAsync(cancellationToken);
 
 
         var items = await query
@@ -116,7 +116,7 @@ public class CourseGradeRepository
                    })
                    .ToList()
            })
-           .ToListAsync();
+           .ToListAsync(cancellationToken);
 
 
         return new PagedResultDto<StudentCardDto>
@@ -128,7 +128,7 @@ public class CourseGradeRepository
         };
     }
     public async Task<List<CourseGradesExportDto>>
-    GetCourseGradesForExportAsync(int courseOfferingId)
+    GetCourseGradesForExportAsync(int courseOfferingId, CancellationToken cancellationToken = default)
     {
         // 1) Enrollments + student profile data via explicit projection.
         var rows = await _context.Enrollments
@@ -143,7 +143,7 @@ public class CourseGradeRepository
                 AcademicId = e.Student!.AcademicId ?? string.Empty,
                 EnrollmentId = e.EnrollmentID
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         if (rows.Count == 0)
             return rows;
@@ -153,7 +153,7 @@ public class CourseGradeRepository
             .AsNoTracking()
             .Where(m => m.CourseOfferingID == courseOfferingId)
             .OrderBy(m => m.ModuleID)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         var enrollmentIds = rows.Select(x => x.EnrollmentId).ToList();
         var moduleIds = modules.Select(m => m.ModuleID).ToList();
@@ -164,7 +164,7 @@ public class CourseGradeRepository
             .Where(g =>
                 enrollmentIds.Contains(g.EnrollmentID) &&
                 moduleIds.Contains(g.ModuleID))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         var gradesByKey = grades.ToDictionary(
             g => (g.EnrollmentID, g.ModuleID),
@@ -212,19 +212,19 @@ public class CourseGradeRepository
     /// </summary>
     public async Task<List<CourseGrade>> GetByEnrollmentAndModulesAsync(
     List<int> enrollmentIds,
-    List<int> moduleIds)
+    List<int> moduleIds, CancellationToken cancellationToken = default)
     {
         return await _context.CourseGrades
             .Where(x => enrollmentIds.Contains(x.EnrollmentID)
                      && moduleIds.Contains(x.ModuleID))
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
     /// <summary>
     /// Add Range Async.
     /// </summary>
-    public async Task AddRangeAsync(List<CourseGrade> grades)
+    public async Task AddRangeAsync(List<CourseGrade> grades, CancellationToken cancellationToken = default)
     {
-        await _context.CourseGrades.AddRangeAsync(grades);
+        await _context.CourseGrades.AddRangeAsync(grades, cancellationToken);
     }
 
     /// <summary>

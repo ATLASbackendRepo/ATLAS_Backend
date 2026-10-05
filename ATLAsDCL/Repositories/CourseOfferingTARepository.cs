@@ -16,24 +16,24 @@ public class CourseOfferingTARepository
     /// <summary>
     /// Get By TAAsync.
     /// </summary>
-    public async Task<IEnumerable<CourseOfferingTA>> GetByTAAsync(int taId)
+    public async Task<IEnumerable<CourseOfferingTA>> GetByTAAsync(int taId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseOfferingTAs
             .AsNoTracking()
             .Include(c => c.CourseOffering)
             .Where(c => c.TeacherAssistID == taId)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     /// <summary>
     /// Get TAs By Offering Async.
     /// </summary>
-    public async Task<IEnumerable<CourseOfferingTA>> GetTAsByOfferingAsync(int offeringId)
+    public async Task<IEnumerable<CourseOfferingTA>> GetTAsByOfferingAsync(int offeringId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseOfferingTAs
             .AsNoTracking()
             .Include(c => c.CourseOffering)
             .Where(c => c.CourseOfferingID == offeringId)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 }   

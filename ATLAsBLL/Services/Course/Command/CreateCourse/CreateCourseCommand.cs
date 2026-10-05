@@ -6,5 +6,5 @@ namespace ATLAsBLL.Features.Courses.Commands.CreateCourse
     /// <summary>
     /// Create Course Command.
     /// </summary>
-    public record CreateCourseCommand(CreateCourseDTO CreateCourseDTO) : ICommand<int>;
+    public record CreateCourseCommand(CreateCourseDTO CreateCourseDTO) : ICommand<int>, IWriteCommand;
 }

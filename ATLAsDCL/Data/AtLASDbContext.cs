@@ -81,6 +81,12 @@ namespace ATLAsDCL.Data
         /// Course Grades.
         /// </summary>
         public DbSet<CourseGrade> CourseGrades { get; set; }
+
+        /// <summary>
+        /// Course Grade History. Append-only trail of every accepted grade change
+        /// (MED-06).
+        /// </summary>
+        public DbSet<CourseGradeHistory> CourseGradeHistory { get; set; }
         /// <summary>
         /// Attendance Sessions.
         /// </summary>
@@ -89,6 +95,10 @@ namespace ATLAsDCL.Data
         /// Attendance Records.
         /// </summary>
         public DbSet<AttendanceRecord> AttendanceRecords { get; set; } = null!;
+        /// <summary>
+        /// Registered Devices.
+        /// </summary>
+        public DbSet<RegisteredDevice> RegisteredDevices { get; set; } = null!;
         /// <summary>
         /// Semester Student Rankings.
         /// </summary>
@@ -160,6 +170,11 @@ namespace ATLAsDCL.Data
             {
                 entity.HasNoKey();
                 entity.ToView("vw_CourseDetails");
+
+                // The view exposes the decimal(5,2) columns of CourseGrades and
+                // AssessmentModules, so the properties must not be mapped as int.
+                entity.Property(x => x.studentdegree).HasPrecision(5, 2);
+                entity.Property(x => x.maxDegree).HasPrecision(5, 2);
             });
 
 

@@ -32,7 +32,7 @@ namespace ATLAsBLL.Features.Semesters.Commands.CreateSemester
                 AcademicYear = request.AcademicYear
             };
 
-            await _unitOfWork.Semesters.AddAsync(semester);
+            await _unitOfWork.Semesters.AddAsync(semester, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return semester.SemesterID;

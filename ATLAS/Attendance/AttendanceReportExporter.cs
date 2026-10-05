@@ -62,11 +62,34 @@ internal static class AttendanceReportExporter
         if (string.IsNullOrEmpty(value))
             return "\"\"";
 
+        // A student controls their own name, and a spreadsheet executes any cell
+        // that starts with one of these characters. Prefixing the value with a
+        // single quote keeps it as text (LOW-10).
+        var neutralised = StartsWithFormula(value)
+            ? "'" + value
+            : value;
+
         // CSV requires escaping quotes by doubling them.
-        var escaped = value.Replace("\"", "\"\"");
+        var escaped = neutralised.Replace("\"", "\"\"");
 
         // Always quote text values to safely handle commas and new lines.
         return $"\"{escaped}\"";
+    }
+
+    /// <summary>
+    /// Detects a value that a spreadsheet application would treat as a formula.
+    /// </summary>
+    private static bool StartsWithFormula(string value)
+    {
+        foreach (var character in value)
+        {
+            if (char.IsWhiteSpace(character))
+                continue;
+
+            return character is '=' or '+' or '-' or '@';
+        }
+
+        return false;
     }
 
 

@@ -23,7 +23,7 @@ public class GetAllInstitutionsHandler : IRequestHandler<GetAllInstitutionsQuery
     /// </summary>
     public async Task<List<InstitutionDto>> Handle(GetAllInstitutionsQuery request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Institutions.GetAllInstitutionsAsync();
+        return await _unitOfWork.Institutions.GetAllInstitutionsAsync(cancellationToken);
     }
 }
 
@@ -49,7 +49,7 @@ public class GetInstitutionByIdHandler : IRequestHandler<GetInstitutionByIdQuery
     /// </summary>
     public async Task<InstitutionDto?> Handle(GetInstitutionByIdQuery request, CancellationToken cancellationToken)
     {
-        return await unitOfWork1.Institutions.GetInstitutionByIdAsync(request.Id);
+        return await unitOfWork1.Institutions.GetInstitutionByIdAsync(request.Id, cancellationToken);
 
 
     }

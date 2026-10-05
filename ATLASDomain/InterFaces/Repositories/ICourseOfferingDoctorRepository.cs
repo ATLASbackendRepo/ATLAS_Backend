@@ -7,6 +7,21 @@ using ATLASDomain.InterFaces.Repositories;
 public interface ICourseOfferingDoctorRepository
     : IGenericRepository<CourseOfferingDoctor>
 {
-    Task<IEnumerable<int>> GetDoctorsByOfferingAsync(int offeringId);
-    Task<IEnumerable<int>> GetDoctorIdsByCourseOfferingIdAsync(int offeringId);
+    /// <summary>
+    /// Gets the doctor user ids assigned to a course offering.
+    /// </summary>
+    /// <param name="offeringId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The assigned doctor user ids.</returns>
+    Task<IEnumerable<int>> GetDoctorsByOfferingAsync(int offeringId, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets the doctor user ids of a course offering. Equivalent to
+    /// <see cref="GetDoctorsByOfferingAsync"/> and kept for callers that name the
+    /// course offering explicitly.
+    /// </summary>
+    /// <param name="offeringId">Course offering identifier.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>The assigned doctor user ids.</returns>
+    Task<IEnumerable<int>> GetDoctorIdsByCourseOfferingIdAsync(int offeringId, CancellationToken cancellationToken = default);
 }

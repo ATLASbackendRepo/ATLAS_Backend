@@ -30,7 +30,7 @@ namespace ATLAsBLL.Services.Instution.Command.Create
         /// </summary>
         public async Task<InstitutionDto> Handle(CreateInstitutionCommand request, CancellationToken cancellationToken)
         {
-            return await unitOfWork.Institutions.CreateInstitutionAsync(request.Dto);
+            return await unitOfWork.Institutions.CreateInstitutionAsync(request.Dto, cancellationToken);
         }
     }
 }

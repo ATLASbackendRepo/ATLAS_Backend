@@ -5,5 +5,5 @@ namespace ATLAsBLL.Features.CourseOfferingDoctors.Commands.DeleteCourseOfferingD
     /// <summary>
     /// Delete Course Offering Doctor Command.
     /// </summary>
-    public record DeleteCourseOfferingDoctorCommand(int CourseOfferingDoctorId) : ICommand<bool>;
+    public record DeleteCourseOfferingDoctorCommand(int CourseOfferingDoctorId) : ICommand<bool>, IWriteCommand;
 }

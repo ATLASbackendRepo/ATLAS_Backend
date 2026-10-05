@@ -1,6 +1,7 @@
 // Application/Users/Events/UserCreatedEvent.cs
 using ATLASDomain.Entities;
 using MediatR;
+
 namespace ATLAsBLL.Events
 {
     /// <summary>

@@ -27,7 +27,7 @@ namespace ATLAsBLL.Services.Student.Queries.GetSTudentGrade
         /// </summary>
         public async Task<StudentGradeDto> Handle(GetStudentGradeQuery request, CancellationToken cancellationToken)
         {
-            var student = await _unitOfWork.Students.GetStudentWithModeAsync(request.CourseOfferingID, request.ModuleId, request.StudentCode);
+            var student = await _unitOfWork.Students.GetStudentWithModeAsync(request.CourseOfferingID, request.ModuleId, request.StudentCode, cancellationToken);
             if (student == null) return null!;
             return student;
         }

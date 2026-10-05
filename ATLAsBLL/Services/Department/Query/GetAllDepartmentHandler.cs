@@ -24,6 +24,6 @@ public class GetAllDepartmentHandler : IRequestHandler<GetAllDepartment, List<De
     /// </summary>
     public async Task<List<DepartmentDTO>> Handle(GetAllDepartment request, CancellationToken cancellationToken)
     {
-        return await _unitOfWork.Departments.GetDepartments(request.Name);
+        return await _unitOfWork.Departments.GetDepartments(request.Name, cancellationToken);
     }
 }

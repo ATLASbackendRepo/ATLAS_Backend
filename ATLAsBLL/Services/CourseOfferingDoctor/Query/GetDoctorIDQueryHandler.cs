@@ -28,7 +28,7 @@ namespace ATLAsBLL.Services.CourseOfferingDoctor.Query
         /// </summary>
         public async Task<IEnumerable<int>> Handle(GetDoctorIDQuery request, CancellationToken cancellationToken)
         {
-            var DoctorIDs = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(request.CourseOfferingID);
+            var DoctorIDs = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(request.CourseOfferingID, cancellationToken);
             if (DoctorIDs == null || !DoctorIDs.Any())
                 throw new ArgumentException("No doctors found for the specified course offering.");
 

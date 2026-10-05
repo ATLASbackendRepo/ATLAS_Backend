@@ -18,56 +18,47 @@ public class DepartmentRepository
     /// <summary>
     /// Get Department With Students Async.
     /// </summary>
-    public async Task<Department?> GetDepartmentWithStudentsAsync(int departmentId)
+    public async Task<Department?> GetDepartmentWithStudentsAsync(int departmentId, CancellationToken cancellationToken = default)
     {
         return await _context.Departments
             .AsNoTracking()
             .Include(d => d.Students)
             .ThenInclude(s => s.User)
-            .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
+            .FirstOrDefaultAsync(d => d.DepartmentId == departmentId, cancellationToken);
     }
 
     /// <summary>
     /// Get Department With Doctors Async.
     /// </summary>
-    public async Task<Department?> GetDepartmentWithDoctorsAsync(int departmentId)
+    public async Task<Department?> GetDepartmentWithDoctorsAsync(int departmentId, CancellationToken cancellationToken = default)
     {
         return await _context.Departments
             .AsNoTracking()
             .Include(d => d.Users)
-            .FirstOrDefaultAsync(d => d.DepartmentId == departmentId);
+            .FirstOrDefaultAsync(d => d.DepartmentId == departmentId, cancellationToken);
     }
 
     /// <summary>
     /// Get Department Withname Async.
+    /// The lookup is read-only: a name that does not exist for the institution
+    /// is reported as 0 so the caller can reject the row instead of silently
+    /// creating a department from a typo (MED-14).
     /// </summary>
-    public async Task<int> GetDepartmentWithnameAsync(string departmentName, int institutionId)
+    public async Task<int> GetDepartmentWithnameAsync(string departmentName, int institutionId, CancellationToken cancellationToken = default)
     {
         var departmentId = await _context.Departments
             .AsNoTracking()
             .Where(d => d.D_Name == departmentName && d.InstitutionID == institutionId)
             .Select(d => (int?)d.DepartmentId)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
-        if (departmentId.HasValue)
-        {
-            return departmentId.Value;
-        }
-
-       var newDepartment = new Department
-       {
-           D_Name = departmentName,
-           InstitutionID = institutionId
-       };
-        _context.Departments.Add(newDepartment);
-        await _context.SaveChangesAsync();
-        return newDepartment.DepartmentId;
+        return departmentId ?? 0;
     }
 
     /// <summary>
     /// Get Departments.
     /// </summary>
-    public async Task<List<DepartmentDTO>> GetDepartments(string? departmentName)
+    public async Task<List<DepartmentDTO>> GetDepartments(string? departmentName, CancellationToken cancellationToken = default)
     {
         var query = _context.Departments
             .AsNoTracking()
@@ -89,7 +80,7 @@ public class DepartmentRepository
                 NumOfDoctors = d.Users.Count(u => u.Role == enUserRole.Doctor),
                 NumOfTeacherAssistants = d.Users.Count(u => u.Role == enUserRole.TeachingAssistant)
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
         return departments;
     }

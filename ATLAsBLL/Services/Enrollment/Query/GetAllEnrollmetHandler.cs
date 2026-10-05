@@ -31,7 +31,7 @@ namespace ATLAsBLL.Services.Enrollment.Query
         public async Task<PagedResultDto<CourseEnrollmentSummaryDto>> Handle(GetEnrollment request, CancellationToken cancellationToken)
         {
             var EnrollmentOverview = await _unitOfWork.Enrollments.GetEnrollmentsOverviewAsync(request.searchKeyword, request.doctorId
-                                                                                                , request.pageIndex);
+                                                                                                , request.pageIndex, cancellationToken: cancellationToken);
             if (EnrollmentOverview == null)
                 throw new Exception();
 

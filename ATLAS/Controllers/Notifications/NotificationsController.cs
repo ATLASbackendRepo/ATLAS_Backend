@@ -12,12 +12,12 @@ using System.Security.Claims;
 namespace ATLAS.Controllers;
 
 
-[Authorize]
-[ApiController]
-[Route("api/notifications")]
 /// <summary>
 /// Notifications Controller.
 /// </summary>
+[Authorize]
+[ApiController]
+[Route("api/notifications")]
 public class NotificationsController : ControllerBase
 {
     /// <summary>
@@ -31,15 +31,14 @@ public class NotificationsController : ControllerBase
     }
 
   
+    /// <summary>
+    /// Get Notifications.
+    /// </summary>
     [HttpGet ( Name = "GetNotifications" )]
     [ProducesResponseType(typeof(List<NotificationDto>), 200)]
     [ProducesResponseType(statusCode: 404)]
     [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
     [EnableRateLimiting("NotificationsPolicy")]
-
-    /// <summary>
-    /// Get Notifications.
-    /// </summary>
     public async Task<ActionResult<List<NotificationDto>>> GetNotifications(
         [FromQuery] bool unreadOnly = false,
         CancellationToken cancellationToken = default)
@@ -55,6 +54,7 @@ public class NotificationsController : ControllerBase
 
     /// <summary>
     /// Mark a single notification as read.
+    /// Mark As Read.
     /// </summary>
     [HttpPost("{notificationId}/read")]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -62,9 +62,6 @@ public class NotificationsController : ControllerBase
     [ProducesResponseType(StatusCodes.Status403Forbidden)]
     [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
     [EnableRateLimiting("NotificationsPolicy")]
-    /// <summary>
-    /// Mark As Read.
-    /// </summary>
     public async Task<IActionResult> MarkAsRead(
     [FromRoute] int notificationId,
     CancellationToken cancellationToken = default)
@@ -92,14 +89,12 @@ public class NotificationsController : ControllerBase
 
     /// <summary>
     /// Mark all notifications as read for the current user.
+    /// Mark All As Read.
     /// </summary>
     [HttpPost("read-all")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [Authorize(Roles = "Doctor,TeachingAssistant,Student")]
     [EnableRateLimiting("NotificationsReadAllPolicy")]
-    /// <summary>
-    /// Mark All As Read.
-    /// </summary>
     public async Task<IActionResult> MarkAllAsRead(CancellationToken cancellationToken = default)
     {
         try

@@ -55,7 +55,7 @@ public class SendCourseGroupMessageCommandHandler : IRequestHandler<SendCourseGr
             IsDeleted = false
         };
 
-        await _unitOfWork.CourseGroupMessages.AddAsync(message);
+        await _unitOfWork.CourseGroupMessages.AddAsync(message, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         // Publish domain event to create notifications

@@ -13,7 +13,10 @@ public interface IAttendanceService
 {
     Task<AttendanceSessionDto> StartAsync(int courseOfferingId, int userId, int durationMinutes, CancellationToken cancellationToken);
     Task<AttendanceQrDto?> GetCurrentQrAsync(Guid sessionId, CancellationToken cancellationToken);
-    Task<AttendanceScanResult> RecordScanAsync(string qrToken, int studentUserId, string deviceId, CancellationToken cancellationToken);
+    /// <summary>
+    /// Records a scan after the device binding has been proved (MED-17).
+    /// </summary>
+    Task<AttendanceScanResult> RecordScanAsync(AttendanceScanRequest request, int studentUserId, CancellationToken cancellationToken);
     Task<AttendanceSessionDto?> EndAsync(Guid sessionId, CancellationToken cancellationToken);
     Task<AttendanceReportDto?> GetReportAsync(Guid sessionId, CancellationToken cancellationToken);
 }
@@ -21,7 +24,7 @@ public interface IAttendanceService
 /// <summary>
 /// Attendance Service.
 /// </summary>
-public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeProvider) : IAttendanceService
+public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeProvider, IDeviceBindingService deviceBinding) : IAttendanceService
 {
     // QR payloads are verified server-side; a captured payload is valid for one five-second slot only.
     /// <summary>
@@ -50,7 +53,20 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
             SigningKey = Convert.ToBase64String(RandomNumberGenerator.GetBytes(32))
         };
         context.AttendanceSessions.Add(session);
-        await context.SaveChangesAsync(cancellationToken);
+
+        try
+        {
+            await context.SaveChangesAsync(cancellationToken);
+        }
+        catch (DbUpdateException)
+        {
+            // LOW-09: the filtered unique index caught the race that the check
+            // above cannot. Without this the losing instructor would receive a 500
+            // for what is really a conflict they can act on - they already have a
+            // session running for this offering.
+            throw new AttendanceConflictException("An attendance session is already active for this course offering.");
+        }
+
         return ToDto(session, 0);
     }
 
@@ -74,12 +90,17 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
     /// <summary>
     /// Record Scan Async.
     /// </summary>
-    public async Task<AttendanceScanResult> RecordScanAsync(string qrToken, int studentUserId, string deviceId, CancellationToken cancellationToken)
+    public async Task<AttendanceScanResult> RecordScanAsync(AttendanceScanRequest request, int studentUserId, CancellationToken cancellationToken)
     {
-        if (string.IsNullOrWhiteSpace(deviceId) || deviceId.Length < 16 || deviceId.Length > 256)
-            throw new AttendanceValidationException("A valid app-generated device identifier is required.");
-        var parsed = ParseToken(qrToken);
+        var parsed = ParseToken(request.QrToken);
         if (parsed is null) throw new AttendanceValidationException("The QR code is malformed.");
+
+        // MED-17: nothing about the device identifier is taken on trust. The pairing
+        // token proves this server paired the device, and the per-scan signature
+        // proves the device still holds the secret it was issued. Both are checked
+        // before the identifier is allowed to identify anything.
+        var device = await deviceBinding.VerifyScanAsync(
+            request.DeviceId, request.PairingToken, request.DeviceSignature, request.QrToken, studentUserId, cancellationToken);
 
         var session = await context.AttendanceSessions.SingleOrDefaultAsync(x => x.AttendanceSessionId == parsed.Value.SessionId, cancellationToken);
         if (session is null) throw new AttendanceValidationException("The attendance session was not found.");
@@ -87,7 +108,20 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
         ExpireIfNeeded(session, now);
         if (session.Status != AttendanceSessionStatus.Active) throw new AttendanceValidationException("This attendance session is closed.");
         var currentSlot = new DateTimeOffset(now).ToUnixTimeSeconds() / RotationSeconds;
-        if (parsed.Value.Slot != currentSlot || !CryptographicOperations.FixedTimeEquals(
+
+        // LOW-09: the code only accepted the current slot, so a code displayed at
+        // the very end of its five-second window was rejected while the student was
+        // still looking at it. The HMAC binds the slot into the signature, so
+        // accepting the previous slot cannot be forged - it only widens the window
+        // by one rotation, and only for a code this server issued moments earlier.
+        // Without the grace period the scan has to be retried, which is exactly what
+        // students do when the app tells them "this QR code has expired" while the
+        // code is still on the screen.
+        var previousSlot = currentSlot - 1;
+        var slotIsAcceptable = parsed.Value.Slot == currentSlot ||
+                               parsed.Value.Slot == previousSlot;
+
+        if (!slotIsAcceptable || !CryptographicOperations.FixedTimeEquals(
                 Encoding.UTF8.GetBytes(parsed.Value.Signature), Encoding.UTF8.GetBytes(Sign(session, parsed.Value.Slot))))
             throw new AttendanceValidationException("This QR code has expired. Scan the currently displayed code.");
 
@@ -96,7 +130,9 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
         var enrolled = await context.Enrollments.AnyAsync(x => x.StudentID == student.StudentId && x.CourseOfferingID == session.CourseOfferingId, cancellationToken);
         if (!enrolled) throw new AttendanceValidationException("You are not enrolled in this course offering.");
 
-        var deviceHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(deviceId)));
+        // Now meaningful: DeviceHash comes from an identifier the server paired, so
+        // a student cannot mint a fresh one per friend to bypass the rule below.
+        var deviceHash = device.DeviceHash;
         if (await context.AttendanceRecords.AnyAsync(x => x.AttendanceSessionId == session.AttendanceSessionId && x.StudentId == student.StudentId, cancellationToken))
             throw new AttendanceConflictException("Attendance has already been recorded for this student.");
         if (await context.AttendanceRecords.AnyAsync(x => x.AttendanceSessionId == session.AttendanceSessionId && x.DeviceHash == deviceHash, cancellationToken))

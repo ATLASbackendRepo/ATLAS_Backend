@@ -3,6 +3,7 @@ using ATLAsBLL.Features.AssessmentModules.Commands.DeleteAssessmentModule;
 using ATLAsBLL.Features.AssessmentModules.Commands.UpdateAssessmentModule;
 using ATLAsBLL.Services.AssessmentModule.Qureies;
 using ATLASDomain.DTO.AssessmentModule;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -89,7 +90,7 @@ namespace ATLAS.Controllers.AssessmentModule
         /// </summary>
         [HttpPost("CreateAssessmentModule")]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [Authorize(Roles = "Doctor,TeachingAssistant")]
         [EnableRateLimiting("CourseGradeReadPolicy")]
@@ -100,15 +101,31 @@ namespace ATLAS.Controllers.AssessmentModule
                 var userId = GetCurrentUserId();
                 var command = new CreateAssessmentModuleCommand(createModeDTO , userId);
                 var moduleId = await _mediator.Send(command, cancellationToken);
-                return Ok(moduleId);
+                // LOW-07: creating an assessment module is a 201, not a 200. The
+                // created id is returned in the body as before.
+                return StatusCode(StatusCodes.Status201Created, moduleId);
             }
             catch (UnauthorizedAccessException)
             {
                 return Unauthorized(new { message = "Authentication is required to perform this operation." });
             }
-            catch (ArgumentException)
+            catch (ValidationException validationException)
             {
-                return BadRequest(new { message = "The request is invalid." });
+                // A rejected request (for example MaxDegree outside the allowed
+                // range) is a client mistake, not a server fault (MED-07).
+                return BadRequest(new
+                {
+                    message = "The request is invalid.",
+                    errors = validationException.Errors
+                        .GroupBy(failure => failure.PropertyName)
+                        .ToDictionary(
+                            group => group.Key,
+                            group => group.Select(failure => failure.ErrorMessage).ToArray())
+                });
+            }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(new { message = exception.Message });
             }
             catch (Exception)
             {
@@ -142,9 +159,23 @@ namespace ATLAS.Controllers.AssessmentModule
             {
                 return NotFound(new { message = "The requested resource was not found." });
             }
-            catch (ArgumentException)
+            catch (ValidationException validationException)
             {
-                return BadRequest(new { message = "The request is invalid." });
+                // A rejected request (for example MaxDegree outside the allowed
+                // range) is a client mistake, not a server fault (MED-07).
+                return BadRequest(new
+                {
+                    message = "The request is invalid.",
+                    errors = validationException.Errors
+                        .GroupBy(failure => failure.PropertyName)
+                        .ToDictionary(
+                            group => group.Key,
+                            group => group.Select(failure => failure.ErrorMessage).ToArray())
+                });
+            }
+            catch (ArgumentException exception)
+            {
+                return BadRequest(new { message = exception.Message });
             }
             catch (Exception)
             {

@@ -43,9 +43,9 @@ namespace ATLAsBLL.Services.Notifications
 
 
             var studentUserIds = await _unitOfWork.Enrollments
-                             .GetStudentUserIdsByCourseOfferingAsync(notification.CourseOfferingId);
+                             .GetStudentUserIdsByCourseOfferingAsync(notification.CourseOfferingId, cancellationToken);
             var offering = (await _unitOfWork.CourseOfferings
-                          .GetCourseOFferingByID( notification.CourseOfferingId));
+                          .GetCourseOFferingByID( notification.CourseOfferingId, cancellationToken));
 
             if (offering == null)
             {
@@ -77,7 +77,7 @@ namespace ATLAsBLL.Services.Notifications
 
             if (notifications.Any())
             {
-                await _unitOfWork.Notifications.AddRangeAsync(notifications);
+                await _unitOfWork.Notifications.AddRangeAsync(notifications, cancellationToken);
                 await _unitOfWork.SaveChangesAsync(cancellationToken);
             }
         }

@@ -34,7 +34,7 @@ namespace ATLAsBLL.Features.CourseOfferings.Commands.CreateCourseOffering
                 SemesterID = request.SemesterId
             };
 
-            await _unitOfWork.CourseOfferings.AddAsync(offering);
+            await _unitOfWork.CourseOfferings.AddAsync(offering, cancellationToken);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
             return offering.CourseOfferingID;

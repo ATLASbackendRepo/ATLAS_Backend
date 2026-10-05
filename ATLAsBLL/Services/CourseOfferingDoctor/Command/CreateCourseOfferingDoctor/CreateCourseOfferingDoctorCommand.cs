@@ -5,5 +5,5 @@ namespace ATLAsBLL.Features.CourseOfferingDoctors.Commands.CreateCourseOfferingD
     /// <summary>
     /// Create Course Offering Doctor Command.
     /// </summary>
-    public record CreateCourseOfferingDoctorCommand(int CourseOfferingId, int DoctorId) : ICommand<int>;
+    public record CreateCourseOfferingDoctorCommand(int CourseOfferingId, int DoctorId) : ICommand<int>, IWriteCommand;
 }

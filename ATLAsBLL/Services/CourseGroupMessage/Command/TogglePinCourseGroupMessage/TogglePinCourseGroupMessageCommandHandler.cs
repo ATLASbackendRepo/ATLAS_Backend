@@ -26,11 +26,16 @@ public class TogglePinCourseGroupMessageCommandHandler : IRequestHandler<ToggleP
     /// </summary>
     public async Task<int> Handle(TogglePinCourseGroupMessageCommand request, CancellationToken cancellationToken)
     {
-        var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId);
+        var message = await _unitOfWork.CourseGroupMessages.GetByIdAsync(request.MessageId, cancellationToken);
 
         if (message == null)
         {
             throw new KeyNotFoundException($"Message with ID {request.MessageId} not found.");
+        }
+
+        if (message.IsDeleted)
+        {
+            throw new InvalidDataException("A deleted message can no longer be pinned or unpinned.");
         }
 
         // Authorization: only sender can toggle pin
@@ -39,7 +44,7 @@ public class TogglePinCourseGroupMessageCommandHandler : IRequestHandler<ToggleP
             throw new ForbiddenAccessException("You can only pin/unpin your own messages.");
         }
 
-        await _unitOfWork.CourseGroupMessages.TogglePinAsync(message);
+        await _unitOfWork.CourseGroupMessages.TogglePinAsync(message, cancellationToken);
         await _unitOfWork.SaveChangesAsync(cancellationToken);
 
         return message.MessageID;

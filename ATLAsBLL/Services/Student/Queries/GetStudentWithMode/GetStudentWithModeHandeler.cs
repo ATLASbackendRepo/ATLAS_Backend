@@ -29,7 +29,7 @@ namespace ATLAsBLL.Services.Student.Queries.GetStudentWithMode
         /// </summary>
         public async Task<IEnumerable<StudentGradeDto>> Handle(GetStudentWithModequery request, CancellationToken cancellationToken)
         {
-            var students = await _unitOfWork.Students.GetAllStudentWithModeAsync(request.CourseOfferingID, request.ModelID);
+            var students = await _unitOfWork.Students.GetAllStudentWithModeAsync(request.CourseOfferingID, request.ModelID, cancellationToken);
             if (students == null) return Enumerable.Empty<StudentGradeDto>();
 
             return students;

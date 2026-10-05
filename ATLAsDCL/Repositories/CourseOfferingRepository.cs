@@ -22,7 +22,7 @@ public class CourseOfferingRepository
     /// <summary>
     /// Get Details Async.
     /// </summary>
-    private async Task<CourseOffering?> GetDetailsAsync(int id)
+    private async Task<CourseOffering?> GetDetailsAsync(int id, CancellationToken cancellationToken)
     {
         return await _context.CourseOfferings
             .AsNoTracking()
@@ -32,7 +32,7 @@ public class CourseOfferingRepository
             .Include(c => c.CourseOfferingTAs)
             .Include(c => c.Enrollments)
             .AsSplitQuery()
-            .FirstOrDefaultAsync(c => c.CourseOfferingID == id);
+            .FirstOrDefaultAsync(c => c.CourseOfferingID == id, cancellationToken);
     }
 
 
@@ -41,50 +41,50 @@ public class CourseOfferingRepository
     /// <summary>
     /// Get Course OFfering By ID.
     /// </summary>
-    public async Task<CourseOffering?> GetCourseOFferingByID(int id)
+    public async Task<CourseOffering?> GetCourseOFferingByID(int id, CancellationToken cancellationToken = default)
     {
         return await _context.CourseOfferings
             .AsNoTracking()
             .Include(c => c.Course)
-            .FirstOrDefaultAsync(c => c.CourseOfferingID == id);
+            .FirstOrDefaultAsync(c => c.CourseOfferingID == id, cancellationToken);
     }
 
     /// <summary>
     /// Get Offering Details Async.
     /// </summary>
-    public async Task<CourseOffering?> GetOfferingDetailsAsync(int offeringId)
+    public async Task<CourseOffering?> GetOfferingDetailsAsync(int offeringId, CancellationToken cancellationToken = default)
     {
 
-        return await GetDetailsAsync(offeringId);
+        return await GetDetailsAsync(offeringId, cancellationToken);
     }
 
     /// <summary>
     /// Get By Semester Async.
     /// </summary>
-    public async Task<IEnumerable<CourseOffering>> GetBySemesterAsync(int semesterId)
+    public async Task<IEnumerable<CourseOffering>> GetBySemesterAsync(int semesterId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseOfferings
             .AsNoTracking()
             .Where(c => c.SemesterID == semesterId)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     /// <summary>
     /// Get By Course Async.
     /// </summary>
-    public async Task<IEnumerable<CourseOffering>> GetByCourseAsync(int courseId)
+    public async Task<IEnumerable<CourseOffering>> GetByCourseAsync(int courseId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseOfferings
             .AsNoTracking()
             .Where(c => c.CourseID == courseId)
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
 
     /// <summary>
     /// Get My Course Async.
     /// </summary>
-    public async Task<IEnumerable<CourseOfferingDTO>> GetMyCourseAsync(int userId)
+    public async Task<IEnumerable<CourseOfferingDTO>> GetMyCourseAsync(int userId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseOfferings
             .AsNoTracking()
@@ -107,13 +107,13 @@ public class CourseOfferingRepository
                     .SelectMany(e => e.CourseGrades)
                     .Sum(cg => (decimal?)cg.StudentDegree) ?? 0m
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
     /// <summary>
     /// Get Details Course Async.
     /// </summary>
     public async Task<IEnumerable< CourseofferingDetailsDTO>> GetDetailsCourseAsync(
-        int courseOfferingId)
+        int courseOfferingId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseDetails
             .AsNoTracking()
@@ -127,12 +127,12 @@ public class CourseOfferingRepository
                 maxDegree = cd.maxDegree,
                 studentdegree = cd.studentdegree
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
     /// <summary>
     /// Get Staff My Course Async.
     /// </summary>
-    public async Task<IEnumerable<DoctorCourseOfferingDTO>> GetStaffMyCourseAsync(int staffId)
+    public async Task<IEnumerable<DoctorCourseOfferingDTO>> GetStaffMyCourseAsync(int staffId, CancellationToken cancellationToken = default)
     {
         return await _context.CourseOfferings
             .AsNoTracking()
@@ -145,7 +145,7 @@ public class CourseOfferingRepository
                 CourseName = co.Course.C_Name,
                 Semester = co.Semester.SemesterName
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
 
@@ -154,12 +154,12 @@ public class CourseOfferingRepository
     /// <summary>
     /// Get My Course Details Async.
     /// </summary>
-    public  async Task<IEnumerable<CourseofferingDetailsDTO>> GetMyCourseDetailsAsync(int courseofferingId, int userId)
+    public  async Task<IEnumerable<CourseofferingDetailsDTO>> GetMyCourseDetailsAsync(int courseofferingId, int userId, CancellationToken cancellationToken = default)
     {
         var StudentID = await _context.Students
             .Where(s => s.UserId == userId)
             .Select(s => s.StudentId)
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
 
 
 
@@ -175,7 +175,7 @@ public class CourseOfferingRepository
                 maxDegree = cd.maxDegree,
                 studentdegree = cd.studentdegree
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
 
     }
 
@@ -191,7 +191,7 @@ public class CourseOfferingRepository
     /// <summary>
     /// Get Course Analysis Async.
     /// </summary>
-    public async Task<CourseAnalysisResponseDto> GetCourseAnalysisAsync(int courseOfferingId)
+    public async Task<CourseAnalysisResponseDto> GetCourseAnalysisAsync(int courseOfferingId, CancellationToken cancellationToken = default)
     {
         
 

@@ -26,7 +26,7 @@ namespace ATLAsBLL.Features.Students.Commands.DeleteStudent
         public async Task<bool> Handle(DeleteStudentCommand request, CancellationToken cancellationToken)
         {
             
-            var student = await _unitOfWork.Students.GetStudentWithUserAsync(request.StudentCode);
+            var student = await _unitOfWork.Students.GetStudentWithUserAsync(request.StudentCode, cancellationToken);
 
             if (student == null)
             {

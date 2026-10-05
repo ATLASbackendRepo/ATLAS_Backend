@@ -21,7 +21,7 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
     /// <summary>
     /// Get By Id Async.
     /// </summary>
-    public async Task<GradeAppealRequestDto?> GetByIdAsync(int requestId)
+    public async Task<GradeAppealRequestDto?> GetByIdAsync(int requestId, CancellationToken cancellationToken = default)
     {
         return await _context.GradeAppealRequests
             .AsNoTracking()
@@ -46,13 +46,13 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
                 SubmittedAt = x.SubmittedAt,
                 ReviewedAt = x.ReviewedAt
             })
-            .FirstOrDefaultAsync();
+            .FirstOrDefaultAsync(cancellationToken);
     }
 
     /// <summary>
     /// Get By Student Id Async.
     /// </summary>
-    public async Task<List<GradeAppealRequestDto>> GetByStudentIdAsync(int studentId)
+    public async Task<List<GradeAppealRequestDto>> GetByStudentIdAsync(int studentId, CancellationToken cancellationToken = default)
     {
         return await _context.GradeAppealRequests
             .AsNoTracking()
@@ -74,13 +74,13 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
                 SubmittedAt = x.SubmittedAt,
                 ReviewedAt = x.ReviewedAt
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     /// <summary>
     /// Get By Doctor Id Async.
     /// </summary>
-    public async Task<List<GradeAppealRequestDto>> GetByDoctorIdAsync(int doctorUserId)
+    public async Task<List<GradeAppealRequestDto>> GetByDoctorIdAsync(int doctorUserId, CancellationToken cancellationToken = default)
     {
         return await _context.GradeAppealRequests
             .AsNoTracking()
@@ -102,7 +102,7 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
                 SubmittedAt = x.SubmittedAt,
                 ReviewedAt = x.ReviewedAt
             })
-            .ToListAsync();
+            .ToListAsync(cancellationToken);
     }
 
     /// <summary>
@@ -110,20 +110,20 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
     /// </summary>
     public async Task<bool> HasOpenRequestAsync(
         int studentId,
-        int assessmentModuleId)
+        int assessmentModuleId, CancellationToken cancellationToken = default)
     {
         return await _context.GradeAppealRequests.AnyAsync(x =>
             x.StudentID == studentId &&
             x.AssessmentModuleID == assessmentModuleId &&
             (x.Status == enGradeAppealStatus.Pending
-             || x.Status == enGradeAppealStatus.UnderReview));
+             || x.Status == enGradeAppealStatus.UnderReview), cancellationToken);
     }
     /// <summary>
     /// Add Async.
     /// </summary>
     public async Task<int> AddAsync(
         CreateGradeAppealRequestDto dto,
-        int studentId)
+        int studentId, CancellationToken cancellationToken = default)
     {
         var request = new GradeAppealRequest
         {
@@ -137,8 +137,8 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
             SubmittedAt = DateTime.UtcNow
         };
 
-        await _context.GradeAppealRequests.AddAsync(request);
-        await _context.SaveChangesAsync();
+        await _context.GradeAppealRequests.AddAsync(request, cancellationToken);
+        await _context.SaveChangesAsync(cancellationToken);
 
         return request.RequestID;
     }
@@ -148,15 +148,26 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
     public async Task<bool> UpdateAsync(
         int requestId,
         int doctorUserId,
-        UpdateGradeAppealRequestDto dto)
+        UpdateGradeAppealRequestDto dto, CancellationToken cancellationToken = default)
     {
         var request = await _context.GradeAppealRequests
             .FirstOrDefaultAsync(x =>
                 x.RequestID == requestId &&
-                x.DoctorUserID == doctorUserId);
+                x.DoctorUserID == doctorUserId, cancellationToken);
 
         if (request is null)
             return false;
+
+        // MED-08: the status used to be written straight from the request body, so
+        // any value could replace any other one. That let a final appeal be reopened
+        // (Closed to Approved) and let a not-yet-reviewed appeal jump straight to a
+        // decision. The appeal is a state machine, so a transition that is not part
+        // of it is refused rather than applied.
+        if (!GradeAppealStatusTransitions.IsAllowed(request.Status, dto.Status))
+        {
+            throw new InvalidOperationException(
+                $"A grade appeal cannot move from {request.Status} to {dto.Status}.");
+        }
 
         request.Status = dto.Status;
         request.DoctorResponse = dto.DoctorResponse;
@@ -170,7 +181,7 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
 
         try
         {
-            await _context.SaveChangesAsync();
+            await _context.SaveChangesAsync(cancellationToken);
         }
         catch (DbUpdateConcurrencyException ex)
         {

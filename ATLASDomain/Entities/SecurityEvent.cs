@@ -62,5 +62,22 @@ namespace ATLASDomain.Entities
         /// Alerted At Utc.
         /// </summary>
         public DateTime? AlertedAtUtc { get; set; }
+
+        /// <summary>
+        /// How many delivery attempts have been made for this event (MED-11).
+        /// </summary>
+        public int DeliveryAttempts { get; set; }
+
+        /// <summary>
+        /// Earliest time the next delivery attempt may run. Set after a failed
+        /// attempt so a permanently broken provider is retried with a backoff
+        /// instead of being retried every poll.
+        /// </summary>
+        public DateTime? NextAttemptAtUtc { get; set; }
+
+        /// <summary>
+        /// Message of the most recent failed delivery attempt, kept for diagnosis.
+        /// </summary>
+        public string? LastDeliveryError { get; set; }
     }
 }

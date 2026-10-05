@@ -1,6 +1,7 @@
 using ATLAsDCL.UnitOfWork;
 using ATLASDomain.DTO.Request;
 using MediatR;
+
 namespace ATLAsBLL.Services.Request.Qeuries
 {
 
@@ -28,7 +29,7 @@ namespace ATLAsBLL.Services.Request.Qeuries
             GetGradeAppealByIdQuery query,
             CancellationToken cancellationToken)
         {
-            var request = await _UnitOfWork.GradeAppealRequests.GetByIdAsync(query.RequestId);
+            var request = await _UnitOfWork.GradeAppealRequests.GetByIdAsync(query.RequestId, cancellationToken);
 
             if (request is null)
                 return null;

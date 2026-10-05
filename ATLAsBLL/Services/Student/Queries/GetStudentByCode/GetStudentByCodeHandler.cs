@@ -30,7 +30,7 @@ namespace ATLAsBLL.Services.Student.Queries.GetallStudent
         public async Task<StudentDTO> Handle(GetStudentByCodeQuery request, CancellationToken cancellationToken)
         {
 
-            var student = await _unitOfWork.Students.GetStudentByCodeAsync(request.StudentCode);
+            var student = await _unitOfWork.Students.GetStudentByCodeAsync(request.StudentCode, cancellationToken);
 
 
             if (student is null)

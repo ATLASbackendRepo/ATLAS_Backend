@@ -14,6 +14,12 @@ namespace ATLASDomain.Entities
         /// </summary>
         public const decimal MaximumMaxDegree = 40;
         /// <summary>
+        /// Maximum total Max Degree of all modules of one course offering.
+        /// The per-module values are what a course grade is composed of, so the
+        /// sum for a single offering is capped at 100 (MED-07).
+        /// </summary>
+        public const decimal MaximumOfferingTotalMaxDegree = 100;
+        /// <summary>
         /// Module ID.
         /// </summary>
         public int ModuleID { get; set; }

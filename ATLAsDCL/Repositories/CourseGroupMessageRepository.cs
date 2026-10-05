@@ -32,7 +32,7 @@ namespace ATLAsDCL.Repositories
         /// <summary>
         /// Get By Course Offering Async.
         /// </summary>
-        public async Task<IEnumerable<CourseGroupMessage>> GetByCourseOfferingAsync(int courseOfferingId, int page, int pageSize)
+        public async Task<IEnumerable<CourseGroupMessage>> GetByCourseOfferingAsync(int courseOfferingId, int page, int pageSize, CancellationToken cancellationToken = default)
         {
             return await _Context.CourseGroupMessages
                 .Where(m => m.CourseOfferingID == courseOfferingId && !m.IsDeleted)
@@ -41,13 +41,13 @@ namespace ATLAsDCL.Repositories
                 .Skip((page - 1) * pageSize)
                 .Take(pageSize)
                 .Include(m => m.SenderUser)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
         /// <summary>
         /// Soft Delete Async.
         /// </summary>
-        public Task SoftDeleteAsync(CourseGroupMessage message)
+        public Task SoftDeleteAsync(CourseGroupMessage message, CancellationToken cancellationToken = default)
         {
             message.IsDeleted = true;
             _Context.CourseGroupMessages.Update(message);
@@ -57,7 +57,7 @@ namespace ATLAsDCL.Repositories
         /// <summary>
         /// Toggle Pin Async.
         /// </summary>
-        public Task TogglePinAsync(CourseGroupMessage message)
+        public Task TogglePinAsync(CourseGroupMessage message, CancellationToken cancellationToken = default)
         {
             message.IsPinned = !message.IsPinned;
             _Context.CourseGroupMessages.Update(message);

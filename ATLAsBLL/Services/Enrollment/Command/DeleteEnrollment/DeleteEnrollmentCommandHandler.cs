@@ -25,7 +25,7 @@ namespace ATLAsBLL.Features.Enrollments.Commands.DeleteEnrollment
         /// </summary>
         public async Task<bool> Handle(DeleteEnrollmentCommand request, CancellationToken cancellationToken)
         {
-            var ISDeleted = await _unitOfWork.Enrollments.DeleteEnrollmentByIdAsync(request.EnrollmentID);
+            var ISDeleted = await _unitOfWork.Enrollments.DeleteEnrollmentByIdAsync(request.EnrollmentID, cancellationToken);
             return ISDeleted;
         }
     }

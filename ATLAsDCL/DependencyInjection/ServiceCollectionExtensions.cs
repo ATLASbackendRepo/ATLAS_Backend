@@ -25,6 +25,22 @@ public static class ServiceCollectionExtensions
         var connectionString =
             configuration.GetConnectionString("DefaultConnection");
 
+        // LOW-01: the connection string was a literal sa password committed to
+        // appsettings.json, and is now supplied by user-secrets, an environment
+        // variable or the compose .env file. Failing here means a missing secret
+        // produces one clear message naming the fix, instead of an obscure SQL
+        // error much later when the first query opens a connection.
+        if (string.IsNullOrWhiteSpace(connectionString))
+        {
+            throw new InvalidOperationException(
+                "No database connection string is configured. Set the " +
+                "ConnectionStrings:DefaultConnection value through user-secrets " +
+                "(dotnet user-secrets set ConnectionStrings:DefaultConnection \"<value>\"), " +
+                "the ConnectionStrings__DefaultConnection environment variable, or the .env " +
+                "file used by docker-compose. See .env.example. " +
+                "It is intentionally not committed to appsettings.json.");
+        }
+
         // DbContext used by repositories/services.
         // The options are a singleton because the factory below is a singleton:
         // a scoped DbContextOptions cannot be consumed from the root provider,

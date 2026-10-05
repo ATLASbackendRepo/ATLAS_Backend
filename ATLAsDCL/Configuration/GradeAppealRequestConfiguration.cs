@@ -63,6 +63,12 @@ public class GradeAppealRequestConfiguration
         builder.Property(x => x.ReviewedAt)
             .HasColumnName("ReviewedAt");
 
+        // MED-08: two doctors deciding the same appeal at the same time would
+        // otherwise overwrite each other.
+        builder.Property(x => x.RowVersion)
+            .IsRowVersion()
+            .IsConcurrencyToken();
+
         builder.HasOne(x => x.Student)
             .WithMany()
             .HasForeignKey(x => x.StudentID)
@@ -91,5 +97,15 @@ public class GradeAppealRequestConfiguration
      t.HasCheckConstraint(
         "CK_GradeAppealRequests_Status",
             "[Status] IN ('Pending', 'UnderReview', 'NeedMoreInfo', 'Approved', 'Rejected', 'Closed')"));
+
+        // MED-08: the "one open appeal per student and module" rule used to be a
+        // check-then-insert in the repository, which two concurrent requests
+        // could both pass. A filtered unique index makes the database the
+        // authority: only the open states are unique, so a student may file a
+        // new appeal after a previous one has been decided.
+        builder.HasIndex(x => new { x.StudentID, x.AssessmentModuleID })
+            .IsUnique()
+            .HasFilter("[Status] IN ('Pending', 'UnderReview')")
+            .HasDatabaseName("UX_GradeAppealRequests_OpenAppealPerStudentModule");
     }
 }

@@ -31,12 +31,12 @@ namespace ATLAsBLL.Services.profile.Student.command
             updateStudentProfileInfoCommand request,
             CancellationToken cancellationToken)
         {
-            var student = await _unitOfWork.Students.GetStudentByUserIDAsync(request.UserId);
+            var student = await _unitOfWork.Students.GetStudentByUserIDAsync(request.UserId, cancellationToken);
 
             if(student == null) 
                 return false;
 
-            var profile = await _unitOfWork.StudentProfile.GetByUserIdAsync(student.StudentId);
+            var profile = await _unitOfWork.StudentProfile.GetByUserIdAsync(student.StudentId, cancellationToken);
 
             if (profile == null || profile.Student == null || profile.Student.User == null)
                 return false;

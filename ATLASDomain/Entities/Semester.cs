@@ -21,6 +21,12 @@ public class Semester
     public string AcademicYear { get; set; } = null!;
 
     /// <summary>
+    /// Whether grading has been closed for this semester. While true, no grade
+    /// may be assigned or imported for a course offering of this semester (MED-07).
+    /// </summary>
+    public bool IsGradingClosed { get; set; }
+
+    /// <summary>
     /// Course Offerings.
     /// </summary>
     public ICollection<CourseOffering> CourseOfferings { get; set; } = new List<CourseOffering>();

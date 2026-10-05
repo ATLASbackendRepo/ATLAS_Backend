@@ -75,7 +75,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                 try
                 {
                     // One round trip for every user and student in the file.
-                    await _unitOfWork.Students.AddRangeAsync(students);
+                    await _unitOfWork.Students.AddRangeAsync(students, cancellationToken);
                     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                     // The generated student ids are known now, so every profile is
@@ -91,7 +91,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                         })
                         .ToList();
 
-                    await _unitOfWork.StudentProfile.AddRangeAsync(profiles);
+                    await _unitOfWork.StudentProfile.AddRangeAsync(profiles, cancellationToken);
                     await _unitOfWork.SaveChangesAsync(cancellationToken);
 
                     await _unitOfWork.CommitTransactionAsync(cancellationToken);
@@ -205,7 +205,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                     {
                         institutionId =
                             await _unitOfWork.Institutions
-                                .GetInstitutionWithNameAsync(institutionName);
+                                .GetInstitutionWithNameAsync(institutionName, cancellationToken);
 
                         if (institutionId <= 0)
                         {
@@ -230,7 +230,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                             await _unitOfWork.Departments
                                 .GetDepartmentWithnameAsync(
                                     departmentName,
-                                    institutionId);
+                                    institutionId, cancellationToken);
 
                         if (departmentId <= 0)
                         {

@@ -26,28 +26,29 @@ namespace ATLAsDCL.Repositories
         /// <summary>
         /// Get Unread For User Async.
         /// </summary>
-        public async Task<IEnumerable<Notification>> GetUnreadForUserAsync(int userId)
+        public async Task<IEnumerable<Notification>> GetUnreadForUserAsync(int userId, CancellationToken cancellationToken = default)
         {
             return await _dbSet.Where(n => n.RecipientUserID == userId && !n.IsRead)
                 .OrderByDescending(n => n.CreatedAt)
-                .ToListAsync();
+                .ToListAsync(cancellationToken);
         }
 
         /// <summary>
         /// Mark All As Read Async.
         /// </summary>
-        public async Task MarkAllAsReadAsync(int userId)
+        /// <returns>The number of notifications that were actually marked.</returns>
+        public async Task<int> MarkAllAsReadAsync(int userId, CancellationToken cancellationToken = default)
         {
-            await _dbSet.Where(n => n.RecipientUserID == userId && !n.IsRead)
-                .ExecuteUpdateAsync(setters => setters.SetProperty(n => n.IsRead, true));
+            return await _dbSet.Where(n => n.RecipientUserID == userId && !n.IsRead)
+                .ExecuteUpdateAsync(setters => setters.SetProperty(n => n.IsRead, true), cancellationToken);
         }
 
         /// <summary>
         /// Mark As Read Async.
         /// </summary>
-        public async Task MarkAsReadAsync(int notificationId)
+        public async Task MarkAsReadAsync(int notificationId, CancellationToken cancellationToken = default)
         {
-            var item = await _dbSet.FindAsync(notificationId);
+            var item = await _dbSet.FindAsync(notificationId, cancellationToken);
             if (item != null)
             {
                 item.IsRead = true;

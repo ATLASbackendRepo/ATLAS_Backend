@@ -1,5 +1,6 @@
 using ATLASDomain.DTO.Profile;
 using MediatR;
+
 namespace ATLAsBLL.Services.profile.Student.command
 {
     /// <summary>
