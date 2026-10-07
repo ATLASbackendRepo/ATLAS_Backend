@@ -22,6 +22,11 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.CreateAssessmentModule
         /// </summary>
         public async Task<int> Handle(CreateAssessmentModuleCommand request, CancellationToken cancellationToken)
         {
+            if (_unitOfWork.Semesters != null && await _unitOfWork.Semesters.IsGradingClosedForOfferingAsync(request.DTO.CourseOfferingId, cancellationToken))
+            {
+                throw new System.InvalidOperationException("Grading is closed for the semester of this course offering.");
+            }
+
             var DoctorsID = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(request.DTO.CourseOfferingId, cancellationToken);
             if (!DoctorsID.ToList().Contains(request.UserId))
             {

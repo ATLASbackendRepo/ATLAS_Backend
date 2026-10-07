@@ -29,6 +29,11 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
     private const int DuplicateKey = 2627;
 
     /// <summary>
+    /// SQL Server foreign key constraint violation.
+    /// </summary>
+    private const int ForeignKeyViolation = 547;
+
+    /// <summary>
     /// Handles the exception and writes the problem response.
     /// </summary>
     /// <param name="httpContext">Current request.</param>
@@ -40,6 +45,11 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         Exception exception,
         CancellationToken cancellationToken)
     {
+        // Preserve security headers on error responses (MED-01)
+        httpContext.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        httpContext.Response.Headers["X-Frame-Options"] = "DENY";
+        httpContext.Response.Headers["Referrer-Policy"] = "strict-origin-when-cross-origin";
+
         var (status, title) = Map(exception);
 
         // A client that disconnected mid-request is not a server fault, so it
@@ -132,6 +142,10 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
                 when IsDuplicate(databaseException) =>
                 (StatusCodes.Status409Conflict, "The record already exists."),
 
+            DbUpdateException databaseException
+                when IsForeignKey(databaseException) =>
+                (StatusCodes.Status409Conflict, "The operation cannot be completed because related records exist."),
+
             _ => (StatusCodes.Status500InternalServerError, "An unexpected error occurred.")
         };
 
@@ -144,4 +158,13 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
         => exception.InnerException is SqlException sqlException &&
            (sqlException.Number == UniqueViolation ||
             sqlException.Number == DuplicateKey);
+
+    /// <summary>
+    /// Detects a foreign key constraint violation reported by SQL Server (QA-05).
+    /// </summary>
+    /// <param name="exception">Database exception.</param>
+    /// <returns>True when the failure is a foreign key constraint violation.</returns>
+    private static bool IsForeignKey(DbUpdateException exception)
+        => exception.InnerException is SqlException sqlException &&
+           sqlException.Number == ForeignKeyViolation;
 }

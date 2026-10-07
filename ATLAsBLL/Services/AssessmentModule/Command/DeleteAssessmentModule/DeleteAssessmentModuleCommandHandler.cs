@@ -25,6 +25,11 @@ namespace ATLAsBLL.Features.AssessmentModules.Commands.DeleteAssessmentModule
 
             var module = await _unitOfWork.AssessmentModules.GetByIdAsync(request.ModuleId, cancellationToken);
             if (module == null) throw new System.Collections.Generic.KeyNotFoundException("Module not found.");
+
+            if (_unitOfWork.Semesters != null && await _unitOfWork.Semesters.IsGradingClosedForOfferingAsync(module.CourseOfferingID, cancellationToken))
+            {
+                throw new System.InvalidOperationException("Grading is closed for the semester of this course offering.");
+            }
             var doctors = await _unitOfWork.CourseOfferingDoctors.GetDoctorsByOfferingAsync(module.CourseOfferingID, cancellationToken);
             var teachingAssistants = await _unitOfWork.CourseOfferingTAs.GetTAsByOfferingAsync(module.CourseOfferingID, cancellationToken);
             if (!doctors.Contains(request.UserId) && !teachingAssistants.Any(ta => ta.TeacherAssistID == request.UserId))

@@ -151,11 +151,15 @@ public class GradeAppealRequestRepository : IGradeAppealRequestRepository
         UpdateGradeAppealRequestDto dto, CancellationToken cancellationToken = default)
     {
         var request = await _context.GradeAppealRequests
-            .FirstOrDefaultAsync(x =>
-                x.RequestID == requestId &&
-                x.DoctorUserID == doctorUserId, cancellationToken);
+            .FirstOrDefaultAsync(x => x.RequestID == requestId, cancellationToken);
 
         if (request is null)
+            return false;
+
+        var isAssignedDoctor = request.DoctorUserID == doctorUserId ||
+            await _context.CourseOfferingDoctors.AnyAsync(cod => cod.CourseOfferingID == request.CourseOfferingID && cod.DoctorID == doctorUserId, cancellationToken);
+
+        if (!isAssignedDoctor)
             return false;
 
         // MED-08: the status used to be written straight from the request body, so

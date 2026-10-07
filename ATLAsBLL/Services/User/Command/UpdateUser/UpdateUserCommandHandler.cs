@@ -42,7 +42,14 @@ namespace ATLAsBLL.Features.Users.Commands.UpdateUser
             {
                 user.InstitutionID = request.Update_StaffDto.InstituteId;
             }   
-            user.Role = request.Update_StaffDto.Role;
+            if (request.Update_StaffDto.Role != 0)
+            {
+                if (user.Role != request.Update_StaffDto.Role)
+                {
+                    user.SecurityStamp = System.Guid.NewGuid();
+                }
+                user.Role = request.Update_StaffDto.Role;
+            }
 
             await _unitOfWork.SaveChangesAsync(cancellationToken);
             return true;

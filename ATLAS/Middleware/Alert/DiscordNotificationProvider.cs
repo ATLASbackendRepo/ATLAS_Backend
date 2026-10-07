@@ -48,14 +48,21 @@ namespace ATLAS.Middleware.Alert
 
 
 
+            string Sanitize(string? text) =>
+                string.IsNullOrEmpty(text)
+                    ? "Unknown"
+                    : text.Replace("@everyone", "@\u200beveryone")
+                          .Replace("@here", "@\u200bhere")
+                          .Replace("`", "'");
+
             var payload = new
             {
                 content =
-                    $"🚨 **{securityEvent.Severity} Security Event: {securityEvent.EventType}**\n" +
-                    $"User: {securityEvent.UserId?.ToString() ?? securityEvent.AttemptedAcademicId ?? "Unknown"}\n" +
-                    $"IP: {securityEvent.IpAddress}\n" +
+                    $"🚨 **{Sanitize(securityEvent.Severity)} Security Event: {Sanitize(securityEvent.EventType)}**\n" +
+                    $"User: {Sanitize(securityEvent.UserId?.ToString() ?? securityEvent.AttemptedAcademicId)}\n" +
+                    $"IP: {Sanitize(securityEvent.IpAddress)}\n" +
                     $"Time: {securityEvent.TimestampUtc:u}\n" +
-                    $"Correlation: {securityEvent.CorrelationId}"
+                    $"Correlation: {Sanitize(securityEvent.CorrelationId)}"
             };
 
             try
@@ -80,7 +87,7 @@ namespace ATLAS.Middleware.Alert
                         response.ReasonPhrase,
                         responseBody);
 
-                    return;
+                    throw new HttpRequestException($"Discord webhook failed with status code {(int)response.StatusCode}: {response.ReasonPhrase}");
                 }
 
                 _logger.LogInformation(
