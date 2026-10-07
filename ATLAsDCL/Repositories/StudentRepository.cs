@@ -56,6 +56,10 @@ public class StudentRepository
          {
             students = students.Where(s => s.IsActive == fillter.Status.Value);
          }
+         if(fillter.InstitutionId.HasValue)
+         {
+            students = students.Where(s => s.InstitutionID == fillter.InstitutionId.Value);
+         }
 
 
         // MED-12: this list is now bounded. Without the Skip/Take below the query

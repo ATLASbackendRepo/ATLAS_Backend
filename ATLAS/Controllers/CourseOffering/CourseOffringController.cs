@@ -1,5 +1,9 @@
 using ATLAsBLL.Services.CourseOffering.Queries;
 using ATLAsBLL.Services.User.qeusies.GetUserID;
+using ATLAsBLL.Features.CourseOfferings.Commands.CreateCourseOffering;
+using ATLAsBLL.Features.CourseOfferings.Commands.DeleteCourseOffering;
+using ATLAsBLL.Features.CourseOfferingDoctors.Commands.CreateCourseOfferingDoctor;
+using ATLAsBLL.Features.CourseOfferingTAs.Commands.CreateCourseOfferingTA;
 using ATLASDomain.DTO.CourseOffring;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -198,8 +202,90 @@ namespace ATLAS.Controllers.CourseOffering
                     return NotFound($"No doctors found for CourseOfferingId {courseOfferingId}.");
                 }
                 return Ok(doctorIDs);
-   
         }
+
+        /// <summary>
+        /// Creates a new course offering for a course in a semester.
+        /// </summary>
+        [HttpPost]
+        [Authorize(Roles = "SAdmin,Admin")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateCourseOffering(
+            [FromBody] CreateCourseOfferingCommand command,
+            CancellationToken cancellationToken = default)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var id = await _mediator.Send(command, cancellationToken);
+            return CreatedAtAction(nameof(CreateCourseOffering), new { id }, new { courseOfferingId = id });
+        }
+
+        /// <summary>
+        /// Deletes a course offering.
+        /// </summary>
+        [HttpDelete("{id:int}")]
+        [Authorize(Roles = "SAdmin,Admin")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteCourseOffering(
+            [FromRoute] int id,
+            CancellationToken cancellationToken = default)
+        {
+            var command = new DeleteCourseOfferingCommand(id);
+            var result = await _mediator.Send(command, cancellationToken);
+
+            if (!result)
+            {
+                return NotFound($"Course offering with ID {id} was not found.");
+            }
+
+            return Ok(new { message = "Course offering deleted successfully." });
+        }
+
+        /// <summary>
+        /// Assigns a doctor to a course offering.
+        /// </summary>
+        [HttpPost("assign-doctor")]
+        [Authorize(Roles = "SAdmin,Admin")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AssignDoctorToOffering(
+            [FromBody] CreateCourseOfferingDoctorCommand command,
+            CancellationToken cancellationToken = default)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var id = await _mediator.Send(command, cancellationToken);
+            return CreatedAtAction(nameof(AssignDoctorToOffering), new { id }, new { assignmentId = id });
+        }
+
+        /// <summary>
+        /// Assigns a teaching assistant to a course offering.
+        /// </summary>
+        [HttpPost("assign-ta")]
+        [Authorize(Roles = "SAdmin,Admin")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> AssignTAToOffering(
+            [FromBody] CreateCourseOfferingTACommand command,
+            CancellationToken cancellationToken = default)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var id = await _mediator.Send(command, cancellationToken);
+            return CreatedAtAction(nameof(AssignTAToOffering), new { id }, new { assignmentId = id });
+        }
+
         /// <summary>
         /// Get Current User Id.
         /// </summary>

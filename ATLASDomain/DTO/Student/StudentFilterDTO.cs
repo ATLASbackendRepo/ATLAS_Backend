@@ -25,5 +25,10 @@ namespace ATLASDomain.DTO.Student
         /// Status.
         /// </summary>
         public bool? Status { get; set; }
+
+        /// <summary>
+        /// Institution Id tenant filter.
+        /// </summary>
+        public int? InstitutionId { get; set; }
     }
 }

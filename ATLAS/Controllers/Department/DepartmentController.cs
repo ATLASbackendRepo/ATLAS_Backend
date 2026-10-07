@@ -7,6 +7,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Claims;
 
 namespace ATLAS.Controllers.Department
 {
@@ -34,6 +35,15 @@ namespace ATLAS.Controllers.Department
         [EnableRateLimiting("AdminUpdatePolicy")]
         public async Task<IActionResult> CreateDepartment([FromBody] string departmentName, int institutionId, CancellationToken cancellationToken = default)
         {
+            if (!User.IsInRole("SAdmin"))
+            {
+                var instClaim = User.FindFirstValue("institution_id");
+                if (!int.TryParse(instClaim, out var callerInstId) || callerInstId != institutionId)
+                {
+                    return Forbid();
+                }
+            }
+
             if (!string.IsNullOrEmpty(departmentName) && institutionId > 0)
             {
                 var departmentId = await _mediator.Send(new CreateDepartmentCommand(departmentName, institutionId), cancellationToken);

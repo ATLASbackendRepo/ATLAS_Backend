@@ -4,6 +4,7 @@ using ATLAsBLL.Services;
 using ATLAsBLL.Services.Auth;
 using ATLAsBLL.Services.Auth.Queries;
 using ATLAsBLL.Services.User.Command.ChangePassword;
+using ATLAsBLL.Services.User.Command.AdminResetUserPassword;
 using ATLAsBLL.Services.User.qeusies;
 using ATLASDomain.DTO.Login;
 using ATLASDomain.Entities;
@@ -44,6 +45,11 @@ namespace ATLAS.Controllers.Authtenication
         /// </summary>
         private readonly JwtOptions _jwtOptions;
 
+        /// <summary>
+        /// Fixed dummy hash used to equalize BCrypt timing when an account is not found (HIGH-02).
+        /// </summary>
+        private static readonly string DummyHash = BCrypt.Net.BCrypt.HashPassword("DummyPasswordToEqualizeTiming123!");
+
 
         public AuthController(IMediator mediator, IOptions<JwtOptions> jwtOptions, ISecurityEventService securityEventService)
         {
@@ -83,9 +89,11 @@ namespace ATLAS.Controllers.Authtenication
 
             var User = await _mediator.Send(new GetUserByAcademicIdQuery(request.AcademicId), cancellationToken);
 
+            var isUserValid = User != null && User.IsActive;
+            var hashToVerify = isUserValid ? User!.Password : DummyHash;
+            var isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, hashToVerify);
 
-
-            if (User == null || !User.IsActive || !BCrypt.Net.BCrypt.Verify(request.Password, User.Password))
+            if (!isUserValid || !isPasswordValid)
             {
                 var recentFailures = await _securityEventService.CountRecentFailedLoginsAsync(
                           request.AcademicId, TimeSpan.FromMinutes(9));
@@ -454,6 +462,78 @@ namespace ATLAS.Controllers.Authtenication
 
             return Ok(new { message = "Password changed successfully." });
         }
+
+        /// <summary>
+        /// Resets the password of a target user account (Admin / SAdmin only).
+        /// </summary>
+        [HttpPost("users/{academicId}/reset-password")]
+        [Authorize(Roles = "SAdmin,Admin")]
+        [EnableRateLimiting("AuthLimiter")]
+        public async Task<IActionResult> ResetUserPassword(
+            [FromRoute] string academicId,
+            [FromBody] ChangePasswordAdmin model,
+            CancellationToken cancellationToken = default)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var performingUserIdStr = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (!int.TryParse(performingUserIdStr, out var performingUserId))
+            {
+                return Unauthorized();
+            }
+
+            var roleClaim = User.FindFirstValue(ClaimTypes.Role);
+            if (!Enum.TryParse<enUserRole>(roleClaim, true, out var performingRole))
+            {
+                return Unauthorized();
+            }
+
+            int? institutionId = null;
+            var instClaim = User.FindFirstValue("institution_id");
+            if (!string.IsNullOrWhiteSpace(instClaim) && int.TryParse(instClaim, out var parsedInst))
+            {
+                institutionId = parsedInst;
+            }
+
+            try
+            {
+                var success = await _mediator.Send(new AdminResetUserPasswordCommand(
+                    academicId,
+                    model.NewPassword,
+                    model.ConfirmPassword,
+                    performingUserId,
+                    performingRole,
+                    institutionId
+                ), cancellationToken);
+
+                if (!success)
+                {
+                    return BadRequest("Password reset failed.");
+                }
+
+                return Ok(new { message = "User password reset successfully." });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid();
+            }
+            catch (InvalidDataException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
 
 
         /// <summary>

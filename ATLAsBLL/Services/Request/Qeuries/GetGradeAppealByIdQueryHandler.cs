@@ -35,7 +35,9 @@ namespace ATLAsBLL.Services.Request.Qeuries
                 return null;
 
             
-            bool canView = request.DoctorUserID == query.CurrentUserId;
+            bool canView = query.IsSuperAdmin ||
+                           request.DoctorUserID == query.CurrentUserId ||
+                           (query.CurrentStudentId.HasValue && request.StudentID == query.CurrentStudentId.Value);
 
             return canView ? request : null;
         }

@@ -56,20 +56,20 @@ namespace ATLAsBLL.Features.CourseGrades.Commands.UpdateCourseGrade
                     CreatedBy = request.UserId
                 };
 
-                await _unitOfWork.CourseGrades.AddAsync(courseGrade, cancellationToken);
-
                 // MED-06: the first value a grade ever takes is recorded too, with
                 // no previous value, so the trail is complete rather than starting
-                // from the second edit onwards.
-                await _unitOfWork.CourseGradeHistory.AddAsync(new CourseGradeHistory
+                // from the second edit onwards. Add via navigation property so EF Core
+                // sets CG_ID automatically on insert.
+                courseGrade.History.Add(new CourseGradeHistory
                 {
-                    CG_ID = courseGrade.CG_ID,
                     EnrollmentID = courseGrade.EnrollmentID,
                     ModuleID = courseGrade.ModuleID,
                     PreviousDegree = null,
                     NewDegree = request.StudentDegree,
                     ChangedBy = request.UserId
-                }, cancellationToken);
+                });
+
+                await _unitOfWork.CourseGrades.AddAsync(courseGrade, cancellationToken);
             }
             else
             {

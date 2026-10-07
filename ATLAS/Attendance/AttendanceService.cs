@@ -40,6 +40,21 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
         var now = timeProvider.GetUtcNow().UtcDateTime;
         if (!await context.CourseOfferings.AnyAsync(x => x.CourseOfferingID == courseOfferingId, cancellationToken))
             throw new AttendanceValidationException("The course offering was not found.");
+
+        var staleSessions = await context.AttendanceSessions
+            .Where(x => x.CourseOfferingId == courseOfferingId && x.Status == AttendanceSessionStatus.Active && x.ExpiresAt <= now)
+            .ToListAsync(cancellationToken);
+
+        if (staleSessions.Count > 0)
+        {
+            foreach (var s in staleSessions)
+            {
+                s.Status = AttendanceSessionStatus.Expired;
+                s.EndedAt ??= s.ExpiresAt;
+            }
+            await context.SaveChangesAsync(cancellationToken);
+        }
+
         var active = await context.AttendanceSessions
             .AnyAsync(x => x.CourseOfferingId == courseOfferingId && x.Status == AttendanceSessionStatus.Active && x.ExpiresAt > now, cancellationToken);
         if (active) throw new AttendanceConflictException("An attendance session is already active for this course offering.");
@@ -79,8 +94,8 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
         if (session is null) return null;
         var now = timeProvider.GetUtcNow().UtcDateTime;
         ExpireIfNeeded(session, now);
-        if (session.Status != AttendanceSessionStatus.Active) return null;
         if (context.Entry(session).State == EntityState.Modified) await context.SaveChangesAsync(cancellationToken);
+        if (session.Status != AttendanceSessionStatus.Active) return null;
 
         var slot = new DateTimeOffset(now).ToUnixTimeSeconds() / RotationSeconds;
         var validUntil = DateTimeOffset.FromUnixTimeSeconds((slot + 1) * RotationSeconds).UtcDateTime;
@@ -106,6 +121,7 @@ public sealed class AttendanceService(AtLASDbContext context, TimeProvider timeP
         if (session is null) throw new AttendanceValidationException("The attendance session was not found.");
         var now = timeProvider.GetUtcNow().UtcDateTime;
         ExpireIfNeeded(session, now);
+        if (context.Entry(session).State == EntityState.Modified) await context.SaveChangesAsync(cancellationToken);
         if (session.Status != AttendanceSessionStatus.Active) throw new AttendanceValidationException("This attendance session is closed.");
         var currentSlot = new DateTimeOffset(now).ToUnixTimeSeconds() / RotationSeconds;
 

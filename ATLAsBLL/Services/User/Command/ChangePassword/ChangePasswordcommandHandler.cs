@@ -47,6 +47,9 @@ namespace ATLAsBLL.Services.User.Command.ChangePassword
             request.user.Password = BCrypt.Net.BCrypt.HashPassword(request.model.NewPassword);
             request.user.MustChangePassword = false;
 
+            // Rotate SecurityStamp so any active JWT issued before the password change is instantly revoked (HIGH-03).
+            request.user.SecurityStamp = Guid.NewGuid();
+
             // Any refresh token issued before the password change is no longer
             // trustworthy (it may predate the mandatory-change flag), so the
             // whole family is revoked and the user signs in again with the new

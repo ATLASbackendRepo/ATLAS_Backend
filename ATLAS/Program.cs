@@ -68,12 +68,21 @@ builder.Services.Configure<Microsoft.AspNetCore.Builder.ForwardedHeadersOptions>
     options.KnownNetworks.Clear();
     options.KnownProxies.Clear();
 
-    foreach (var proxy in builder.Configuration
-                 .GetSection("ForwardedHeaders:KnownProxies")
-                 .Get<string[]>() ?? Array.Empty<string>())
+    var configuredProxies = builder.Configuration
+        .GetSection("ForwardedHeaders:KnownProxies")
+        .Get<string[]>() ?? Array.Empty<string>();
+
+    foreach (var proxy in configuredProxies)
     {
         if (System.Net.IPAddress.TryParse(proxy, out var address))
             options.KnownProxies.Add(address);
+    }
+
+    // Default to loopback proxies when no explicit list is configured so external clients cannot spoof X-Forwarded-For headers (HIGH-01).
+    if (options.KnownProxies.Count == 0)
+    {
+        options.KnownProxies.Add(System.Net.IPAddress.Loopback);
+        options.KnownProxies.Add(System.Net.IPAddress.IPv6Loopback);
     }
 });
 

@@ -11,4 +11,5 @@ TestResults/
 
 .env
 *.env
-
+sql-backups/
+*.bak

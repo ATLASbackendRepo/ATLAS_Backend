@@ -15,6 +15,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 using System.Threading.Tasks;
 
 namespace ATLAS.Controllers.Student
@@ -51,6 +52,14 @@ namespace ATLAS.Controllers.Student
         [EnableRateLimiting("AdminGetAllPolicy")]
         public async Task<ActionResult<IEnumerable<StudentDTO>>> GetAllStudent([FromQuery] StudentFilterDTO studentFilter, CancellationToken cancellationToken = default)
         {
+            if (User?.IsInRole("SAdmin") == false)
+            {
+                var instClaim = User.FindFirstValue("institution_id");
+                if (int.TryParse(instClaim, out var instId))
+                {
+                    studentFilter.InstitutionId = instId;
+                }
+            }
 
             var Students = await _mediator.Send(new GetAllStudentsQuery(studentFilter), cancellationToken);
             if (Students == null || (Students.Count() == 0))
