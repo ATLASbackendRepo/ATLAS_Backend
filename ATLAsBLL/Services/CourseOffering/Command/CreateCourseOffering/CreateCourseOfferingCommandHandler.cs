@@ -31,7 +31,8 @@ namespace ATLAsBLL.Features.CourseOfferings.Commands.CreateCourseOffering
             var offering = new CourseOffering
             {
                 CourseID = request.CourseId,
-                SemesterID = request.SemesterId
+                SemesterID = request.SemesterId,
+                InstitutionID = request.InstitutionId
             };
 
             await _unitOfWork.CourseOfferings.AddAsync(offering, cancellationToken);

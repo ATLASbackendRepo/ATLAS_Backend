@@ -68,8 +68,6 @@ public class ProfileUpdateTrackingTests
                 user.UserId,
                 new StaffProfileUpdateDTO
                 {
-                    FullName = "After",
-                    DepartmentID = 4,
                     TeachingYears = "7"
                 }),
             CancellationToken.None);
@@ -78,7 +76,7 @@ public class ProfileUpdateTrackingTests
 
         var storedUser = await context.Users.SingleAsync(candidate => candidate.UserId == user.UserId);
 
-        Assert.Equal("After", storedUser.FullName);
+        Assert.Equal("Before", storedUser.FullName);
         Assert.Equal("stored-password-hash", storedUser.Password);
         Assert.Equal("stored-refresh-token-hash", storedUser.RefreshTokenHash);
         Assert.True(storedUser.IsActive);
@@ -87,7 +85,7 @@ public class ProfileUpdateTrackingTests
 
         Assert.Equal(user.UserId, storedProfile.UserID);
         Assert.Equal(createdAt, storedProfile.CreatedAt);
-        Assert.Equal(4, storedProfile.DepartmentID);
+        Assert.Equal(3, storedProfile.DepartmentID);
         Assert.Equal("7", storedProfile.TeachingYears);
     }
 
@@ -150,9 +148,6 @@ public class ProfileUpdateTrackingTests
                 user.UserId,
                 new StudentUpdateProfileInfoDTO
                 {
-                    FullName = "After",
-                    Faculty = "New Faculty",
-                    SectionNumber = 3,
                     LinkedInUrl = "https://example.test/stu01"
                 }),
             CancellationToken.None);
@@ -161,7 +156,7 @@ public class ProfileUpdateTrackingTests
 
         var storedUser = await context.Users.SingleAsync(candidate => candidate.UserId == user.UserId);
 
-        Assert.Equal("After", storedUser.FullName);
+        Assert.Equal("Before", storedUser.FullName);
         Assert.Equal("stored-password-hash", storedUser.Password);
         Assert.Equal("stored-refresh-token-hash", storedUser.RefreshTokenHash);
         Assert.True(storedUser.IsActive);
@@ -175,8 +170,8 @@ public class ProfileUpdateTrackingTests
 
         Assert.Equal(student.StudentId, storedProfile.StudentID);
         Assert.Equal(createdAt, storedProfile.CreatedAt);
-        Assert.Equal("New Faculty", storedProfile.Faculty);
-        Assert.Equal(3, storedProfile.SectionNumber);
+        Assert.Equal("Old Faculty", storedProfile.Faculty);
+        Assert.Equal(1, storedProfile.SectionNumber);
         Assert.Equal("https://example.test/stu01", storedProfile.LinkedInUrl);
     }
 

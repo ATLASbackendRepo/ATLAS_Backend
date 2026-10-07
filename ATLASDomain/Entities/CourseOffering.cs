@@ -21,6 +21,16 @@ public class CourseOffering
     public int CourseID { get; set; }
 
     /// <summary>
+    /// Institution ID.
+    /// </summary>
+    public int? InstitutionID { get; set; }
+
+    /// <summary>
+    /// Institution.
+    /// </summary>
+    public Institution? Institution { get; set; }
+
+    /// <summary>
     /// Semester.
     /// </summary>
     public Semester Semester { get; set; } = null!;

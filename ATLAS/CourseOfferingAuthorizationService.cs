@@ -48,32 +48,27 @@ public sealed class CourseOfferingAuthorizationService(AtLASDbContext context) :
 
         if (user.IsInRole("Admin"))
         {
-            // The tenant boundary is the whole point of this check, so it happens in
-            // the database rather than by loading the offering and comparing in
-            // memory: the offering's institution is reached through its course's
-            // department, so a mismatch must be ruled out before any row is returned.
             if (!TryGetInstitutionId(user, out var adminInstitutionId))
             {
-                // An Admin token with no institution cannot be scoped to a tenant, so
-                // it is granted nothing. Failing closed is the only safe default
-                // here - returning true would reintroduce the cross-tenant breach.
                 return false;
             }
 
-            // The offering reaches its institution through the students enrolled in
-            // it, because Courses carry no department or institution of their own.
-            // The distinct() matters: one offering has many enrollments, and the
-            // comparison below is "every enrolled student belongs to my tenant",
-            // not "at least one does" - otherwise a single in-tenant student would
-            // grant access to an offering that also serves another institution.
+            var offeringInstitutionId = await context.CourseOfferings
+                .Where(co => co.CourseOfferingID == courseOfferingId)
+                .Select(co => co.InstitutionID)
+                .FirstOrDefaultAsync(cancellationToken);
+
+            if (offeringInstitutionId.HasValue)
+            {
+                return offeringInstitutionId.Value == adminInstitutionId;
+            }
+
             var enrolledInstitutionIds = await context.Enrollments
                 .Where(e => e.CourseOfferingID == courseOfferingId)
                 .Select(e => e.Student.InstitutionID)
                 .Distinct()
                 .ToListAsync(cancellationToken);
 
-            // An offering nobody is enrolled in yet cannot be attributed to any
-            // tenant, so it is refused rather than opened up to every admin.
             return enrolledInstitutionIds.Count > 0 &&
                    enrolledInstitutionIds.All(id => id == adminInstitutionId);
         }

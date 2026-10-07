@@ -27,6 +27,16 @@ public class Semester
     public bool IsGradingClosed { get; set; }
 
     /// <summary>
+    /// Institution ID.
+    /// </summary>
+    public int? InstitutionID { get; set; }
+
+    /// <summary>
+    /// Institution.
+    /// </summary>
+    public Institution? Institution { get; set; }
+
+    /// <summary>
     /// Course Offerings.
     /// </summary>
     public ICollection<CourseOffering> CourseOfferings { get; set; } = new List<CourseOffering>();
