@@ -64,16 +64,28 @@ namespace ATLAsBLL.Services
         /// Count Recent Failed Logins Async.
         /// </summary>
         public async Task<int> CountRecentFailedLoginsAsync(string academicId, TimeSpan window, CancellationToken cancellationToken = default)
+            => await CountRecentFailedLoginsAsync(academicId, null, window, cancellationToken);
+
+        /// <summary>
+        /// Count Recent Failed Logins Async by Academic ID and optional source IP.
+        /// </summary>
+        public async Task<int> CountRecentFailedLoginsAsync(string academicId, string? ipAddress, TimeSpan window, CancellationToken cancellationToken = default)
         {
             await using var context = await _contextFactory.CreateDbContextAsync(cancellationToken);
 
             var since = DateTime.UtcNow - window;
 
-            return await context.Set<SecurityEvent>()
+            var query = context.Set<SecurityEvent>()
                 .Where(e => e.EventType == "FailedLogin"
                          && e.AttemptedAcademicId == academicId
-                         && e.TimestampUtc >= since)
-                .CountAsync(cancellationToken);
+                         && e.TimestampUtc >= since);
+
+            if (!string.IsNullOrEmpty(ipAddress))
+            {
+                query = query.Where(e => e.IpAddress == ipAddress);
+            }
+
+            return await query.CountAsync(cancellationToken);
         }
 
 

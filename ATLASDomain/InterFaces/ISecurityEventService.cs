@@ -13,6 +13,7 @@ namespace ATLASDomain.InterFaces
     {
         Task LogAsync(SecurityEventEntry entry, CancellationToken cancellationToken = default);
         Task<int> CountRecentFailedLoginsAsync(string academicId, TimeSpan window, CancellationToken cancellationToken = default);
+        Task<int> CountRecentFailedLoginsAsync(string academicId, string? ipAddress, TimeSpan window, CancellationToken cancellationToken = default);
     }
 
     /// <summary>

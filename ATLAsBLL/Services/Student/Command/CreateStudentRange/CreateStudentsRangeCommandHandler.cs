@@ -64,7 +64,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                     cancellationToken);
 
                 if (preparedRows.Count == 0)
-                    return true;
+                    throw new System.IO.InvalidDataException("The uploaded Excel file contains no student data rows.");
 
                 var students = preparedRows
                     .Select(row => row.ToStudent(GenerateOneTimePassword()))

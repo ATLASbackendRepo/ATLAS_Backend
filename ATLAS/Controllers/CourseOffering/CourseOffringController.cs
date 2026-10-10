@@ -5,11 +5,14 @@ using ATLAsBLL.Features.CourseOfferings.Commands.DeleteCourseOffering;
 using ATLAsBLL.Features.CourseOfferingDoctors.Commands.CreateCourseOfferingDoctor;
 using ATLAsBLL.Features.CourseOfferingTAs.Commands.CreateCourseOfferingTA;
 using ATLASDomain.DTO.CourseOffring;
+using ATLAS.Claims;
+using ATLAsDCL.UnitOfWork;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -32,11 +35,16 @@ namespace ATLAS.Controllers.CourseOffering
         /// _logger.
         /// </summary>
         private readonly ILogger<CourseOffringController> _logger;
+        /// <summary>
+        /// _unitOfWork.
+        /// </summary>
+        private readonly IUnitOfWork? _unitOfWork;
 
-        public CourseOffringController(IMediator mediator, ILogger<CourseOffringController> logger)
+        public CourseOffringController(IMediator mediator, ILogger<CourseOffringController> logger, IUnitOfWork? unitOfWork = null)
         {
             _mediator = mediator;
             _logger = logger;
+            _unitOfWork = unitOfWork;
         }
 
 
@@ -75,27 +83,34 @@ namespace ATLAS.Controllers.CourseOffering
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("CourseQueryPolicy")]
         public async Task<ActionResult<IEnumerable<CourseOfferingDTO>>> GetAdminStudentMyCourses([FromRoute] string AcdimicID, CancellationToken cancellationToken = default)
         {
-              var userId = await GetCurrentUserId(AcdimicID);
+            var unitOfWork = _unitOfWork ?? HttpContext.RequestServices.GetRequiredService<IUnitOfWork>();
+            var targetUser = await unitOfWork.Users.GetUserByAcademicIDAsync(AcdimicID, cancellationToken);
+            if (targetUser == null)
+            {
+                return BadRequest("Invalid Request.");
+            }
 
-                if (userId < 1)
+            if (User.IsInRole("Admin") && !User.IsInRole("SAdmin"))
+            {
+                var rawInstitutionId = User.FindFirstValue(AtlasClaims.InstitutionId);
+                if (!int.TryParse(rawInstitutionId, out int adminInstitutionId) || targetUser.InstitutionID != adminInstitutionId)
                 {
-                    return BadRequest("Invalid Request.");
+                    return Forbid();
                 }
+            }
 
-                var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Student.GetMyCourseQuery(userId), cancellationToken);
-                if (courses == null || !courses.Any())
-                {
-                    return NotFound($"No courses found for student ID {userId}.");
-                }
-                return Ok(courses);
-            
+            var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Student.GetMyCourseQuery(targetUser.UserId), cancellationToken);
+            if (courses == null || !courses.Any())
+            {
+                return NotFound($"No courses found for student ID {targetUser.UserId}.");
+            }
+            return Ok(courses);
         }
-
-
 
         /// <summary>
         /// Get Staff My Courses.
@@ -121,33 +136,40 @@ namespace ATLAS.Controllers.CourseOffering
             return Ok(courses);
         }
 
-
         /// <summary>
         /// Get Admin Staff My Courses.
         /// </summary>
-
         [HttpGet("Admin/Staff/MyCourses/{AcdimicID}", Name = "GetAdminStaffMyCourses")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("CourseQueryPolicy")]
         public async Task<ActionResult<IEnumerable<DoctorCourseOfferingDTO>>> GetAdminStaffMyCourses([FromRoute] string AcdimicID, CancellationToken cancellationToken = default)
         {
-            
-                var StaffId = await GetCurrentUserId(AcdimicID);
+            var unitOfWork = _unitOfWork ?? HttpContext.RequestServices.GetRequiredService<IUnitOfWork>();
+            var targetUser = await unitOfWork.Users.GetUserByAcademicIDAsync(AcdimicID, cancellationToken);
+            if (targetUser == null)
+            {
+                return BadRequest("Invalid Request.");
+            }
 
-                if (StaffId < 1)
+            if (User.IsInRole("Admin") && !User.IsInRole("SAdmin"))
+            {
+                var rawInstitutionId = User.FindFirstValue(AtlasClaims.InstitutionId);
+                if (!int.TryParse(rawInstitutionId, out int adminInstitutionId) || targetUser.InstitutionID != adminInstitutionId)
                 {
-                    return BadRequest("Invalid Request.");
+                    return Forbid();
                 }
-                var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Doctor.GetStaffMyCourseQuery(StaffId), cancellationToken);
-                if (courses == null || !courses.Any())
-                {
-                    return NotFound($"No courses found for Staff ID {StaffId }.");
-                }
-                return Ok(courses);
+            }
 
+            var courses = await _mediator.Send(new ATLAsBLL.Services.CourseOffering.Queries.GetmyCourse.Doctor.GetStaffMyCourseQuery(targetUser.UserId), cancellationToken);
+            if (courses == null || !courses.Any())
+            {
+                return NotFound($"No courses found for Staff ID {targetUser.UserId}.");
+            }
+            return Ok(courses);
         }
 
 

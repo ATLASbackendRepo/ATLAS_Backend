@@ -38,9 +38,14 @@ namespace ATLAsBLL.Features.Users.Commands.UpdateUser
             {
                 user.DepartmentId = request.Update_StaffDto.DepartmentId;
             }   
-            if(request.Update_StaffDto.InstituteId != default(int))
+            bool institutionChanged = false;
+            if (request.Update_StaffDto.InstituteId != default(int))
             {
-                user.InstitutionID = request.Update_StaffDto.InstituteId;
+                if (user.InstitutionID != request.Update_StaffDto.InstituteId)
+                {
+                    institutionChanged = true;
+                    user.InstitutionID = request.Update_StaffDto.InstituteId;
+                }
             }   
             bool roleChanged = false;
             if (request.Update_StaffDto.Role != 0)
@@ -48,13 +53,18 @@ namespace ATLAsBLL.Features.Users.Commands.UpdateUser
                 if (user.Role != request.Update_StaffDto.Role)
                 {
                     roleChanged = true;
-                    user.SecurityStamp = System.Guid.NewGuid();
                 }
                 user.Role = request.Update_StaffDto.Role;
             }
 
+            bool needsSecurityStampBump = roleChanged || institutionChanged;
+            if (needsSecurityStampBump)
+            {
+                user.SecurityStamp = System.Guid.NewGuid();
+            }
+
             var saved = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
-            if (roleChanged)
+            if (needsSecurityStampBump)
             {
                 await _unitOfWork.Users.BumpSecurityStampAsync(user.UserId, cancellationToken);
             }

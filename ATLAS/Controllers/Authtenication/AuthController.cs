@@ -87,8 +87,9 @@ namespace ATLAS.Controllers.Authtenication
                 return BadRequest("Academic ID and password are required.");
             }
 
+            var clientIp = HttpContext?.Connection?.RemoteIpAddress?.ToString();
             var recentFailuresBefore = _securityEventService != null
-                ? await _securityEventService.CountRecentFailedLoginsAsync(request.AcademicId, TimeSpan.FromMinutes(9), cancellationToken)
+                ? await _securityEventService.CountRecentFailedLoginsAsync(request.AcademicId, clientIp, TimeSpan.FromMinutes(9), cancellationToken)
                 : 0;
 
             if (recentFailuresBefore >= 5)
