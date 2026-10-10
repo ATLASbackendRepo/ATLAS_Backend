@@ -9,6 +9,7 @@ using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Security.Claims;
 
 namespace ATLAS.Controllers.Staff
 {
@@ -38,6 +39,14 @@ namespace ATLAS.Controllers.Staff
         [EnableRateLimiting("AdminGetAllPolicy")]
         public async Task<ActionResult<IEnumerable<StaffDto>>> GetAllStudent(enUserRole role , [FromQuery] StaffFilterDTO staffFilter, CancellationToken cancellationToken = default)
         {
+            if (User?.IsInRole("SAdmin") == false)
+            {
+                var instClaim = User.FindFirstValue("institution_id");
+                if (int.TryParse(instClaim, out var instId))
+                {
+                    staffFilter.InstitutionId = instId;
+                }
+            }
 
             var Staff = await _mediator.Send(new GetallStaff(role, staffFilter), cancellationToken);
 

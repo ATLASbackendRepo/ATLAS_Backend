@@ -58,11 +58,16 @@ public class DepartmentRepository
     /// <summary>
     /// Get Departments.
     /// </summary>
-    public async Task<List<DepartmentDTO>> GetDepartments(string? departmentName, CancellationToken cancellationToken = default)
+    public async Task<List<DepartmentDTO>> GetDepartments(string? departmentName, int? institutionId = null, CancellationToken cancellationToken = default)
     {
         var query = _context.Departments
             .AsNoTracking()
             .AsQueryable();
+
+        if (institutionId.HasValue)
+        {
+            query = query.Where(d => d.InstitutionID == institutionId.Value);
+        }
 
         if (!string.IsNullOrWhiteSpace(departmentName))
         {

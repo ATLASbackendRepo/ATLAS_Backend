@@ -135,4 +135,13 @@ public interface IEnrollmentRepository : IGenericRepository<Enrollment>
       int? doctorId = null,
       int pageIndex = 1,
       int pageSize = 10, CancellationToken cancellationToken = default);
+
+    /// <summary>
+    /// Gets student IDs of students already enrolled in a course offering.
+    /// </summary>
+    /// <param name="courseOfferingId">Course offering ID.</param>
+    /// <param name="studentIds">Student IDs to check.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
+    /// <returns>Set of student IDs already enrolled.</returns>
+    Task<HashSet<int>> GetEnrolledStudentIdsAsync(int courseOfferingId, IEnumerable<int> studentIds, CancellationToken cancellationToken = default);
 }

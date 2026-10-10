@@ -12,6 +12,8 @@ using Microsoft.Extensions.Options;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using Xunit;
+using ATLAsDCL.Repositories;
+using ATLAsDCL.UnitOfWork;
 
 namespace ATLAS.Tests;
 
@@ -144,6 +146,161 @@ public class AuthenticationAndAuthorizationTests
         Assert.IsType<BadRequestObjectResult>(result);
     }
 
+    [Fact]
+    public async Task Login_NonExistentUser_ExecutesBCryptAndReturnsUnauthorized()
+    {
+        // Arrange
+        var services = new ServiceCollection();
+        services.AddSingleton<IRequestHandler<GetUserByAcademicIdQuery, User?>>(
+            new StudentLookupHandler(null!));
+
+        using var provider = services.BuildServiceProvider();
+        var mediator = new FakeMediator(provider);
+
+        var jwtOptions = Options.Create(new JwtOptions
+        {
+            Key = "test-signing-key-must-be-at-least-32-characters",
+            Issuer = "ATLAS.Tests",
+            Audience = "ATLAS.Tests",
+            ExpiryMinutes = 30
+        });
+
+        var controller = new AuthController(
+            mediator,
+            jwtOptions,
+            null!
+        );
+
+        var loginDto = new LoginDTO
+        {
+            AcademicId = "NON_EXISTENT_ID",
+            Password = "some-attempted-password"
+        };
+
+        // Act
+        var result = await controller.Login(loginDto);
+
+        // Assert
+        Assert.IsType<UnauthorizedResult>(result);
+    }
+
+    [Fact]
+    public async Task AdminResetUserPassword_ValidStudentTarget_ResetsPasswordAndInvalidatesSessions()
+    {
+        await using var context = TestDbContextFactory.Create();
+        var targetStudent = new User
+        {
+            UserId = 10,
+            AcademicId = "STU100",
+            InstitutionID = 1,
+            Role = enUserRole.Student,
+            FullName = "Student One",
+            Password = BCrypt.Net.BCrypt.HashPassword("oldpassword123"),
+            MustChangePassword = false
+        };
+        context.Users.Add(targetStudent);
+        await context.SaveChangesAsync();
+
+        var unitOfWork = new UnitOfWork(
+            context, null!, null!, null!, null!, null!, null!, null!, null!, null!, null!,
+            new UserRepository(context), null!, null!, null!, null!, null!, null!, null!
+        );
+
+        var handler = new ATLAsBLL.Services.User.Command.AdminResetUserPassword.AdminResetUserPasswordCommandHandler(unitOfWork);
+        var command = new ATLAsBLL.Services.User.Command.AdminResetUserPassword.AdminResetUserPasswordCommand(
+            "STU100",
+            "NewSecret#123",
+            "NewSecret#123",
+            PerformingUserId: 2,
+            PerformingUserRole: enUserRole.Admin,
+            PerformingUserInstitutionId: 1
+        );
+
+        var success = await handler.Handle(command, CancellationToken.None);
+
+        Assert.True(success);
+        var updatedUser = await context.Users.FindAsync(10);
+        Assert.NotNull(updatedUser);
+        Assert.True(updatedUser!.MustChangePassword);
+        Assert.True(BCrypt.Net.BCrypt.Verify("NewSecret#123", updatedUser.Password));
+        Assert.Null(updatedUser.RefreshTokenHash);
+    }
+
+    [Fact]
+    public async Task AdminResetUserPassword_TargetInDifferentInstitution_ThrowsUnauthorized()
+    {
+        await using var context = TestDbContextFactory.Create();
+        context.Users.Add(new User
+        {
+            UserId = 10,
+            AcademicId = "STU200",
+            InstitutionID = 2,
+            Role = enUserRole.Student,
+            FullName = "Other Inst Student",
+            Password = BCrypt.Net.BCrypt.HashPassword("oldpassword123")
+        });
+        await context.SaveChangesAsync();
+
+        var unitOfWork = new UnitOfWork(
+            context, null!, null!, null!, null!, null!, null!, null!, null!, null!, null!,
+            new UserRepository(context), null!, null!, null!, null!, null!, null!, null!
+        );
+
+        var handler = new ATLAsBLL.Services.User.Command.AdminResetUserPassword.AdminResetUserPasswordCommandHandler(unitOfWork);
+        var command = new ATLAsBLL.Services.User.Command.AdminResetUserPassword.AdminResetUserPasswordCommand(
+            "STU200",
+            "NewSecret#123",
+            "NewSecret#123",
+            PerformingUserId: 2,
+            PerformingUserRole: enUserRole.Admin,
+            PerformingUserInstitutionId: 1
+        );
+
+        await Assert.ThrowsAsync<UnauthorizedAccessException>(() => handler.Handle(command, CancellationToken.None));
+    }
+
+    [Fact]
+    public async Task ChangePassword_RotatesSecurityStamp_InvalidatingExistingTokens()
+    {
+        await using var context = TestDbContextFactory.Create();
+        var originalStamp = Guid.NewGuid();
+        var user = new User
+        {
+            UserId = 15,
+            AcademicId = "STU300",
+            InstitutionID = 1,
+            Role = enUserRole.Student,
+            FullName = "Student Security Stamp",
+            Password = BCrypt.Net.BCrypt.HashPassword("oldpassword123"),
+            SecurityStamp = originalStamp
+        };
+        context.Users.Add(user);
+        await context.SaveChangesAsync();
+
+        var unitOfWork = new UnitOfWork(
+            context, null!, null!, null!, null!, null!, null!, null!, null!, null!, null!,
+            new UserRepository(context), null!, null!, null!, null!, null!, null!, null!
+        );
+
+        var handler = new ATLAsBLL.Services.User.Command.ChangePassword.ChangePasswordcommandHandler(unitOfWork);
+        var command = new ATLAsBLL.Services.User.Command.ChangePassword.ChangePasswordcommand(
+            user,
+            new ChangePassword
+            {
+                OldPassword = "oldpassword123",
+                NewPassword = "NewPassword#123",
+                ConfirmPassword = "NewPassword#123"
+            }
+        );
+
+        var success = await handler.Handle(command, CancellationToken.None);
+
+        Assert.True(success);
+        var updatedUser = await context.Users.FindAsync(15);
+        Assert.NotNull(updatedUser);
+        Assert.NotEqual(originalStamp, updatedUser!.SecurityStamp);
+    }
+
     private sealed class NoOpSaveRefreshTokenHandler
         : IRequestHandler<SaveRefreshTokenCommand, bool>
     {
@@ -169,7 +326,7 @@ public class AuthenticationAndAuthorizationTests
             GetUserByAcademicIdQuery request,
             CancellationToken cancellationToken)
         {
-            User? result = request.AcademicId == _user.AcademicId
+            User? result = _user != null && request.AcademicId == _user.AcademicId
                 ? _user
                 : null;
 

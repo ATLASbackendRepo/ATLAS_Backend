@@ -385,5 +385,26 @@ public class EnrollmentRepository
         };
     }
 
-    
+    /// <summary>
+    /// Gets student IDs of students already enrolled in a course offering.
+    /// </summary>
+    public async Task<HashSet<int>> GetEnrolledStudentIdsAsync(
+        int courseOfferingId,
+        IEnumerable<int> studentIds,
+        CancellationToken cancellationToken = default)
+    {
+        var ids = studentIds.Distinct().ToList();
+        if (ids.Count == 0)
+        {
+            return new HashSet<int>();
+        }
+
+        var enrolled = await _context.Enrollments
+            .AsNoTracking()
+            .Where(e => e.CourseOfferingID == courseOfferingId && ids.Contains(e.StudentID))
+            .Select(e => e.StudentID)
+            .ToListAsync(cancellationToken);
+
+        return new HashSet<int>(enrolled);
+    }
 }

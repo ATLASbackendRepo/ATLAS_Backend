@@ -42,16 +42,22 @@ namespace ATLAsBLL.Features.Users.Commands.UpdateUser
             {
                 user.InstitutionID = request.Update_StaffDto.InstituteId;
             }   
+            bool roleChanged = false;
             if (request.Update_StaffDto.Role != 0)
             {
                 if (user.Role != request.Update_StaffDto.Role)
                 {
+                    roleChanged = true;
                     user.SecurityStamp = System.Guid.NewGuid();
                 }
                 user.Role = request.Update_StaffDto.Role;
             }
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken);
+            var saved = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+            if (roleChanged)
+            {
+                await _unitOfWork.Users.BumpSecurityStampAsync(user.UserId, cancellationToken);
+            }
             return true;
         }
     }

@@ -35,6 +35,13 @@ public class GradeAndAuthorizationTests
         Assert.Equal(75, grade.StudentDegree);
         Assert.Equal(9, grade.CreatedBy);
         Assert.Equal(10, grade.UpdatedBy);
+
+        var history = context.CourseGradeHistory.OrderBy(h => h.HistoryId).ToList();
+        Assert.Equal(2, history.Count);
+        Assert.Null(history[0].PreviousDegree);
+        Assert.Equal(60, history[0].NewDegree);
+        Assert.Equal(60, history[1].PreviousDegree);
+        Assert.Equal(75, history[1].NewDegree);
     }
 
     /// <summary>

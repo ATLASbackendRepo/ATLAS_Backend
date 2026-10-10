@@ -60,6 +60,10 @@ namespace ATLAsBLL.Services.User.Command.ChangePassword
 
             unitOfWork.Users.Update(request.user);
             var isSuccess = await unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+            if (isSuccess)
+            {
+                await unitOfWork.Users.BumpSecurityStampAsync(request.user.UserId, cancellationToken);
+            }
 
             return isSuccess;
 

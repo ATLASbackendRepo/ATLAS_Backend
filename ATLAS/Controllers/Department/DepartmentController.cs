@@ -71,7 +71,17 @@ namespace ATLAS.Controllers.Department
             {
                 if (departmentId > 0 && !string.IsNullOrEmpty(departmentName))
                 {
-                    var result = await _mediator.Send(new UpdateDepartmentCommand(departmentId, departmentName), cancellationToken);
+                    int? instId = null;
+                    if (User?.IsInRole("SAdmin") == false)
+                    {
+                        var instClaim = User.FindFirstValue("institution_id");
+                        if (int.TryParse(instClaim, out var parsedInstId))
+                        {
+                            instId = parsedInstId;
+                        }
+                    }
+
+                    var result = await _mediator.Send(new UpdateDepartmentCommand(departmentId, departmentName, instId), cancellationToken);
                     if (result)
                         return Ok("Department updated successfully.");
 
@@ -99,7 +109,18 @@ namespace ATLAS.Controllers.Department
             {
                 return BadRequest("Invalid department ID.");
             }
-            var ISDelete = await _mediator.Send(new DeleteDepartmentCommand(departmentId), cancellationToken);
+
+            int? instId = null;
+            if (User?.IsInRole("SAdmin") == false)
+            {
+                var instClaim = User.FindFirstValue("institution_id");
+                if (int.TryParse(instClaim, out var parsedInstId))
+                {
+                    instId = parsedInstId;
+                }
+            }
+
+            var ISDelete = await _mediator.Send(new DeleteDepartmentCommand(departmentId, instId), cancellationToken);
             if (!ISDelete)
             {
                 return NotFound("Department not found.");
@@ -118,13 +139,18 @@ namespace ATLAS.Controllers.Department
         [EnableRateLimiting("AdminGetAllPolicy")]
         public async Task<IActionResult> GetDepartments([FromQuery] string? departmentName, CancellationToken cancellationToken = default)
         {
-            var departments = await _mediator.Send(new GetAllDepartment(departmentName), cancellationToken);
+            int? instId = null;
+            if (User?.IsInRole("SAdmin") == false)
+            {
+                var instClaim = User.FindFirstValue("institution_id");
+                if (int.TryParse(instClaim, out var parsedInstId))
+                {
+                    instId = parsedInstId;
+                }
+            }
 
-            // LOW-07: an empty result is a successful query, not a missing
-            // resource. Returning 404 here meant a client could not distinguish
-            // "this filter matched nothing" from "this endpoint does not exist",
-            // and every caller had to special-case it. An empty list returns 200
-            // with [] and no special handling.
+            var departments = await _mediator.Send(new GetAllDepartment(departmentName, instId), cancellationToken);
+
             return Ok(departments ?? new List<DepartmentDTO>());
 
 

@@ -70,6 +70,10 @@ public class UserRepository
         {
             query = query.Where(u => u.IsActive == filter.Status.Value);
         }
+        if (filter.InstitutionId.HasValue)
+        {
+            query = query.Where(u => u.InstitutionID == filter.InstitutionId.Value);
+        }
 
         // MED-12: the staff list is bounded for the same reason as the student list.
         // Without this the query returned every account in the system, including
@@ -178,6 +182,14 @@ public class UserRepository
         int userId,
         CancellationToken cancellationToken = default)
     {
+        if (_context.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
+        {
+            var user = await _context.Users.FirstOrDefaultAsync(u => u.UserId == userId, cancellationToken);
+            if (user is null) return 0;
+            user.SecurityStamp = Guid.NewGuid();
+            return await _context.SaveChangesAsync(cancellationToken);
+        }
+
         return await _context.Users
             .Where(u => u.UserId == userId)
             .ExecuteUpdateAsync(

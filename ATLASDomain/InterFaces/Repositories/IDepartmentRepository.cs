@@ -38,9 +38,10 @@ public interface IDepartmentRepository : IGenericRepository<Department>
     /// Gets the departments, optionally filtered by a name fragment.
     /// </summary>
     /// <param name="departmentName">
-    /// <param name="cancellationToken">Cancellation token.</param>
     /// Substring to match against the department name; null returns everything.
     /// </param>
+    /// <param name="institutionId">Optional institution ID for tenant filtering.</param>
+    /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>The matching departments.</returns>
-    Task<List<DepartmentDTO>> GetDepartments(string? departmentName, CancellationToken cancellationToken = default);
+    Task<List<DepartmentDTO>> GetDepartments(string? departmentName, int? institutionId = null, CancellationToken cancellationToken = default);
 }

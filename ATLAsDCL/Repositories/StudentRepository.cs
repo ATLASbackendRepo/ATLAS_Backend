@@ -220,4 +220,30 @@ public class StudentRepository
             })
             .FirstOrDefaultAsync(s => s.StudentCode == StudentCode, cancellationToken);
     }
+
+    /// <summary>
+    /// Gets matching students by their academic IDs.
+    /// </summary>
+    public async Task<List<Student>> GetStudentsByAcademicIdsAsync(
+        IEnumerable<string> academicIds,
+        CancellationToken cancellationToken = default)
+    {
+        var ids = academicIds
+            .Where(id => !string.IsNullOrWhiteSpace(id))
+            .Select(id => id.Trim())
+            .Distinct(StringComparer.OrdinalIgnoreCase)
+            .ToList();
+
+        if (ids.Count == 0)
+        {
+            return new List<Student>();
+        }
+
+        return await _context.Students
+            .AsNoTracking()
+            .Include(s => s.User)
+            .Where(s => (s.AcademicId != null && ids.Contains(s.AcademicId))
+                     || (s.User != null && s.User.AcademicId != null && ids.Contains(s.User.AcademicId)))
+            .ToListAsync(cancellationToken);
+    }
 }

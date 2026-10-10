@@ -27,7 +27,7 @@ namespace ATLAsBLL.Features.Department.Comand.UpdateDepartment
         {
             var department = await _unitOfWork.Departments.GetByIdAsync(request.DepartmentID, cancellationToken);
 
-            if (department == null)
+            if (department == null || (request.InstitutionId.HasValue && department.InstitutionID != request.InstitutionId.Value))
             {
                 throw new System.Collections.Generic.KeyNotFoundException($"Department with ID {request.DepartmentID} was not found.");
             }

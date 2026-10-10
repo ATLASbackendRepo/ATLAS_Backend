@@ -28,5 +28,10 @@ namespace ATLASDomain.DTO.Staff
         /// Status.
         /// </summary>
         public bool? Status { get; set; }
+
+        /// <summary>
+        /// Institution Id for tenant isolation.
+        /// </summary>
+        public int? InstitutionId { get; set; }
     }
 }

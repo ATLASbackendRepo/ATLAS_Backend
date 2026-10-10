@@ -220,6 +220,15 @@ namespace ATLAS.Controllers.CourseOffering
                 return BadRequest(ModelState);
             }
 
+            if (!User.IsInRole("SAdmin"))
+            {
+                var instClaim = User.FindFirstValue("institution_id");
+                if (int.TryParse(instClaim, out var instId))
+                {
+                    command = command with { InstitutionId = instId };
+                }
+            }
+
             var id = await _mediator.Send(command, cancellationToken);
             return CreatedAtAction(nameof(CreateCourseOffering), new { id }, new { courseOfferingId = id });
         }

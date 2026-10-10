@@ -102,5 +102,12 @@ public interface IStudentRepository : IGenericRepository<Student>
    /// <param name="cancellationToken">Cancellation token.</param>
    /// <returns>The student's grade, or null when none has been recorded.</returns>
    Task <StudentGradeDto?> GetStudentWithModeAsync( int courseOfferingID,int modelId , string StudentCode, CancellationToken cancellationToken = default);
-}
 
+   /// <summary>
+   /// Gets matching students by their academic IDs.
+   /// </summary>
+   /// <param name="academicIds">List of academic IDs to search for.</param>
+   /// <param name="cancellationToken">Cancellation token.</param>
+   /// <returns>Matching students.</returns>
+   Task<List<Student>> GetStudentsByAcademicIdsAsync(IEnumerable<string> academicIds, CancellationToken cancellationToken = default);
+}

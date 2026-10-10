@@ -35,20 +35,21 @@ namespace ATLAsBLL.Features.Students.Commands.DeleteStudent
 
             var user = student.User;
 
-            
             student.IsActive = false; 
 
-            
             if (user != null)
             {
                user.IsActive = false; 
+               user.SecurityStamp = System.Guid.NewGuid();
             }
 
-           
             var affected = await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            // Report failure when nothing was written, for example when the
-            // student was already deactivated.
+            if (affected > 0 && user != null)
+            {
+                await _unitOfWork.Users.BumpSecurityStampAsync(user.UserId, cancellationToken);
+            }
+
             return affected > 0;
         }
     }

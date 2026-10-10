@@ -66,36 +66,78 @@ namespace ATLAS.Controllers.Enrollment
         }
 
         /// <summary>
-        /// Create Range Enrollment.
+        /// Creates bulk student enrollments from an uploaded Excel file (.xlsx).
         /// </summary>
+        /// <param name="file">The uploaded Excel file (.xlsx) containing 'AcademicID' and 'Name' columns.</param>
+        /// <param name="dto">The course offering details (CourseID, AcademicYear, SemesterName, DepartmentID, level).</param>
+        /// <param name="cancellationToken">Cancellation token.</param>
+        /// <returns>A detailed summary of rows processed, enrollments created, skipped duplicates, and missing Academic IDs.</returns>
         [HttpPost("range")]
-        [ProducesResponseType(StatusCodes.Status201Created)]
+        [Consumes("multipart/form-data")]
+        [ProducesResponseType(typeof(BulkEnrollmentResultDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [EnableRateLimiting("AdminCreateRangePolicy")]
-        
-        public async Task<IActionResult> CreateRangeEnrollment([FromBody] BulkCreateEnrollmentDTO dto, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CreateRangeEnrollment(
+            IFormFile file,
+            [FromForm] BulkCreateEnrollmentDTO dto,
+            CancellationToken cancellationToken = default)
         {
-                var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+            const long maxUploadBytes = 10 * 1024 * 1024; // 10 MB limit
 
-                if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out var userId))
+            var userIdClaim = User.FindFirst(ClaimTypes.NameIdentifier);
+
+            if (userIdClaim is null || !int.TryParse(userIdClaim.Value, out var userId))
+            {
+                return Unauthorized();
+            }
+
+            if (dto is null)
+            {
+                return BadRequest(" enrollments details are required.");
+            }
+
+            if (file == null || file.Length == 0)
+            {
+                return BadRequest("Upload a non-empty Excel file.");
+            }
+
+            if (file.Length > maxUploadBytes)
+            {
+                return BadRequest("File size exceeds maximum allowed limit of 10 MB.");
+            }
+
+            var extension = Path.GetExtension(file.FileName ?? string.Empty).ToLowerInvariant();
+            if (extension is not ".xlsx" and not ".xls")
+            {
+                return BadRequest("Only Excel files (.xlsx or .xls) are supported.");
+            }
+
+            // Validate magic bytes signature for Excel files
+            var signature = new byte[8];
+            await using (var stream = file.OpenReadStream())
+            {
+                var bytesRead = await stream.ReadAsync(signature, 0, signature.Length, cancellationToken);
+                var isXlsx = signature.Take(2).SequenceEqual(new byte[] { 0x50, 0x4B });
+                var isXls = signature.Take(bytesRead).SequenceEqual(new byte[] { 0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1 });
+                if ((extension == ".xlsx" && !isXlsx) || (extension == ".xls" && !isXls))
                 {
-                    return Unauthorized();
+                    return BadRequest("The uploaded file content does not match its Excel file extension.");
                 }
+            }
 
+            using var memoryStream = new MemoryStream();
+            await file.CopyToAsync(memoryStream, cancellationToken);
+            memoryStream.Position = 0;
+
+          
                 var result = await _mediator.Send(
-                    new CreateEnrollmentsRangeCommand(dto, userId), cancellationToken);
+                    new CreateEnrollmentsRangeCommand(memoryStream, file.FileName, dto, userId),
+                    cancellationToken);
 
-                if (!result)
-                {
-                    return BadRequest(
-                        "No student matched the enrollment filter, or they are already enrolled.");
-                }
-
-                // LOW-07: bulk creation still creates resources, so it returns a
-                // 201 with no single Location to point at.
-                return StatusCode(StatusCodes.Status201Created, "Enrollments range created successfully.");
-            
+                return StatusCode(StatusCodes.Status201Created, result);
+           
         }
        /// <summary>
         /// Delete Enrollment.

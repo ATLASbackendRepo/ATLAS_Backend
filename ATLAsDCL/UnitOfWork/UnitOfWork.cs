@@ -153,6 +153,9 @@ public sealed class UnitOfWork : IUnitOfWork
         if (_currentTransaction != null)
             return;
 
+        if (_context.Database.ProviderName == "Microsoft.EntityFrameworkCore.InMemory")
+            return;
+
         _currentTransaction =
             await _context.Database.BeginTransactionAsync(cancellationToken);
     }

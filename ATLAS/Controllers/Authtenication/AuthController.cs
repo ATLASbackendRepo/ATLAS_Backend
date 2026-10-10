@@ -87,29 +87,56 @@ namespace ATLAS.Controllers.Authtenication
                 return BadRequest("Academic ID and password are required.");
             }
 
+            var recentFailuresBefore = _securityEventService != null
+                ? await _securityEventService.CountRecentFailedLoginsAsync(request.AcademicId, TimeSpan.FromMinutes(9), cancellationToken)
+                : 0;
+
+            if (recentFailuresBefore >= 5)
+            {
+                if (_securityEventService != null)
+                {
+                    await _securityEventService.LogAsync(new SecurityEventEntry
+                    {
+                        EventType = "AccountLockout",
+                        AttemptedAcademicId = request.AcademicId,
+                        Severity = "High",
+                        IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                        CorrelationId = HttpContext.TraceIdentifier,
+                        Description = "Too many failed login attempts; account temporarily locked."
+                    }, cancellationToken);
+                }
+
+                return StatusCode(StatusCodes.Status429TooManyRequests, new
+                {
+                    message = "Too many failed login attempts. Please try again later."
+                });
+            }
+
             var User = await _mediator.Send(new GetUserByAcademicIdQuery(request.AcademicId), cancellationToken);
 
-            var isUserValid = User != null && User.IsActive;
+            var isUserValid = User != null && User.IsActive && !string.IsNullOrEmpty(User.Password);
             var hashToVerify = isUserValid ? User!.Password : DummyHash;
             var isPasswordValid = BCrypt.Net.BCrypt.Verify(request.Password, hashToVerify);
 
             if (!isUserValid || !isPasswordValid)
             {
-                var recentFailures = await _securityEventService.CountRecentFailedLoginsAsync(
-                          request.AcademicId, TimeSpan.FromMinutes(9));
+                var recentFailures = recentFailuresBefore + 1;
 
                 var severity = recentFailures >= 5 ? "High"
                              : recentFailures >= 3 ? "Medium"
                              : "Low";
 
-                await _securityEventService.LogAsync(new SecurityEventEntry
+                if (_securityEventService != null)
                 {
-                    EventType = "FailedLogin",
-                    AttemptedAcademicId = request.AcademicId,
-                    Severity = severity,
-                    IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                    CorrelationId = HttpContext.TraceIdentifier
-                });
+                    await _securityEventService.LogAsync(new SecurityEventEntry
+                    {
+                        EventType = "FailedLogin",
+                        AttemptedAcademicId = request.AcademicId,
+                        Severity = severity,
+                        IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
+                        CorrelationId = HttpContext.TraceIdentifier
+                    }, cancellationToken);
+                }
 
                 return Unauthorized();
             }
@@ -393,57 +420,6 @@ namespace ATLAS.Controllers.Authtenication
             try
             {
                 isChange = await _mediator.Send(new ChangePasswordcommand(user, model), cancellationToken);
-            }
-            catch (UnauthorizedAccessException)
-            {
-                return Unauthorized();
-            }
-            catch (InvalidDataException exception)
-            {
-                return BadRequest(new { message = exception.Message });
-            }
-
-            // 6. Check Output Result
-            if (!isChange)
-            {
-                return BadRequest("Password change failed." );
-            }
-
-            return Ok(new { message = "Password changed successfully." });
-        }
- /// <summary>
-        /// Change Password.
-        /// </summary>
-        [HttpPost("ChangePasswordAdmin")]
-         [Authorize(Roles = "SAdmin,Admin")]
-        [EnableRateLimiting("AuthLimiter")]
-        public async Task<IActionResult> ChangePasswordAdmin([FromBody] ChangePasswordAdmin model, CancellationToken cancellationToken = default)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-          
-
-            var AcademicId = GetCurrentACdimicId();
-
-            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            var user = !string.IsNullOrEmpty(userId) && int.TryParse(userId, out var parsedUserId)
-                ? await _mediator.Send(new GetUserByIdQuery(parsedUserId), cancellationToken)
-                : !string.IsNullOrWhiteSpace(AcademicId)
-                    ? await _mediator.Send(new GetUserByAcademicIdQuery(AcademicId), cancellationToken)
-                    : null;
-            if (user == null)
-            {
-                return Unauthorized();
-            }
-
-            // 5. Change Password via UserManager
-            bool isChange;
-            try
-            {
-                isChange = await _mediator.Send(new ChangePasswordAdimincommand(user, model), cancellationToken);
             }
             catch (UnauthorizedAccessException)
             {

@@ -414,4 +414,43 @@ public class AttendanceDeviceBindingTests
         Assert.Contains("not registered", ex.Message, StringComparison.OrdinalIgnoreCase);
         Assert.Empty(await scene.Context.AttendanceRecords.ToListAsync());
     }
+
+    [Fact]
+    public async Task StartAsync_LapsedActiveSession_IsExpiredInDbAndAllowsNewSession()
+    {
+        using var scene = new Scene();
+        var service = scene.Attendance();
+
+        // Expire the active session by advancing the clock past session.ExpiresAt
+        scene.Clock.Advance(TimeSpan.FromDays(8));
+
+        // Attempt to start a new session for the same offering
+        var newSession = await service.StartAsync(OfferingId, StudentA, 30, CancellationToken.None);
+
+        Assert.NotNull(newSession);
+
+        // Verify that the initial session status in DB is now Expired
+        var oldSessionInDb = await scene.Context.AttendanceSessions.FindAsync(scene.Session.AttendanceSessionId);
+        Assert.NotNull(oldSessionInDb);
+        Assert.Equal(AttendanceSessionStatus.Expired, oldSessionInDb!.Status);
+    }
+
+    [Fact]
+    public async Task GetCurrentQrAsync_LapsedActiveSession_PersistsExpiredStatus()
+    {
+        using var scene = new Scene();
+        var service = scene.Attendance();
+
+        // Expire the session in time
+        scene.Clock.Advance(TimeSpan.FromDays(8));
+
+        // GetCurrentQrAsync on lapsed session should return null AND persist Expired status in DB
+        var qr = await service.GetCurrentQrAsync(scene.Session.AttendanceSessionId, CancellationToken.None);
+
+        Assert.Null(qr);
+
+        var sessionInDb = await scene.Context.AttendanceSessions.FindAsync(scene.Session.AttendanceSessionId);
+        Assert.NotNull(sessionInDb);
+        Assert.Equal(AttendanceSessionStatus.Expired, sessionInDb!.Status);
+    }
 }

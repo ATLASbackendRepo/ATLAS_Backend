@@ -62,7 +62,12 @@ namespace ATLAsBLL.Services.User.Command.AdminResetUserPassword
             targetUser.RefreshTokenRevokedAt = DateTime.UtcNow;
 
             _unitOfWork.Users.Update(targetUser);
-            return await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+            var saved = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
+            if (saved)
+            {
+                await _unitOfWork.Users.BumpSecurityStampAsync(targetUser.UserId, cancellationToken);
+            }
+            return saved;
         }
     }
 }
