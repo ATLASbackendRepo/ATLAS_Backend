@@ -113,6 +113,11 @@ namespace ATLAS.Controllers.Student
 
             bool insertSecessfully = await _mediator.Send(new CreateStudentsRangeCommand(filePath), cancellationToken);
 
+            if (!insertSecessfully)
+            {
+                return BadRequest("Failed to process student records from the uploaded file.");
+            }
+
             return Ok(new
             {
                 message = "File uploaded and data saved successfully.",

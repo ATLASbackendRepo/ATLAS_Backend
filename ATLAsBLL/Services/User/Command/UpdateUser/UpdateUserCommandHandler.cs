@@ -63,11 +63,7 @@ namespace ATLAsBLL.Features.Users.Commands.UpdateUser
                 user.SecurityStamp = System.Guid.NewGuid();
             }
 
-            var saved = await _unitOfWork.SaveChangesAsync(cancellationToken) > 0;
-            if (needsSecurityStampBump)
-            {
-                await _unitOfWork.Users.BumpSecurityStampAsync(user.UserId, cancellationToken);
-            }
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
             return true;
         }
     }

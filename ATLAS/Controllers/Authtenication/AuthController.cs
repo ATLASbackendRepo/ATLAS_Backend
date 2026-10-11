@@ -87,7 +87,8 @@ namespace ATLAS.Controllers.Authtenication
                 return BadRequest("Academic ID and password are required.");
             }
 
-            var clientIp = HttpContext?.Connection?.RemoteIpAddress?.ToString();
+            var rawIp = HttpContext?.Connection?.RemoteIpAddress?.ToString();
+            var clientIp = string.IsNullOrWhiteSpace(rawIp) ? "unknown" : rawIp;
             var recentFailuresBefore = _securityEventService != null
                 ? await _securityEventService.CountRecentFailedLoginsAsync(request.AcademicId, clientIp, TimeSpan.FromMinutes(9), cancellationToken)
                 : 0;
@@ -101,8 +102,8 @@ namespace ATLAS.Controllers.Authtenication
                         EventType = "AccountLockout",
                         AttemptedAcademicId = request.AcademicId,
                         Severity = "High",
-                        IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                        CorrelationId = HttpContext.TraceIdentifier,
+                        IpAddress = clientIp,
+                        CorrelationId = HttpContext?.TraceIdentifier,
                         Description = "Too many failed login attempts; account temporarily locked."
                     }, cancellationToken);
                 }
@@ -134,9 +135,24 @@ namespace ATLAS.Controllers.Authtenication
                         EventType = "FailedLogin",
                         AttemptedAcademicId = request.AcademicId,
                         Severity = severity,
-                        IpAddress = HttpContext.Connection.RemoteIpAddress?.ToString(),
-                        CorrelationId = HttpContext.TraceIdentifier
+                        IpAddress = clientIp,
+                        CorrelationId = HttpContext?.TraceIdentifier
                     }, cancellationToken);
+
+                    // Layered defense: Check account-wide failures across all IPs to detect distributed attacks
+                    var accountWideFailures = await _securityEventService.CountRecentFailedLoginsAsync(request.AcademicId, TimeSpan.FromMinutes(15), cancellationToken);
+                    if (accountWideFailures >= 10)
+                    {
+                        await _securityEventService.LogAsync(new SecurityEventEntry
+                        {
+                            EventType = "DistributedBruteForceDetected",
+                            AttemptedAcademicId = request.AcademicId,
+                            Severity = "High",
+                            IpAddress = clientIp,
+                            CorrelationId = HttpContext?.TraceIdentifier,
+                            Description = $"Potential distributed brute force attack detected against academic ID '{request.AcademicId}' ({accountWideFailures} attempts across multiple sources within 15 minutes)."
+                        }, cancellationToken);
+                    }
                 }
 
                 return Unauthorized();

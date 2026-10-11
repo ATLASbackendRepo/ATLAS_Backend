@@ -80,9 +80,10 @@ namespace ATLAsBLL.Services
                          && e.AttemptedAcademicId == academicId
                          && e.TimestampUtc >= since);
 
-            if (!string.IsNullOrEmpty(ipAddress))
+            if (ipAddress != null)
             {
-                query = query.Where(e => e.IpAddress == ipAddress);
+                var targetIp = string.IsNullOrWhiteSpace(ipAddress) ? "unknown" : ipAddress;
+                query = query.Where(e => e.IpAddress == targetIp);
             }
 
             return await query.CountAsync(cancellationToken);
