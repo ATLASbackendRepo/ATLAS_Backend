@@ -1,3 +1,4 @@
+using ATLAsBLL.Services.Common;
 using ATLAS.Domain.Entities;
 using ATLAsDCL.UnitOfWork;
 using ATLASDomain.Entities;
@@ -20,7 +21,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
     /// number of rows is capped by <see cref="MaxImportRows"/>.
     /// </remarks>
     public class CreateStudentsRangeCommandHandler
-        : IRequestHandler<CreateStudentsRangeCommand, bool>
+        : IRequestHandler<CreateStudentsRangeCommand, StudentImportResult>
     {
         /// <summary>
         /// Largest number of data rows a single import may contain.
@@ -47,7 +48,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
         /// <summary>
         /// Handle.
         /// </summary>
-        public async Task<bool> Handle(
+        public async Task<StudentImportResult> Handle(
             CreateStudentsRangeCommand request,
             CancellationToken cancellationToken)
         {
@@ -66,9 +67,42 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                 if (preparedRows.Count == 0)
                     throw new System.IO.InvalidDataException("The uploaded Excel file contains no student data rows.");
 
-                var students = preparedRows
-                    .Select(row => row.ToStudent(GenerateOneTimePassword()))
+                var incomingAcademicIds = preparedRows
+                    .Select(r => r.AcademicNumber)
+                    .Where(id => !string.IsNullOrWhiteSpace(id))
+                    .Distinct()
                     .ToList();
+
+                var existingStudents = await _unitOfWork.Students.GetStudentsByAcademicIdsAsync(
+                    incomingAcademicIds,
+                    cancellationToken);
+
+                if (existingStudents != null && existingStudents.Count > 0)
+                {
+                    var duplicate = existingStudents.First();
+                    var duplicateId = !string.IsNullOrWhiteSpace(duplicate.AcademicId)
+                        ? duplicate.AcademicId
+                        : duplicate.User?.AcademicId ?? "unknown";
+
+                    throw new System.IO.InvalidDataException(
+                        $"Academic ID '{duplicateId}' is already in use by an existing student account.");
+                }
+
+                var expiresAt = DateTime.UtcNow.AddHours(72);
+                var credentialRecords = new List<StudentCredentialRecord>(preparedRows.Count);
+                var students = new List<Student>(preparedRows.Count);
+
+                foreach (var row in preparedRows)
+                {
+                    var tempPassword = CredentialExportService.GenerateTemporaryPassword();
+                    students.Add(row.ToStudent(tempPassword, expiresAt));
+                    credentialRecords.Add(new StudentCredentialRecord(
+                        row.AcademicNumber,
+                        row.FullName,
+                        tempPassword,
+                        expiresAt,
+                        "Student"));
+                }
 
                 await _unitOfWork.BeginTransactionAsync(cancellationToken);
 
@@ -102,7 +136,8 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                     throw;
                 }
 
-                return true;
+                var excelBytes = CredentialExportService.GenerateCredentialsWorkbook(credentialRecords);
+                return new StudentImportResult(students.Count, excelBytes, expiresAt);
             }
             finally
             {
@@ -291,7 +326,7 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
             /// Random password generated for this account.
             /// </param>
             /// <returns>The student, with its user, ready to be inserted.</returns>
-            public Student ToStudent(string oneTimePassword)
+            public Student ToStudent(string oneTimePassword, DateTime expiresAt)
             {
                 return new Student
                 {
@@ -310,7 +345,8 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudentsRange
                         Password = BCrypt.Net.BCrypt.HashPassword(oneTimePassword),
                         Role = enUserRole.Student,
                         IsActive = true,
-                        MustChangePassword = true
+                        MustChangePassword = true,
+                        TemporaryPasswordExpiresAt = expiresAt
                     }
                 };
             }

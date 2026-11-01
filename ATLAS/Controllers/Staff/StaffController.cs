@@ -68,16 +68,21 @@ namespace ATLAS.Controllers.Staff
         [EnableRateLimiting("AdminUpdatePolicy")]
         public async Task<ActionResult> CreateStaff([FromBody] CreateStaffDto createStaffDTO, CancellationToken cancellationToken = default)
         {
-                var staffId = await _mediator.Send(new CreateUserCommand(createStaffDTO), cancellationToken);
-                if (staffId > 0)
-                {
-                    // LOW-07: creating a staff member is a 201, not a 200.
-                    return StatusCode(StatusCodes.Status201Created, new { message = "Staff created successfully.", StaffId = staffId });
-                }
-                else
-                {
-                    return BadRequest("Failed to create staff.");
-                }
+            var result = await _mediator.Send(new CreateUserCommand(createStaffDTO), cancellationToken);
+
+            if (result == null || result.UserId <= 0 || result.ExcelFileBytes == null || result.ExcelFileBytes.Length == 0)
+            {
+                return BadRequest("Failed to create staff.");
+            }
+
+            Response.Headers["Cache-Control"] = "no-store, no-cache, max-age=0, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["X-Staff-Id"] = result.UserId.ToString();
+
+            return File(
+                result.ExcelFileBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"staff-credential-{result.AcademicId}.xlsx");
         }
 
 

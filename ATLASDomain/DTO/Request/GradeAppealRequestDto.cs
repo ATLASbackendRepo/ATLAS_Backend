@@ -11,19 +11,25 @@ public class GradeAppealRequestDto
     /// </summary>
     public int RequestID { get; set; }
 
-     /// <summary>
-     /// Student ID.
-     /// </summary>
-     public int StudentID { get; set; }
+    /// <summary>
+    /// Student ID.
+    /// </summary>
+    public int StudentID { get; set; }
+
+    /// <summary>
+    /// Institution ID.
+    /// </summary>
+    public int InstitutionID { get; set; }
+
     required public string CourseName { get; set; } = string.Empty;
     /// <summary>
     /// Assessment Module Name.
     /// </summary>
     public string? AssessmentModuleName { get; set; }
-     /// <summary>
-     /// Doctor User ID.
-     /// </summary>
-     public int DoctorUserID { get; set; }
+    /// <summary>
+    /// Doctor User ID.
+    /// </summary>
+    public int DoctorUserID { get; set; }
 
     /// <summary>
     /// Current Grade.
@@ -31,10 +37,10 @@ public class GradeAppealRequestDto
     public decimal? CurrentGrade { get; set; }
     required public string ProblemDescription { get; set; } = string.Empty;
 
-     /// <summary>
-     /// Status.
-     /// </summary>
-     public enGradeAppealStatus Status { get; set; }
+    /// <summary>
+    /// Status.
+    /// </summary>
+    public enGradeAppealStatus Status { get; set; }
     /// <summary>
     /// Doctor Response.
     /// </summary>

@@ -32,11 +32,12 @@ namespace ATLAsDCL.Configuration
 
             builder.HasIndex(x => new
             {
+                x.InstitutionID,
                 x.SemesterName,
                 x.AcademicYear
             })
             .IsUnique()
-            .HasDatabaseName("UQ_Semester_Name_AcademicYear");
+            .HasDatabaseName("UQ_Semester_Institution_Name_AcademicYear");
         }
     }
-}   
+}

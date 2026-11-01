@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using ATLAsBLL.Exceptions;
 
 namespace ATLAS.Middleware;
 
@@ -131,6 +132,9 @@ public sealed class GlobalExceptionHandler(ILogger<GlobalExceptionHandler> logge
 
             KeyNotFoundException =>
                 (StatusCodes.Status404NotFound, "The requested resource was not found."),
+
+            ForbiddenAccessException =>
+                (StatusCodes.Status403Forbidden, "You are not allowed to perform this action."),
 
             UnauthorizedAccessException =>
                 (StatusCodes.Status403Forbidden, "You are not allowed to perform this action."),

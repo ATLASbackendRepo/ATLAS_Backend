@@ -284,6 +284,8 @@ namespace ATLAS.Controllers.CourseOffering
         [Authorize(Roles = "SAdmin,Admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> AssignDoctorToOffering(
             [FromBody] CreateCourseOfferingDoctorCommand command,
             CancellationToken cancellationToken = default)
@@ -294,7 +296,7 @@ namespace ATLAS.Controllers.CourseOffering
             }
 
             var id = await _mediator.Send(command, cancellationToken);
-            return CreatedAtAction(nameof(AssignDoctorToOffering), new { id }, new { assignmentId = id });
+            return StatusCode(StatusCodes.Status201Created, new { assignmentId = id });
         }
 
         /// <summary>
@@ -304,6 +306,8 @@ namespace ATLAS.Controllers.CourseOffering
         [Authorize(Roles = "SAdmin,Admin")]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> AssignTAToOffering(
             [FromBody] CreateCourseOfferingTACommand command,
             CancellationToken cancellationToken = default)
@@ -314,7 +318,7 @@ namespace ATLAS.Controllers.CourseOffering
             }
 
             var id = await _mediator.Send(command, cancellationToken);
-            return CreatedAtAction(nameof(AssignTAToOffering), new { id }, new { assignmentId = id });
+            return StatusCode(StatusCodes.Status201Created, new { assignmentId = id });
         }
 
         /// <summary>

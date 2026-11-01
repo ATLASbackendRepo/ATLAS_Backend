@@ -19,22 +19,21 @@ namespace ATLAsDCL.Configuration
             builder.Property(co => co.SemesterID).IsRequired();
             builder.Property(co => co.CourseID).IsRequired();
 
-        
-            builder.HasIndex(x => x.SemesterID)
-                .HasDatabaseName("UQ_Course_Semester");
-
+            // BE-17: Replace non-unique index with institution-scoped unique index
+            builder.HasIndex(x => new { x.InstitutionID, x.CourseID, x.SemesterID })
+                .IsUnique()
+                .HasDatabaseName("UQ_CourseOffering_Institution_Course_Semester")
+                .HasFilter("[InstitutionID] IS NOT NULL");
 
             builder.HasOne(co => co.Semester)
                 .WithMany(s => s.CourseOfferings)
                 .HasForeignKey(co => co.SemesterID)
                 .OnDelete(DeleteBehavior.Restrict);
 
-
             builder.HasOne(co => co.Course)
                 .WithMany(c => c.CourseOfferings)
                 .HasForeignKey(co => co.CourseID)
                 .OnDelete(DeleteBehavior.Restrict);
-
 
             builder.HasMany(co => co.AssessmentModules)
                 .WithOne(am => am.CourseOffering)

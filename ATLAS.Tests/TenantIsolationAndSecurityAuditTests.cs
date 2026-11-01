@@ -1,3 +1,4 @@
+using ATLAsBLL.Services.Common;
 using ATLAS.Claims;
 using ATLAS.Controllers.CourseOffering;
 using ATLAS.Controllers.Student;
@@ -585,11 +586,11 @@ namespace ATLAS.Tests
         }
 
         [Fact]
-        public async Task ATLAS_FUNC_001_StudentController_Upload_ReturnsBadRequest_WhenHandlerReturnsFalse()
+        public async Task ATLAS_FUNC_001_StudentController_Upload_ReturnsBadRequest_WhenHandlerReturnsNullOrZero()
         {
             var mediatorMock = new Mock<IMediator>();
             mediatorMock.Setup(m => m.Send(It.IsAny<CreateStudentsRangeCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(false);
+                .ReturnsAsync((StudentImportResult?)null);
 
             var controller = new StudentController(mediatorMock.Object, Mock.Of<ICourseOfferingAuthorizationService>());
             var result = await controller.CreateStudents(CreateDummyExcelFormFile());
@@ -599,17 +600,20 @@ namespace ATLAS.Tests
         }
 
         [Fact]
-        public async Task ATLAS_FUNC_001_StudentController_Upload_ReturnsOk_WhenHandlerReturnsTrue()
+        public async Task ATLAS_FUNC_001_StudentController_Upload_ReturnsFile_WhenHandlerSucceeds()
         {
             var mediatorMock = new Mock<IMediator>();
+            var expectedBytes = new byte[] { 0x50, 0x4B, 0x03, 0x04 };
             mediatorMock.Setup(m => m.Send(It.IsAny<CreateStudentsRangeCommand>(), It.IsAny<CancellationToken>()))
-                .ReturnsAsync(true);
+                .ReturnsAsync(new StudentImportResult(3, expectedBytes, DateTime.UtcNow.AddHours(72)));
 
             var controller = new StudentController(mediatorMock.Object, Mock.Of<ICourseOfferingAuthorizationService>());
             var result = await controller.CreateStudents(CreateDummyExcelFormFile());
 
-            var okResult = Assert.IsType<OkObjectResult>(result);
-            Assert.NotNull(okResult.Value);
+            var fileResult = Assert.IsType<FileContentResult>(result);
+            Assert.Equal("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet", fileResult.ContentType);
+            Assert.Equal(expectedBytes, fileResult.FileContents);
+            Assert.Contains("student-credentials-", fileResult.FileDownloadName);
         }
 
         #endregion

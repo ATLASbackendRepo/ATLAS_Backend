@@ -5,8 +5,12 @@ using ATLAsBLL.Services.Course.Queries;
 using ATLASDomain.DTO.Course;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ATLAS.Controllers.Course
 {
@@ -17,8 +21,8 @@ namespace ATLAS.Controllers.Course
     [ApiController]
     public class CourseController : Controller
     {
-       
         private readonly IMediator _mediator;
+
         public CourseController(IMediator mediator)
         {
             _mediator = mediator;
@@ -28,110 +32,94 @@ namespace ATLAS.Controllers.Course
         /// Create Course.
         /// </summary>
         [HttpPost("CreateCourse")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
         public async Task<IActionResult> CreateCourse([FromBody] CreateCourseDTO createCourseDTO, CancellationToken cancellationToken = default)
         {
-            try
+            if (string.IsNullOrWhiteSpace(createCourseDTO.CourseName) || createCourseDTO.CreditHours <= 0)
             {
-                if (!string.IsNullOrEmpty(createCourseDTO.CourseName) && createCourseDTO.CreditHours > 0)
-                {
-                    var CourseID = await _mediator.Send(new CreateCourseCommand(createCourseDTO), cancellationToken);
-                    if (CourseID <= 0)
-                    {
-                        return BadRequest("Failed to create Course.");
-                    }
-                    // LOW-07: creating a resource is a 201, not a 200. The body is
-                    // unchanged so existing clients keep parsing it the same way.
-                    return StatusCode(StatusCodes.Status201Created, $"Course created successfully. Id: {CourseID}");
-                }
-                return BadRequest();
+                return BadRequest("Invalid course data.");
             }
-            catch
+
+            var courseId = await _mediator.Send(new CreateCourseCommand(createCourseDTO), cancellationToken);
+            if (courseId <= 0)
             {
                 return BadRequest("Failed to create Course.");
             }
+
+            return StatusCode(StatusCodes.Status201Created, $"Course created successfully. Id: {courseId}");
         }
 
         /// <summary>
         /// Update Course.
         /// </summary>
         [HttpPut("UpdateCourse")]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminUpdatePolicy")]
         public async Task<IActionResult> UpdateCourse([FromBody] UpdateCourseDTO updateCourse, CancellationToken cancellationToken = default)
         {
-            try
+            if (updateCourse.Id <= 0 || string.IsNullOrWhiteSpace(updateCourse.CourseName))
             {
-                if (updateCourse.Id > 0 && !string.IsNullOrEmpty(updateCourse.CourseName))
-                {
-                    var result = await _mediator.Send(new UpdateCourseCommand(updateCourse), cancellationToken);
-                    if (result)
-                        return Ok("Department updated successfully.");
+                return BadRequest("Invalid Course data.");
+            }
 
-                }
+            var result = await _mediator.Send(new UpdateCourseCommand(updateCourse), cancellationToken);
+            if (result)
+            {
+                return Ok("Course updated successfully.");
+            }
 
-                return BadRequest("Fialed To Updated Course");
-            }
-            catch (KeyNotFoundException)
-            {
-                return NotFound("Department not found.");
-            }
-            catch
-            {
-                return BadRequest("Fialed To Updated Course");
-            }
+            return BadRequest("Failed to update Course.");
         }
 
-            /// <summary>
-            /// Delete Course.
-            /// </summary>
-            [HttpDelete("DeleteCourse")]
-            [ProducesResponseType(StatusCodes.Status400BadRequest)]
-            [ProducesResponseType(StatusCodes.Status404NotFound)]
-            [ProducesResponseType(StatusCodes.Status200OK)]
-            [Authorize(Roles = "SAdmin,Admin")]
-            [EnableRateLimiting("AdminSoftDeletePolicy")]
-            public async Task<IActionResult> DeleteCourse(int CourseId, CancellationToken cancellationToken = default)
+        /// <summary>
+        /// Delete Course.
+        /// </summary>
+        [HttpDelete("DeleteCourse")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(StatusCodes.Status409Conflict)]
+        [Authorize(Roles = "SAdmin,Admin")]
+        [EnableRateLimiting("AdminSoftDeletePolicy")]
+        public async Task<IActionResult> DeleteCourse(int CourseId, CancellationToken cancellationToken = default)
+        {
+            if (CourseId <= 0)
             {
-                if (CourseId <= 0)
-                {
-                    return BadRequest("Invalid Course ID.");
-                }
-                var ISDelete = await _mediator.Send(new DeleteCourseCommand(CourseId), cancellationToken);
-                if (!ISDelete)
-                {
-                    return NotFound("Department not found.");
-                }
-
-                return Ok("Department deleted successfully.");
+                return BadRequest("Invalid Course ID.");
             }
 
+            var isDeleted = await _mediator.Send(new DeleteCourseCommand(CourseId), cancellationToken);
+            if (!isDeleted)
+            {
+                return NotFound("Course not found.");
+            }
+
+            return Ok("Course deleted successfully.");
+        }
 
         /// <summary>
         /// Get Courses.
         /// </summary>
         [HttpGet("GetCourses")]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [Authorize(Roles = "SAdmin,Admin")]
         [EnableRateLimiting("AdminGetAllPolicy")]
         public async Task<IActionResult> GetCourses([FromQuery] string? Coursename, CancellationToken cancellationToken = default)
         {
-            var departments = await _mediator.Send(new GetAllCourseQuery(Coursename), cancellationToken);
-
-            // LOW-07: an empty result is a successful query and returns 200 with
-            // an empty array. The message here also said "No departments found",
-            // which was a copy-paste from the department controller and actively
-            // misled anyone debugging a course lookup.
-            return Ok(departments ?? new List<CourseDTO>());
-
-
+            var courses = await _mediator.Send(new GetAllCourseQuery(Coursename), cancellationToken);
+            return Ok(courses ?? new List<CourseDTO>());
         }
     }
 }

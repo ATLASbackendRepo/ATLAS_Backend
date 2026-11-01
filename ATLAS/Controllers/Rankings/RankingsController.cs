@@ -3,9 +3,13 @@ using ATLAsBLL.Services.CourseGrade.Queries.GetMySemesterRank;
 using ATLASDomain.DTO.CourseGrade;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using System.Collections.Generic;
 using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ATLAS.API.Controllers;
 
@@ -27,36 +31,33 @@ public class RankingsController : ControllerBase
     }
 
     /// <summary>
-    /// GET /api/semesters/3/rankings/me?studentId=12
+    /// GET /api/semesters/3/rankings/me
     /// Get My Rank.
     /// </summary>
     [HttpGet("me")]
     [ProducesResponseType(typeof(MyRankDto), StatusCodes.Status200OK)]
-    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status403Forbidden)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Student")]
     [EnableRateLimiting("RankingsPolicy")]
     public async Task<ActionResult<MyRankDto>> GetMyRank(
-    int semesterId, 
-    CancellationToken cancellationToken)
+        int semesterId, 
+        CancellationToken cancellationToken)
     {
-     
-
         if (semesterId < 1)
             return BadRequest("SemesterId must be greater than zero.");
 
-        var Userid = GetCurrentUserId();
-        if (Userid == null)
+        var userId = GetCurrentUserId();
+        if (userId == null)
             return Unauthorized();
 
-        
         var result = await _mediator.Send(
-            new GetMySemesterRankQuery(Userid.Value, semesterId),
+            new GetMySemesterRankQuery(userId.Value, semesterId),
             cancellationToken);
 
         if (result is null)
-            return NotFound(
-                $"Student  has no enrollments in  this Semester .");
+            return NotFound("Student has no enrollments in this Semester.");
 
         return Ok(result);
     }
@@ -69,10 +70,11 @@ public class RankingsController : ControllerBase
     [HttpGet("top/{count:int}")]
     [ProducesResponseType(typeof(List<TopRankedStudentDto>), StatusCodes.Status200OK)]
     [ProducesResponseType(typeof(List<TopRankedStudentDto>), StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(typeof(List<TopRankedStudentDto>), StatusCodes.Status403Forbidden)]
     [ProducesResponseType(typeof(List<TopRankedStudentDto>), StatusCodes.Status404NotFound)]
     [Authorize(Roles = "Student")]
     [EnableRateLimiting("RankingsPolicy")]
-    public async Task<ActionResult<List<TopRankedStudentDto>>> GetTopRanked(   // forget level (int)
+    public async Task<ActionResult<List<TopRankedStudentDto>>> GetTopRanked(
         int semesterId,
         int AcademicLevel,
         int count,
@@ -96,7 +98,6 @@ public class RankingsController : ControllerBase
         return Ok(result);
     }
 
-
     /// <summary>
     /// Get Current User Id.
     /// </summary>
@@ -109,6 +110,4 @@ public class RankingsController : ControllerBase
         }
         return userId;
     }
-
-
 }

@@ -124,6 +124,14 @@ public class EnrollmentRepository
     public async Task<SemesterStudentRankingView?> GetStudentSemesterRankAsync(
       int studentId, int semesterId, CancellationToken cancellationToken)
     {
+        var isStudentActive = await _context.Students
+            .AnyAsync(s => s.StudentId == studentId && s.IsActive, cancellationToken);
+
+        if (!isStudentActive)
+        {
+            return null;
+        }
+
         return await _context.SemesterStudentRankings
             .AsNoTracking()
             .Where(r => r.SemesterID == semesterId && r.StudentID == studentId )
@@ -134,11 +142,18 @@ public class EnrollmentRepository
     /// Get Top Ranked Students In Semester Async.
     /// </summary>
     public async Task<List<SemesterStudentRankingView>> GetTopRankedStudentsInSemesterAsync(
-        int semesterId,int AcademicLevel ,int topCount, CancellationToken cancellationToken)
+        int semesterId, int AcademicLevel, int topCount, CancellationToken cancellationToken)
     {
+        var activeStudentIds = _context.Students
+            .Where(s => s.IsActive)
+            .Select(s => s.StudentId);
+
         return await _context.SemesterStudentRankings
             .AsNoTracking()
-            .Where(r => r.SemesterID == semesterId && r.AcademicLevel == AcademicLevel && r.Rank <= topCount)
+            .Where(r => r.SemesterID == semesterId &&
+                        r.AcademicLevel == AcademicLevel &&
+                        r.Rank <= topCount &&
+                        activeStudentIds.Contains(r.StudentID))
             .OrderBy(r => r.Rank)
             .ToListAsync(cancellationToken);
     }
@@ -155,10 +170,6 @@ public class EnrollmentRepository
             .ToListAsync(cancellationToken);
     }
 
-
-
-
-
     /// <summary>
     /// Bulk Enroll Students Fast Async.
     /// Enrolls every active student of one department and academic level into an
@@ -169,11 +180,14 @@ public class EnrollmentRepository
     /// </summary>
     /// <param name="dto">Course, semester, department and level to enroll.</param>
     /// <param name="createdByUserId">User that performs the enrollment.</param>
+    /// <param name="institutionId">Optional institution scope to restrict lookups and enrolled students.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>Number of inserted enrollment rows.</returns>
     public async Task<int> BulkEnrollStudentsFastAsync(
         BulkCreateEnrollmentDTO dto,
-        int createdByUserId, CancellationToken cancellationToken = default)
+        int createdByUserId,
+        int? institutionId = null,
+        CancellationToken cancellationToken = default)
     {
         if (createdByUserId <= 0)
         {
@@ -181,8 +195,13 @@ public class EnrollmentRepository
                 "The acting user is required to enroll students.");
         }
 
-        var semester = await _context.Semesters
-            .AsNoTracking()
+        var semesterQuery = _context.Semesters.AsNoTracking();
+        if (institutionId.HasValue)
+        {
+            semesterQuery = semesterQuery.Where(s => s.InstitutionID == institutionId.Value);
+        }
+
+        var semester = await semesterQuery
             .FirstOrDefaultAsync(s => s.AcademicYear == dto.AcademicYear
                                    && s.SemesterName == dto.SemesterName, cancellationToken);
 
@@ -193,40 +212,62 @@ public class EnrollmentRepository
                 $"'{dto.AcademicYear}' was not found.");
         }
 
-        var courseOfferingId = await _context.CourseOfferings
-            .AsNoTracking()
+        var courseOfferingQuery = _context.CourseOfferings.AsNoTracking();
+        if (institutionId.HasValue)
+        {
+            courseOfferingQuery = courseOfferingQuery.Where(co => co.InstitutionID == institutionId.Value);
+        }
+
+        var courseOffering = await courseOfferingQuery
             .Where(co => co.CourseID == dto.CourseID
                       && co.SemesterID == semester.SemesterID)
-            .Select(co => co.CourseOfferingID)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (courseOfferingId == 0)
+        if (courseOffering is null)
         {
             throw new KeyNotFoundException(
                 $"Course {dto.CourseID} is not offered in semester " +
                 $"'{dto.SemesterName}' of academic year '{dto.AcademicYear}'.");
         }
 
-        var rowsAffected = await _context.Database.ExecuteSqlInterpolatedAsync($@"
-        INSERT INTO Enrollments (StudentID, CourseOfferingID, EnrollmentDate, CreatedByUserID)
-        SELECT 
-            s.StudentID, 
-            {courseOfferingId}, 
-            {DateTime.UtcNow},
-            {createdByUserId}
-        FROM Students s
-        WHERE s.DepartmentID = {dto.DepartmentID} 
-          AND s.AcademicLevel = {dto.level} 
-          AND s.IsActive = 1
-          AND NOT EXISTS (
-              SELECT 1 
-              FROM Enrollments e 
-              WHERE e.StudentID = s.StudentID 
-                AND e.CourseOfferingID = {courseOfferingId}
-          );
-    ");
+        if (courseOffering.InstitutionID != semester.InstitutionID)
+        {
+            throw new ArgumentException("The course offering and semester belong to different institutions.");
+        }
 
-        return rowsAffected;
+        var courseOfferingId = courseOffering.CourseOfferingID;
+        var targetInstId = institutionId ?? courseOffering.InstitutionID;
+
+        if (!targetInstId.HasValue)
+        {
+            throw new InvalidOperationException("Course offering does not have an assigned institution.");
+        }
+
+        var studentQuery = _context.Students
+            .Where(s => s.DepartmentId == dto.DepartmentID
+                     && s.AcademicLevel == dto.level
+                     && s.IsActive
+                     && s.InstitutionID == targetInstId.Value);
+
+        var studentsToEnroll = await studentQuery
+            .Where(s => !_context.Enrollments.Any(e => e.StudentID == s.StudentId && e.CourseOfferingID == courseOfferingId))
+            .Select(s => s.StudentId)
+            .ToListAsync(cancellationToken);
+
+        if (studentsToEnroll.Count == 0)
+            return 0;
+
+        var now = DateTime.UtcNow;
+        var newEnrollments = studentsToEnroll.Select(sid => new Enrollment
+        {
+            StudentID = sid,
+            CourseOfferingID = courseOfferingId,
+            EnrollmentDate = now,
+            CreatedByUserID = createdByUserId
+        }).ToList();
+
+        await _context.Enrollments.AddRangeAsync(newEnrollments, cancellationToken);
+        return await _context.SaveChangesAsync(cancellationToken);
     }
 
     /// <summary>
@@ -237,12 +278,15 @@ public class EnrollmentRepository
     /// <param name="AcdimicID">Academic id of the student to enroll.</param>
     /// <param name="dto">Course and semester the student is enrolled into.</param>
     /// <param name="createdByUserId">User that performs the enrollment.</param>
+    /// <param name="institutionId">Optional institution scope to restrict lookups and enrolled student.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>True when a new enrollment row was inserted.</returns>
     public async Task<bool> AddSingleStudentToEnrollmentAsync(
         string AcdimicID,
         BulkCreateEnrollmentDTO dto,
-        int createdByUserId, CancellationToken cancellationToken = default)
+        int createdByUserId,
+        int? institutionId = null,
+        CancellationToken cancellationToken = default)
     {
         if (createdByUserId <= 0)
         {
@@ -250,8 +294,13 @@ public class EnrollmentRepository
                 "The acting user is required to enroll a student.");
         }
 
-        var semester = await _context.Semesters
-            .AsNoTracking()
+        var semesterQuery = _context.Semesters.AsNoTracking();
+        if (institutionId.HasValue)
+        {
+            semesterQuery = semesterQuery.Where(s => s.InstitutionID == institutionId.Value);
+        }
+
+        var semester = await semesterQuery
             .FirstOrDefaultAsync(s => s.AcademicYear == dto.AcademicYear
                                    && s.SemesterName == dto.SemesterName, cancellationToken);
 
@@ -262,35 +311,53 @@ public class EnrollmentRepository
                 $"'{dto.AcademicYear}' was not found.");
         }
 
-        var courseOfferingId = await _context.CourseOfferings
-            .AsNoTracking()
+        var courseOfferingQuery = _context.CourseOfferings.AsNoTracking();
+        if (institutionId.HasValue)
+        {
+            courseOfferingQuery = courseOfferingQuery.Where(co => co.InstitutionID == institutionId.Value);
+        }
+
+        var courseOffering = await courseOfferingQuery
             .Where(co => co.CourseID == dto.CourseID
                       && co.SemesterID == semester.SemesterID)
-            .Select(co => co.CourseOfferingID)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (courseOfferingId == 0)
+        if (courseOffering is null)
         {
             throw new KeyNotFoundException(
                 $"Course {dto.CourseID} is not offered in semester " +
                 $"'{dto.SemesterName}' of academic year '{dto.AcademicYear}'.");
         }
 
-        var studentId = await _context.Students
-            .AsNoTracking()
+        if (courseOffering.InstitutionID != semester.InstitutionID)
+        {
+            throw new ArgumentException("The course offering and semester belong to different institutions.");
+        }
+
+        var studentQuery = _context.Students.AsNoTracking();
+        if (institutionId.HasValue)
+        {
+            studentQuery = studentQuery.Where(s => s.InstitutionID == institutionId.Value);
+        }
+
+        var student = await studentQuery
             .Where(s => s.AcademicId == AcdimicID)
-            .Select(s => s.StudentId)
             .FirstOrDefaultAsync(cancellationToken);
 
-        if (studentId == 0)
+        if (student is null)
         {
             throw new KeyNotFoundException(
                 $"Student with academic ID '{AcdimicID}' was not found.");
         }
 
+        if (courseOffering.InstitutionID != student.InstitutionID)
+        {
+            throw new ArgumentException("The student and course offering belong to different institutions.");
+        }
+
         var isAlreadyEnrolled = await _context.Enrollments
-            .AnyAsync(e => e.StudentID == studentId
-                        && e.CourseOfferingID == courseOfferingId, cancellationToken);
+            .AnyAsync(e => e.StudentID == student.StudentId
+                        && e.CourseOfferingID == courseOffering.CourseOfferingID, cancellationToken);
 
         if (isAlreadyEnrolled)
         {
@@ -299,8 +366,8 @@ public class EnrollmentRepository
 
         _context.Enrollments.Add(new Enrollment
         {
-            StudentID = studentId,
-            CourseOfferingID = courseOfferingId,
+            StudentID = student.StudentId,
+            CourseOfferingID = courseOffering.CourseOfferingID,
             EnrollmentDate = DateTime.UtcNow,
             CreatedByUserID = createdByUserId
         });
@@ -311,15 +378,35 @@ public class EnrollmentRepository
     }
 
     /// <summary>
-    /// Delete Enrollment By Id Async.
+    /// Delete Enrollment By Id Async with institution check.
     /// </summary>
-    public async Task<bool> DeleteEnrollmentByIdAsync(int enrollmentId, CancellationToken cancellationToken = default)
+    public async Task<bool> DeleteEnrollmentByIdAsync(int enrollmentId, int? institutionId = null, CancellationToken cancellationToken = default)
     {
-        var deletedRows = await _context.Enrollments
-            .Where(e => e.EnrollmentID == enrollmentId)
-            .ExecuteDeleteAsync(cancellationToken);
+        var enrollment = await _context.Enrollments
+            .Include(e => e.CourseOffering)
+            .Include(e => e.Student)
+            .FirstOrDefaultAsync(e => e.EnrollmentID == enrollmentId, cancellationToken);
 
-        return deletedRows > 0;
+        if (enrollment is null)
+        {
+            return false;
+        }
+
+        if (institutionId.HasValue)
+        {
+            var offeringInstId = enrollment.CourseOffering?.InstitutionID;
+            var studentInstId = enrollment.Student?.InstitutionID;
+
+            if (offeringInstId != institutionId.Value || studentInstId != institutionId.Value)
+            {
+                throw new UnauthorizedAccessException(
+                    "You are not authorized to delete enrollments outside your institution.");
+            }
+        }
+
+        _context.Enrollments.Remove(enrollment);
+        await _context.SaveChangesAsync(cancellationToken);
+        return true;
     }
 
   /// <summary>
@@ -329,11 +416,17 @@ public class EnrollmentRepository
       string? searchKeyword = null,
       int? doctorId = null,
       int pageIndex = 1,
-      int pageSize = 10, CancellationToken cancellationToken = default)
+      int pageSize = 10,
+      int? institutionId = null,
+      CancellationToken cancellationToken = default)
   {
    
       var query = _context.CourseOfferings.AsNoTracking();
 
+      if (institutionId.HasValue)
+      {
+          query = query.Where(co => co.InstitutionID == institutionId.Value);
+      }
       
       if (!string.IsNullOrWhiteSpace(searchKeyword))
       {

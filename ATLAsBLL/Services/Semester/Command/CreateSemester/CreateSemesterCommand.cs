@@ -5,5 +5,5 @@ namespace ATLAsBLL.Features.Semesters.Commands.CreateSemester
     /// <summary>
     /// Create Semester Command.
     /// </summary>
-    public record CreateSemesterCommand(string SemesterName, string AcademicYear) : ICommand<int>, IWriteCommand;
+    public record CreateSemesterCommand(string SemesterName, string AcademicYear, int? InstitutionId = null) : ICommand<int>, IWriteCommand;
 }

@@ -5,7 +5,7 @@ using MediatR;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
@@ -16,15 +16,15 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
     public class CreateGradeAppealRequestCommandHandler
         : IRequestHandler<CreateGradeAppealRequestCommand, int>
     {
-        /// <summary>
-        /// _Unit Of Work.
-        /// </summary>
         private readonly IUnitOfWork _UnitOfWork;
+        private readonly ICurrentUserService _currentUserService;
 
         public CreateGradeAppealRequestCommandHandler(
-            IUnitOfWork unitOfWork)
+            IUnitOfWork unitOfWork,
+            ICurrentUserService currentUserService)
         {
             _UnitOfWork = unitOfWork;
+            _currentUserService = currentUserService;
         }
 
         /// <summary>
@@ -37,9 +37,32 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
             if (command.Request.CourseOfferingID <= 0 || !command.Request.AssessmentModuleID.HasValue)
                 throw new ArgumentException("A course offering and assessment module are required.");
 
+            if (!_currentUserService.IsSAdmin)
+            {
+                if (!_currentUserService.InstitutionId.HasValue || _currentUserService.InstitutionId.Value <= 0)
+                {
+                    throw new ForbiddenAccessException("User does not belong to a valid institution.");
+                }
+
+                if (_currentUserService.UserId.HasValue && command.UserId != _currentUserService.UserId.Value)
+                {
+                    throw new ForbiddenAccessException("Cannot submit appeal for another user.");
+                }
+            }
+
+            var offering = await _UnitOfWork.CourseOfferings.GetByIdAsync(command.Request.CourseOfferingID, cancellationToken);
+            if (offering == null)
+            {
+                throw new KeyNotFoundException($"Course offering with ID {command.Request.CourseOfferingID} was not found.");
+            }
+
+            if (!_currentUserService.IsSAdmin && offering.InstitutionID.HasValue && offering.InstitutionID.Value != _currentUserService.InstitutionId!.Value)
+            {
+                throw new ForbiddenAccessException("Course offering does not belong to your institution.");
+            }
+
             var DoctorIds = await _UnitOfWork.CourseOfferingDoctors
                 .GetDoctorIdsByCourseOfferingIdAsync(command.Request.CourseOfferingID, cancellationToken);
-
 
             if (!DoctorIds.Contains(command.Request.DoctorUserID))
             {
@@ -51,6 +74,11 @@ namespace ATLAsBLL.Services.Request.Command.CreateGradeAppealRequest
             if (studentIdentity is null)
             {
                 throw new KeyNotFoundException($"Student with ID '{command.UserId}' was not found.");
+            }
+
+            if (!_currentUserService.IsSAdmin && studentIdentity.InstitutionID != _currentUserService.InstitutionId!.Value)
+            {
+                throw new ForbiddenAccessException("Student does not belong to your institution.");
             }
 
             var student = await _UnitOfWork.Students.GetStudentWithEnrollmentsAsync(studentIdentity.StudentId, cancellationToken)

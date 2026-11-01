@@ -55,6 +55,7 @@ namespace ATLAsBLL.Services.User.Command.AdminResetUserPassword
 
             targetUser.Password = BCrypt.Net.BCrypt.HashPassword(request.NewPassword);
             targetUser.MustChangePassword = true;
+            targetUser.TemporaryPasswordExpiresAt = DateTime.UtcNow.AddHours(72);
             targetUser.SecurityStamp = Guid.NewGuid();
             targetUser.RefreshTokenHash = null;
             targetUser.PreviousRefreshTokenHash = null;

@@ -1,4 +1,5 @@
 using ATLASDomain.DTO.Student;
+using ATLAsBLL.Services.Common;
 using MediatR;
 
 namespace ATLAsBLL.Features.Students.Commands.CreateStudent
@@ -8,5 +9,5 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
     /// </summary>
     public record CreateStudentCommand(
        CreateStudentDTO CreateStudentDTO
-    ) : ICommand<int>, IWriteCommand; 
+    ) : ICommand<CreateStudentResult>, IWriteCommand; 
 }

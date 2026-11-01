@@ -9,6 +9,7 @@ using System.Threading.Tasks;
 using ATLASDomain.DTO.Enrollment;
 using ATLASDomain.Entities;
 using ATLAsDCL.UnitOfWork;
+using ATLAsBLL.Exceptions;
 using ATLAsBLL.Features.Enrollments.Commands.CreateEnrollmentsRange;
 using StudentEntity = ATLASDomain.Entities.Student;
 using EnrollmentEntity = ATLASDomain.Entities.Enrollment;
@@ -17,15 +18,17 @@ namespace ATLAsBLL.Services.Enrollment.Command.CreateEnrollmentRange
 {
     /// <summary>
     /// Create Enrollments Range Command Handler.
-    /// Processes bulk enrollment requests from uploaded Excel files.
+    /// Processes bulk enrollment requests from uploaded Excel files with tenant isolation.
     /// </summary>
     public class CreateEnrollmentsRangeCommandHandler : IRequestHandler<CreateEnrollmentsRangeCommand, BulkEnrollmentResultDTO>
     {
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentUserService _currentUserService;
 
-        public CreateEnrollmentsRangeCommandHandler(IUnitOfWork unitOfWork)
+        public CreateEnrollmentsRangeCommandHandler(IUnitOfWork unitOfWork, ICurrentUserService currentUserService)
         {
             _unitOfWork = unitOfWork ?? throw new ArgumentNullException(nameof(unitOfWork));
+            _currentUserService = currentUserService ?? throw new ArgumentNullException(nameof(currentUserService));
         }
 
         public async Task<BulkEnrollmentResultDTO> Handle(CreateEnrollmentsRangeCommand request, CancellationToken cancellationToken)
@@ -115,10 +118,26 @@ namespace ATLAsBLL.Services.Enrollment.Command.CreateEnrollmentRange
                 return result;
             }
 
-            // 2. Validate Semester and CourseOffering
+            // 2. Validate Semester and CourseOffering with institution scoping
             var dto = request.BulkCreateEnrollment;
+            int? callerInstId;
+            if (_currentUserService.IsSAdmin)
+            {
+                callerInstId = null;
+            }
+            else
+            {
+                var userInstId = _currentUserService.InstitutionId;
+                if (!userInstId.HasValue || userInstId.Value <= 0)
+                {
+                    throw new ForbiddenAccessException("User is not associated with any institution.");
+                }
+                callerInstId = userInstId.Value;
+            }
+
             var semester = await _unitOfWork.Semesters.FirstOrDefaultAsync(
-                s => s.AcademicYear == dto.AcademicYear && s.SemesterName == dto.SemesterName,
+                s => s.AcademicYear == dto.AcademicYear && s.SemesterName == dto.SemesterName &&
+                     (!callerInstId.HasValue || s.InstitutionID == callerInstId.Value),
                 cancellationToken);
 
             if (semester is null)
@@ -127,7 +146,8 @@ namespace ATLAsBLL.Services.Enrollment.Command.CreateEnrollmentRange
             }
 
             var courseOffering = await _unitOfWork.CourseOfferings.FirstOrDefaultAsync(
-                co => co.CourseID == dto.CourseID && co.SemesterID == semester.SemesterID,
+                co => co.CourseID == dto.CourseID && co.SemesterID == semester.SemesterID &&
+                     (!callerInstId.HasValue || co.InstitutionID == callerInstId.Value),
                 cancellationToken);
 
             if (courseOffering is null)
@@ -135,9 +155,26 @@ namespace ATLAsBLL.Services.Enrollment.Command.CreateEnrollmentRange
                 throw new KeyNotFoundException($"Course offering for Course ID {dto.CourseID} in semester '{dto.SemesterName}' of academic year '{dto.AcademicYear}' was not found.");
             }
 
+            if (courseOffering.InstitutionID != semester.InstitutionID)
+            {
+                throw new ArgumentException("The course offering and semester belong to different institutions.");
+            }
+
+            // Target institution for students: use caller's institution, or offering's institution for SAdmin
+            int? targetInstitutionId = callerInstId ?? courseOffering.InstitutionID;
+            if (!targetInstitutionId.HasValue)
+            {
+                throw new InvalidOperationException("Course offering does not have an assigned institution.");
+            }
+
             // 3. Find matching students in database
             var academicIdsInFile = parsedRows.Select(r => r.AcademicId).ToList();
-            var matchingStudents = await _unitOfWork.Students.GetStudentsByAcademicIdsAsync(academicIdsInFile, cancellationToken);
+            var allMatchingStudents = await _unitOfWork.Students.GetStudentsByAcademicIdsAsync(academicIdsInFile, cancellationToken);
+
+            // Filter out any student from a different institution so their data/existence is never disclosed
+            var matchingStudents = allMatchingStudents
+                .Where(s => s.InstitutionID == targetInstitutionId.Value)
+                .ToList();
 
             var studentMap = new Dictionary<string, StudentEntity>(StringComparer.OrdinalIgnoreCase);
             foreach (var student in matchingStudents)

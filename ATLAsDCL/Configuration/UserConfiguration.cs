@@ -26,7 +26,10 @@ namespace ATLAsDCL.Configuration
                 .HasDefaultValue(true);
             builder.Property(u => u.MustChangePassword)
                 .HasDefaultValue(false);
-builder.Property(u => u.PreviousRefreshTokenHash)
+            builder.Property(u => u.TemporaryPasswordExpiresAt)
+                .IsRequired(false);
+
+            builder.Property(u => u.PreviousRefreshTokenHash)
                 .IsRequired(false);
 
             builder.Property(u => u.CreatedAt)

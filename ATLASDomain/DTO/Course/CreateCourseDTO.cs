@@ -17,5 +17,9 @@ namespace ATLASDomain.DTO.Course
         /// Is Practical.
         /// </summary>
         public bool IsPractical { get; set; }
+        /// <summary>
+        /// Target Institution ID (required for SAdmin, overridden by caller claims for Admin).
+        /// </summary>
+        public int? InstitutionId { get; set; }
     }
 }

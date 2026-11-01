@@ -111,21 +111,21 @@ namespace ATLAS.Controllers.Student
                 await file.CopyToAsync(stream);
             }
 
-            bool insertSecessfully = await _mediator.Send(new CreateStudentsRangeCommand(filePath), cancellationToken);
+            var result = await _mediator.Send(new CreateStudentsRangeCommand(filePath), cancellationToken);
 
-            if (!insertSecessfully)
+            if (result == null || result.TotalImported == 0 || result.ExcelFileBytes == null || result.ExcelFileBytes.Length == 0)
             {
                 return BadRequest("Failed to process student records from the uploaded file.");
             }
 
-            return Ok(new
-            {
-                message = "File uploaded and data saved successfully.",
-                // The import never stores a shared default password: every account
-                // gets a random one-time password that only an administrator can
-                // replace, and the change is forced at the first login.
-                note = "Imported accounts must change their password at first login. An administrator sets the initial password through the admin password change endpoint."
-            });
+            Response.Headers["Cache-Control"] = "no-store, no-cache, max-age=0, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["X-Total-Imported"] = result.TotalImported.ToString();
+
+            return File(
+                result.ExcelFileBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"student-credentials-{DateTime.UtcNow:yyyyMMddHHmmss}.xlsx");
         }
 
         /// <summary>
@@ -138,17 +138,21 @@ namespace ATLAS.Controllers.Student
         [EnableRateLimiting("AdminUpdatePolicy")]
         public async Task<ActionResult> CreateStudent([FromBody] CreateStudentDTO createStudentDTO, CancellationToken cancellationToken = default)
         {
-                 var studentId = await _mediator.Send(new CreateStudentCommand(createStudentDTO), cancellationToken);
-            if(studentId > 0)
-            {
-                // LOW-07: creating a student is a 201, not a 200.
-                return StatusCode(StatusCodes.Status201Created, new { message = "Student created successfully.", StudentId = studentId });
-            }
-            else
+            var result = await _mediator.Send(new CreateStudentCommand(createStudentDTO), cancellationToken);
+
+            if (result == null || result.StudentId <= 0 || result.ExcelFileBytes == null || result.ExcelFileBytes.Length == 0)
             {
                 return BadRequest("Failed to create student.");
             }
 
+            Response.Headers["Cache-Control"] = "no-store, no-cache, max-age=0, must-revalidate";
+            Response.Headers["Pragma"] = "no-cache";
+            Response.Headers["X-Student-Id"] = result.StudentId.ToString();
+
+            return File(
+                result.ExcelFileBytes,
+                "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                $"student-credential-{result.AcademicId}.xlsx");
         }
         /// <summary>
         /// update Student.

@@ -43,6 +43,12 @@ public class User
     public bool MustChangePassword { get; set; }
 
     /// <summary>
+    /// When a temporary password was issued, or null if no temporary credential is active.
+    /// Temporary credentials expire 72 hours from issuance.
+    /// </summary>
+    public DateTime? TemporaryPasswordExpiresAt { get; set; }
+
+    /// <summary>
     /// Created At.
     /// </summary>
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;

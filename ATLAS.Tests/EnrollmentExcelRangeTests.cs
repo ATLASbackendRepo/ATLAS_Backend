@@ -5,9 +5,11 @@ using ATLAsDCL.UnitOfWork;
 using ATLAsBLL.Features.Enrollments.Commands.CreateEnrollmentsRange;
 using ATLAsBLL.Services.Enrollment.Command.CreateEnrollmentRange;
 using ClosedXML.Excel;
+using Moq;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
@@ -41,6 +43,14 @@ public class EnrollmentExcelRangeTests
         return stream;
     }
 
+    private static Mock<ICurrentUserService> CreateCurrentUserMock(int institutionId = 1)
+    {
+        var mock = new Mock<ICurrentUserService>();
+        mock.Setup(u => u.IsSAdmin).Returns(false);
+        mock.Setup(u => u.InstitutionId).Returns(institutionId);
+        return mock;
+    }
+
     [Fact]
     public async Task CreateRangeEnrollment_ValidExcel_EnrollsMatchingStudentsAndReturnsSummary()
     {
@@ -51,16 +61,17 @@ public class EnrollmentExcelRangeTests
         {
             SemesterID = 1,
             AcademicYear = "2025-2026",
-            SemesterName = "Fall"
+            SemesterName = "Fall",
+            InstitutionID = 1
         };
-        var course = new Course { CourseID = 101, C_Name = "Computer Science 101", Credit_Hours = 3 };
-        var courseOffering = new CourseOffering { CourseOfferingID = 10, CourseID = 101, SemesterID = 1, Semester = semester, Course = course };
+        var course = new Course { CourseID = 101, C_Name = "Computer Science 101", Credit_Hours = 3, InstitutionID = 1 };
+        var courseOffering = new CourseOffering { CourseOfferingID = 10, CourseID = 101, SemesterID = 1, Semester = semester, Course = course, InstitutionID = 1 };
 
-        var user1 = new User { UserId = 1, AcademicId = "STU-001", FullName = "Alice", Password = "Password123!", Role = enUserRole.Student, IsActive = true };
-        var student1 = new Student { StudentId = 1, StudentCode = "S001", AcademicId = "STU-001", UserId = 1, User = user1, IsActive = true };
+        var user1 = new User { UserId = 1, AcademicId = "STU-001", FullName = "Alice", Password = "Password123!", Role = enUserRole.Student, IsActive = true, InstitutionID = 1 };
+        var student1 = new Student { StudentId = 1, StudentCode = "S001", AcademicId = "STU-001", UserId = 1, User = user1, IsActive = true, InstitutionID = 1 };
 
-        var user2 = new User { UserId = 2, AcademicId = "STU-002", FullName = "Bob", Password = "Password123!", Role = enUserRole.Student, IsActive = true };
-        var student2 = new Student { StudentId = 2, StudentCode = "S002", AcademicId = "STU-002", UserId = 2, User = user2, IsActive = true };
+        var user2 = new User { UserId = 2, AcademicId = "STU-002", FullName = "Bob", Password = "Password123!", Role = enUserRole.Student, IsActive = true, InstitutionID = 1 };
+        var student2 = new Student { StudentId = 2, StudentCode = "S002", AcademicId = "STU-002", UserId = 2, User = user2, IsActive = true, InstitutionID = 1 };
 
         context.Semesters.Add(semester);
         context.Courses.Add(course);
@@ -94,7 +105,8 @@ public class EnrollmentExcelRangeTests
             ("STU-002", "Bob")
         });
 
-        var handler = new CreateEnrollmentsRangeCommandHandler(unitOfWork);
+        var currentUserMock = CreateCurrentUserMock(1);
+        var handler = new CreateEnrollmentsRangeCommandHandler(unitOfWork, currentUserMock.Object);
         var command = new CreateEnrollmentsRangeCommand(stream, "students.xlsx", dto, CreatedByUserId: 99);
 
         // Act
@@ -118,15 +130,15 @@ public class EnrollmentExcelRangeTests
         // Arrange
         await using var context = TestDbContextFactory.Create();
 
-        var semester = new Semester { SemesterID = 1, AcademicYear = "2025-2026", SemesterName = "Fall" };
-        var course = new Course { CourseID = 101, C_Name = "Computer Science 101" };
-        var courseOffering = new CourseOffering { CourseOfferingID = 10, CourseID = 101, SemesterID = 1 };
+        var semester = new Semester { SemesterID = 1, AcademicYear = "2025-2026", SemesterName = "Fall", InstitutionID = 1 };
+        var course = new Course { CourseID = 101, C_Name = "Computer Science 101", InstitutionID = 1 };
+        var courseOffering = new CourseOffering { CourseOfferingID = 10, CourseID = 101, SemesterID = 1, InstitutionID = 1 };
 
-        var user1 = new User { UserId = 1, AcademicId = "STU-001", FullName = "Alice", Password = "Password123!", Role = enUserRole.Student, IsActive = true };
-        var student1 = new Student { StudentId = 1, StudentCode = "S001", AcademicId = "STU-001", UserId = 1, User = user1, IsActive = true };
+        var user1 = new User { UserId = 1, AcademicId = "STU-001", FullName = "Alice", Password = "Password123!", Role = enUserRole.Student, IsActive = true, InstitutionID = 1 };
+        var student1 = new Student { StudentId = 1, StudentCode = "S001", AcademicId = "STU-001", UserId = 1, User = user1, IsActive = true, InstitutionID = 1 };
 
-        var user2 = new User { UserId = 2, AcademicId = "STU-002", FullName = "Bob", Password = "Password123!", Role = enUserRole.Student, IsActive = true };
-        var student2 = new Student { StudentId = 2, StudentCode = "S002", AcademicId = "STU-002", UserId = 2, User = user2, IsActive = true };
+        var user2 = new User { UserId = 2, AcademicId = "STU-002", FullName = "Bob", Password = "Password123!", Role = enUserRole.Student, IsActive = true, InstitutionID = 1 };
+        var student2 = new Student { StudentId = 2, StudentCode = "S002", AcademicId = "STU-002", UserId = 2, User = user2, IsActive = true, InstitutionID = 1 };
 
         // Alice is already enrolled
         var existingEnrollment = new Enrollment { EnrollmentID = 100, StudentID = 1, CourseOfferingID = 10, EnrollmentDate = DateTime.UtcNow, CreatedByUserID = 99 };
@@ -162,7 +174,8 @@ public class EnrollmentExcelRangeTests
             ("STU-002", "Bob")   // New enrollment
         });
 
-        var handler = new CreateEnrollmentsRangeCommandHandler(unitOfWork);
+        var currentUserMock = CreateCurrentUserMock(1);
+        var handler = new CreateEnrollmentsRangeCommandHandler(unitOfWork, currentUserMock.Object);
         var command = new CreateEnrollmentsRangeCommand(stream, "students.xlsx", dto, CreatedByUserId: 99);
 
         // Act
@@ -182,8 +195,8 @@ public class EnrollmentExcelRangeTests
         // Arrange
         await using var context = TestDbContextFactory.Create();
 
-        var semester = new Semester { SemesterID = 1, AcademicYear = "2025-2026", SemesterName = "Fall" };
-        var courseOffering = new CourseOffering { CourseOfferingID = 10, CourseID = 101, SemesterID = 1 };
+        var semester = new Semester { SemesterID = 1, AcademicYear = "2025-2026", SemesterName = "Fall", InstitutionID = 1 };
+        var courseOffering = new CourseOffering { CourseOfferingID = 10, CourseID = 101, SemesterID = 1, InstitutionID = 1 };
 
         context.Semesters.Add(semester);
         context.CourseOfferings.Add(courseOffering);
@@ -206,7 +219,8 @@ public class EnrollmentExcelRangeTests
             ("UNKNOWN-999", "Ghost Student")
         });
 
-        var handler = new CreateEnrollmentsRangeCommandHandler(unitOfWork);
+        var currentUserMock = CreateCurrentUserMock(1);
+        var handler = new CreateEnrollmentsRangeCommandHandler(unitOfWork, currentUserMock.Object);
         var command = new CreateEnrollmentsRangeCommand(stream, "students.xlsx", dto, CreatedByUserId: 99);
 
         // Act
@@ -249,7 +263,8 @@ public class EnrollmentExcelRangeTests
         workbook.SaveAs(stream);
         stream.Position = 0;
 
-        var handler = new CreateEnrollmentsRangeCommandHandler(unitOfWork);
+        var currentUserMock = CreateCurrentUserMock(1);
+        var handler = new CreateEnrollmentsRangeCommandHandler(unitOfWork, currentUserMock.Object);
         var command = new CreateEnrollmentsRangeCommand(stream, "students.xlsx", dto, CreatedByUserId: 99);
 
         // Act & Assert

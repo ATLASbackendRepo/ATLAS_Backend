@@ -58,11 +58,15 @@ public interface IGradeAppealRequestRepository
     /// <param name="requestId">Appeal request identifier.</param>
     /// <param name="doctorUserId">Doctor user identifier answering.</param>
     /// <param name="dto">The answer and the resulting grade.</param>
+    /// <param name="institutionId">Caller's institution ID for tenant isolation.</param>
+    /// <param name="isSAdmin">Whether caller has SAdmin privileges to bypass tenant check.</param>
     /// <param name="cancellationToken">Cancellation token.</param>
     /// <returns>True when the request was found and updated.</returns>
     Task<bool> UpdateAsync(
-    int requestId,
-    int doctorUserId,
-    UpdateGradeAppealRequestDto dto, CancellationToken cancellationToken = default);
-
+        int requestId,
+        int doctorUserId,
+        UpdateGradeAppealRequestDto dto,
+        int? institutionId = null,
+        bool isSAdmin = false,
+        CancellationToken cancellationToken = default);
 }

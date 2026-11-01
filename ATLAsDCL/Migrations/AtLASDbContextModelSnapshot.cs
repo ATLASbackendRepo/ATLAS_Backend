@@ -455,10 +455,12 @@ namespace ATLAsDCL.Migrations
 
                     b.HasIndex("CourseID");
 
-                    b.HasIndex("InstitutionID");
+                    b.HasIndex("SemesterID");
 
-                    b.HasIndex("SemesterID")
-                        .HasDatabaseName("UQ_Course_Semester");
+                    b.HasIndex("InstitutionID", "CourseID", "SemesterID")
+                        .IsUnique()
+                        .HasDatabaseName("UQ_CourseOffering_Institution_Course_Semester")
+                        .HasFilter("[InstitutionID] IS NOT NULL");
 
                     b.ToTable("CourseOfferings");
                 });
@@ -816,11 +818,10 @@ namespace ATLAsDCL.Migrations
 
                     b.HasKey("SemesterID");
 
-                    b.HasIndex("InstitutionID");
-
-                    b.HasIndex("SemesterName", "AcademicYear")
+                    b.HasIndex("InstitutionID", "SemesterName", "AcademicYear")
                         .IsUnique()
-                        .HasDatabaseName("UQ_Semester_Name_AcademicYear");
+                        .HasDatabaseName("UQ_Semester_Institution_Name_AcademicYear")
+                        .HasFilter("[InstitutionID] IS NOT NULL");
 
                     b.ToTable("Semesters", (string)null);
                 });
@@ -959,6 +960,9 @@ namespace ATLAsDCL.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier")
                         .HasDefaultValueSql("NEWID()");
+
+                    b.Property<DateTime?>("TemporaryPasswordExpiresAt")
+                        .HasColumnType("datetime2");
 
                     b.HasKey("UserId");
 

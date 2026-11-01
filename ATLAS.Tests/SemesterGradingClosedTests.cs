@@ -4,6 +4,8 @@ using ATLAsDCL.UnitOfWork;
 using ATLASDomain.Entities;
 using ATLASDomain.Interfaces.Repositories;
 using Moq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace ATLAS.Tests;
@@ -85,7 +87,8 @@ public class SemesterGradingClosedTests
         {
             SemesterID = 1,
             SemesterName = "Spring",
-            AcademicYear = "2024"
+            AcademicYear = "2024",
+            InstitutionID = 1
         };
 
         var semesters = new Mock<ISemesterRepository>();
@@ -101,7 +104,10 @@ public class SemesterGradingClosedTests
             .Setup(work => work.SaveChangesAsync(It.IsAny<CancellationToken>()))
             .ReturnsAsync(1);
 
-        var updated = await new UpdateSemesterCommandHandler(unitOfWork.Object)
+        var currentUserMock = new Mock<ICurrentUserService>();
+        currentUserMock.Setup(u => u.IsSAdmin).Returns(true);
+
+        var updated = await new UpdateSemesterCommandHandler(unitOfWork.Object, currentUserMock.Object)
             .Handle(
                 new UpdateSemesterCommand(1, "Spring", "2024", IsGradingClosed: true),
                 CancellationToken.None);

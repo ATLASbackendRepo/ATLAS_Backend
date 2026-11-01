@@ -2,41 +2,48 @@ using ATLAsBLL.Features.Enrollments.Commands.CreateEnrollment;
 using ATLAsBLL.Features.Enrollments.Commands.CreateEnrollmentsRange;
 using ATLAsBLL.Features.Enrollments.Commands.DeleteEnrollment;
 using ATLAsBLL.Services.Enrollment.Query;
+using ATLASDomain.DTO.CourseGrade;
 using ATLASDomain.DTO.Enrollment;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.RateLimiting;
+using System.IO;
+using System.Linq;
 using System.Security.Claims;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace ATLAS.Controllers.Enrollment
-{    /// <summary>
+{
+    /// <summary>
     /// Enrollment Controller.
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     [Authorize(Roles = "SAdmin,Admin")]
-
     public class EnrollmentController : ControllerBase
     {
-        /// <summary>
-        /// _mediator.
-        /// </summary>
         private readonly IMediator _mediator;
 
         public EnrollmentController(IMediator mediator)
         {
             _mediator = mediator ?? throw new ArgumentNullException(nameof(mediator));
         }
-         /// <summary>
+
+        /// <summary>
         /// Create Enrollment.
         /// </summary>
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
         [EnableRateLimiting("AdminUpdatePolicy")]
-       
-        public async Task<IActionResult> CreateEnrollment([FromQuery] string academicId, [FromBody] BulkCreateEnrollmentDTO dto, CancellationToken cancellationToken = default)
+        public async Task<IActionResult> CreateEnrollment(
+            [FromQuery] string academicId,
+            [FromBody] BulkCreateEnrollmentDTO dto,
+            CancellationToken cancellationToken = default)
         {
             if (string.IsNullOrWhiteSpace(academicId))
             {
@@ -50,19 +57,15 @@ namespace ATLAS.Controllers.Enrollment
                 return Unauthorized();
             }
 
-            
-                var result = await _mediator.Send(
-                    new CreateEnrollmentCommand(academicId, dto, userId), cancellationToken);
+            var result = await _mediator.Send(
+                new CreateEnrollmentCommand(academicId, dto, userId), cancellationToken);
 
-                if (!result)
-                {
-                    return BadRequest(
-                        "The student is already enrolled in this course offering.");
-                }
+            if (!result)
+            {
+                return BadRequest("The student is already enrolled in this course offering.");
+            }
 
-                // LOW-07: creating an enrollment is a 201, not a 200.
-                return StatusCode(StatusCodes.Status201Created, "Enrollment created successfully.");
-            
+            return StatusCode(StatusCodes.Status201Created, new { message = "Enrollment created successfully." });
         }
 
         /// <summary>
@@ -76,6 +79,7 @@ namespace ATLAS.Controllers.Enrollment
         [Consumes("multipart/form-data")]
         [ProducesResponseType(typeof(BulkEnrollmentResultDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [EnableRateLimiting("AdminCreateRangePolicy")]
@@ -95,7 +99,7 @@ namespace ATLAS.Controllers.Enrollment
 
             if (dto is null)
             {
-                return BadRequest(" enrollments details are required.");
+                return BadRequest("Enrollment details are required.");
             }
 
             if (file == null || file.Length == 0)
@@ -131,23 +135,22 @@ namespace ATLAS.Controllers.Enrollment
             await file.CopyToAsync(memoryStream, cancellationToken);
             memoryStream.Position = 0;
 
-          
-                var result = await _mediator.Send(
-                    new CreateEnrollmentsRangeCommand(memoryStream, file.FileName, dto, userId),
-                    cancellationToken);
+            var result = await _mediator.Send(
+                new CreateEnrollmentsRangeCommand(memoryStream, file.FileName, dto, userId),
+                cancellationToken);
 
-                return StatusCode(StatusCodes.Status201Created, result);
-           
+            return StatusCode(StatusCodes.Status201Created, result);
         }
-       /// <summary>
+
+        /// <summary>
         /// Delete Enrollment.
         /// </summary>
         [HttpDelete("{id:int}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status403Forbidden)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [EnableRateLimiting("AdminSoftDeletePolicy")]
- 
         public async Task<IActionResult> DeleteEnrollment(int id, CancellationToken cancellationToken = default)
         {
             if (id <= 0)
@@ -161,27 +164,22 @@ namespace ATLAS.Controllers.Enrollment
                 return NotFound($"Enrollment with ID {id} not found.");
             }
 
-            return Ok("Enrollment deleted successfully.");
+            return Ok(new { message = "Enrollment deleted successfully." });
         }
+
         /// <summary>
-        /// Get Enrollments.
+        /// Get Enrollments Overview.
         /// </summary>
         [HttpGet]
-        [ProducesResponseType(StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        [ProducesResponseType(typeof(PagedResultDto<CourseEnrollmentSummaryDto>), StatusCodes.Status200OK)]
         [EnableRateLimiting("AdminGetAllPolicy")]
-
         public async Task<IActionResult> GetEnrollments(
             [FromQuery] string? searchKeyword = null,
             [FromQuery] int? doctorId = null,
-            [FromQuery] int pageIndex = 1, CancellationToken cancellationToken = default)
+            [FromQuery] int pageIndex = 1,
+            CancellationToken cancellationToken = default)
         {
             var enrollments = await _mediator.Send(new GetEnrollment(searchKeyword, doctorId, pageIndex), cancellationToken);
-            if (enrollments == null)
-            {
-                return NotFound("No enrollments found.");
-            }
-
             return Ok(enrollments);
         }
     }

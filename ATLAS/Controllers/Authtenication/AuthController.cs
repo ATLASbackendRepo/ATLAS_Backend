@@ -259,7 +259,7 @@ namespace ATLAS.Controllers.Authtenication
             var User = await _mediator.Send(new GetUserByAcademicIdQuery(request.AcdimicID), cancellationToken);
 
 
-            if (User == null || !User.IsActive)
+            if (User == null || !User.IsActive || User.MustChangePassword)
                 return Unauthorized();
 
             if (User.RefreshTokenRevokedAt != null)

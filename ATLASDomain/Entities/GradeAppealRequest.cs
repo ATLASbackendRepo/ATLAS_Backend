@@ -1,5 +1,3 @@
-
-
 namespace ATLASDomain.Entities
 {
     /// <summary>
@@ -12,7 +10,6 @@ namespace ATLASDomain.Entities
         Approved,
         UnderReview,
         Closed
-    
     }
 
     /// <summary>
@@ -45,9 +42,14 @@ namespace ATLASDomain.Entities
         /// <param name="to">Requested status.</param>
         /// <returns>True when the transition is part of the state machine.</returns>
         public static bool IsAllowed(enGradeAppealStatus from, enGradeAppealStatus to)
-            => (from, to) switch
+        {
+            // Terminal states can never transition to anything, including themselves (MED-08, BE-06).
+            if (IsFinal(from))
+                return false;
+
+            return (from, to) switch
             {
-                // Re-submitting the same status is always accepted.
+                // Re-submitting the same status is accepted only for open appeals (e.g. UnderReview -> UnderReview).
                 _ when from == to => true,
 
                 // A pending appeal can be picked up, decided, or closed.
@@ -64,6 +66,7 @@ namespace ATLASDomain.Entities
                 // Final states are terminal.
                 _ => false
             };
+        }
     }
 
     /// <summary>
@@ -116,16 +119,15 @@ namespace ATLASDomain.Entities
         /// </summary>
         public DateTime SubmittedAt { get; set; }  = DateTime.UtcNow;
         /// <summary>
-        /// <summary>
         /// Row version (MED-08). Two doctors acting on the same appeal at the
         /// same time would otherwise silently overwrite each other's decision.
         /// </summary>
         public byte[] RowVersion { get; set; } = Array.Empty<byte>();
-    
+
+        /// <summary>
         /// Reviewed At.
         /// </summary>
         public DateTime? ReviewedAt { get; set; }
-   
 
         /// <summary>
         /// Student.

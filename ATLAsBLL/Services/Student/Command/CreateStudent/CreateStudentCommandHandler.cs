@@ -1,27 +1,24 @@
-using MediatR;
+using System;
+using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
 using ATLASDomain.Entities;
 using ATLAsDCL.UnitOfWork;
 using ATLAsBLL.Events;
-using System.Security.Cryptography;
+using ATLAsBLL.Services.Common;
+using MediatR;
 
 namespace ATLAsBLL.Features.Students.Commands.CreateStudent
 {
     /// <summary>
     /// Create Student Command Handler.
+    /// Handles single-student account creation with server-generated temporary credentials (BE-07 / BE-08).
     /// </summary>
-    public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand, int>
+    public class CreateStudentCommandHandler : IRequestHandler<CreateStudentCommand, CreateStudentResult>
     {
-        /// <summary>
-        /// _unit Of Work.
-        /// </summary>
         private readonly IUnitOfWork _unitOfWork;
-        /// <summary>
-        /// _publisher.
-        /// </summary>
         private readonly IPublisher _publisher;
-          public const int MinimumPasswordLength = 8;
+
         public CreateStudentCommandHandler(IUnitOfWork unitOfWork, IPublisher publisher)
         {
             _unitOfWork = unitOfWork;
@@ -29,19 +26,15 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
         }
 
         /// <summary>
-        /// Handle.
+        /// Handles student creation. Ignores any client-supplied initial password, generates
+        /// a unique cryptographically secure temporary password, and returns a protected one-row export.
         /// </summary>
-        public async Task<int> Handle(CreateStudentCommand request, CancellationToken cancellationToken)
+        public async Task<CreateStudentResult> Handle(CreateStudentCommand request, CancellationToken cancellationToken)
         {
-            
+            var academicId = request.CreateStudentDTO.AcademicId?.Trim() ?? string.Empty;
 
-             if (string.IsNullOrWhiteSpace(request.CreateStudentDTO.password))
-                throw new InvalidDataException("New password is required.");
-            if (request.CreateStudentDTO.password.Length < MinimumPasswordLength)
-                throw new InvalidDataException($"New password must be at least {MinimumPasswordLength} characters long.");
-           
-
-            var academicId = request.CreateStudentDTO.AcademicId;
+            if (string.IsNullOrWhiteSpace(academicId))
+                throw new InvalidDataException("Academic ID is required.");
 
             // The academic id is the login identity; a second account reusing it
             // would make logins and imports resolve to an arbitrary row.
@@ -54,42 +47,58 @@ namespace ATLAsBLL.Features.Students.Commands.CreateStudent
                     $"Academic ID '{academicId}' is already in use.");
             }
 
+            // BE-08: Stop trusting client-supplied initial passwords.
+            // Generate a cryptographically secure 24-character temporary password server-side.
+            var temporaryPassword = CredentialExportService.GenerateTemporaryPassword();
+            var expiresAt = DateTime.UtcNow.AddHours(72);
+
             var user = new User
             {
-                FullName = request.CreateStudentDTO.FullName
-                ,
-                AcademicId = request.CreateStudentDTO.AcademicId 
-                , Role = enUserRole.Student,
-                IsActive =true,
+                FullName = request.CreateStudentDTO.FullName?.Trim() ?? string.Empty,
+                AcademicId = academicId,
+                Role = enUserRole.Student,
+                IsActive = true,
                 MustChangePassword = true,
+                TemporaryPasswordExpiresAt = expiresAt,
                 InstitutionID = request.CreateStudentDTO.InstitutionId,
-                DepartmentId = request.CreateStudentDTO.DepartmentId
-
+                DepartmentId = request.CreateStudentDTO.DepartmentId,
+                Password = BCrypt.Net.BCrypt.HashPassword(temporaryPassword)
             };
 
-            user.Password = BCrypt.Net.BCrypt.HashPassword(request.CreateStudentDTO.password);
-
-         
             var student = new Student
             {
-                AcademicId = request.CreateStudentDTO.AcademicId,
+                AcademicId = academicId,
                 AcademicLevel = request.CreateStudentDTO.AcademicLevel,
                 DepartmentId = request.CreateStudentDTO.DepartmentId,
                 InstitutionID = request.CreateStudentDTO.InstitutionId,
-                User = user 
-                ,IsActive = true
+                User = user,
+                IsActive = true
             };
 
-           
             await _unitOfWork.Students.AddAsync(student, cancellationToken);
-
-            
             await _unitOfWork.SaveChangesAsync(cancellationToken);
 
-            
             await _publisher.Publish(new StudentCreatedDomainEvent(student.StudentId), cancellationToken);
 
-            return student.StudentId;
+            // Decision 1A: One-row protected spreadsheet export streamed to SAdmin
+            var records = new[]
+            {
+                new StudentCredentialRecord(
+                    student.AcademicId,
+                    user.FullName,
+                    temporaryPassword,
+                    expiresAt,
+                    "Student")
+            };
+            var excelBytes = CredentialExportService.GenerateCredentialsWorkbook(records);
+
+            return new CreateStudentResult(
+                student.StudentId,
+                student.AcademicId,
+                user.FullName,
+                temporaryPassword,
+                expiresAt,
+                excelBytes);
         }
     }
 }

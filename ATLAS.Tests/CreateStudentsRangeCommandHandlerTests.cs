@@ -1,3 +1,4 @@
+using ATLAsBLL.Services.Common;
 using ATLAsBLL.Behaviors;
 using ATLAsBLL.CQRS;
 using ATLAsBLL.Features.Students.Commands.CreateStudentsRange;
@@ -63,6 +64,10 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
             .Setup(repository => repository.AddRangeAsync(It.IsAny<IEnumerable<Student>>(), It.IsAny<CancellationToken>()))
             .Callback<IEnumerable<Student>, CancellationToken>((rows, _) => _writtenStudents = rows.ToList())
             .Returns(Task.CompletedTask);
+
+        _students
+            .Setup(repository => repository.GetStudentsByAcademicIdsAsync(It.IsAny<IEnumerable<string>>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Student>());
 
         _profiles
             .Setup(repository => repository.AddRangeAsync(It.IsAny<IEnumerable<StudentProfile>>(), It.IsAny<CancellationToken>()))
@@ -193,7 +198,9 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
             new CreateStudentsRangeCommand(path),
             CancellationToken.None);
 
-        Assert.True(succeeded);
+        Assert.NotNull(succeeded);
+        Assert.Equal(2, succeeded.TotalImported);
+        Assert.NotEmpty(succeeded.ExcelFileBytes);
         Assert.Equal(2, _writtenStudents.Count);
         Assert.Equal(2, _writtenProfiles.Count);
 
@@ -276,9 +283,9 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
     [Fact]
     public async Task TransactionBehavior_LeavesSelfManagedCommandsAlone()
     {
-        var behavior = new TransactionBehavior<CreateStudentsRangeCommand, bool>(
+        var behavior = new TransactionBehavior<CreateStudentsRangeCommand, StudentImportResult>(
             _unitOfWork.Object,
-            NullLogger<TransactionBehavior<CreateStudentsRangeCommand, bool>>.Instance);
+            NullLogger<TransactionBehavior<CreateStudentsRangeCommand, StudentImportResult>>.Instance);
 
         var nextCalled = false;
 
@@ -287,11 +294,11 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
             _ =>
             {
                 nextCalled = true;
-                return Task.FromResult(true);
+                return Task.FromResult(new StudentImportResult(0, Array.Empty<byte>(), DateTime.UtcNow));
             },
             CancellationToken.None);
 
-        Assert.True(result);
+        Assert.NotNull(result);
         Assert.True(nextCalled);
 
         _unitOfWork.Verify(
@@ -323,6 +330,79 @@ public class CreateStudentsRangeCommandHandlerTests : IDisposable
         _unitOfWork.Verify(
             work => work.CommitTransactionAsync(It.IsAny<CancellationToken>()),
             Times.Once);
+    }
+
+    /// <summary>
+    /// When an academic ID in the Excel file already exists in the database,
+    /// the handler rejects the whole file immediately without opening a transaction
+    /// or inserting any rows.
+    /// </summary>
+    [Fact]
+    public async Task Handle_RejectsFileWhenAcademicIdAlreadyExistsInDatabase()
+    {
+        var path = CreateWorkbook(
+            ("2024001", "Existing Student"),
+            ("2024002", "New Student"));
+
+        _students
+            .Setup(repository => repository.GetStudentsByAcademicIdsAsync(
+                It.Is<IEnumerable<string>>(ids => ids.Contains("2024001")),
+                It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Student>
+            {
+                new Student { StudentId = 42, AcademicId = "2024001" }
+            });
+
+        var handler = CreateHandler();
+
+        var exception = await Assert.ThrowsAsync<InvalidDataException>(
+            () => handler.Handle(new CreateStudentsRangeCommand(path), CancellationToken.None));
+
+        Assert.Contains("2024001", exception.Message);
+        Assert.Contains("already in use", exception.Message);
+
+        _unitOfWork.Verify(
+            work => work.BeginTransactionAsync(It.IsAny<CancellationToken>()),
+            Times.Never);
+
+        _students.Verify(
+            repository => repository.AddRangeAsync(It.IsAny<IEnumerable<Student>>(), It.IsAny<CancellationToken>()),
+            Times.Never);
+
+        Assert.False(File.Exists(path));
+    }
+
+    /// <summary>
+    /// BE-07 audit regression: Proves that the current implementation hashes one-time passwords
+    /// and flags MustChangePassword = true, but returns only a boolean (true) without any mechanism
+    /// for the caller to receive the generated temporary passwords.
+    /// </summary>
+    [Fact]
+    public async Task Handle_GeneratesHashedPasswordsAndMarksMustChangePassword_WhileReturningOnlyBool()
+    {
+        var path = CreateWorkbook(
+            ("2024101", "Alice Student"),
+            ("2024102", "Bob Student"));
+
+        var handler = CreateHandler();
+
+        var result = await handler.Handle(
+            new CreateStudentsRangeCommand(path),
+            CancellationToken.None);
+
+        Assert.NotNull(result);
+        Assert.Equal(2, result.TotalImported);
+        Assert.NotEmpty(result.ExcelFileBytes);
+        Assert.Equal(2, _writtenStudents.Count);
+
+        foreach (var student in _writtenStudents)
+        {
+            Assert.NotNull(student.User);
+            Assert.True(student.User.MustChangePassword);
+            Assert.True(student.User.IsActive);
+            Assert.Equal(enUserRole.Student, student.User.Role);
+            Assert.StartsWith("$2", student.User.Password);
+        }
     }
 
     /// <summary>
